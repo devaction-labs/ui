@@ -70,4 +70,67 @@ document.addEventListener('alpine:init', () => {
             }
         },
     }));
+
+    /**
+     * Grupo de abas: guarda a aba ativa para os painéis (tab.panel).
+     */
+    Alpine.data('uiTabGroup', () => ({
+        selected: null,
+    }));
+
+    /**
+     * Lista de abas: seleção, wire:model (x-modelable="selected") e teclado.
+     */
+    Alpine.data('uiTabs', ({ selected = null } = {}) => ({
+        selected,
+
+        init() {
+            const tabs = this.tabs();
+
+            tabs.forEach((tab, index) => {
+                tab.dataset.tabName ??= String(index);
+            });
+
+            if (this.selected === null || this.selected === undefined) {
+                const initial = tabs.find((tab) => tab.hasAttribute('data-selected')) ?? tabs.find((tab) => !tab.disabled);
+                this.selected = initial?.dataset.tabName ?? null;
+            }
+
+            this.$watch('selected', (name) => this.$dispatch('ui-tab-change', name));
+            this.$nextTick(() => this.$dispatch('ui-tab-change', this.selected));
+        },
+
+        tabs() {
+            return [...this.$root.querySelectorAll('[data-tab]')].filter((tab) => tab.closest('[data-tabs]') === this.$root);
+        },
+
+        select(name) {
+            this.selected = name;
+        },
+
+        /**
+         * Setas, Home e End movem o foco e selecionam a aba (ativação automática).
+         */
+        moveFocus(event) {
+            const tabs = this.tabs().filter((tab) => !tab.disabled);
+            const index = tabs.indexOf(event.target.closest('[data-tab]'));
+
+            if (index === -1) {
+                return;
+            }
+
+            const targets = {
+                ArrowRight: tabs[(index + 1) % tabs.length],
+                ArrowLeft: tabs[(index - 1 + tabs.length) % tabs.length],
+                Home: tabs[0],
+                End: tabs[tabs.length - 1],
+            };
+
+            if (targets[event.key]) {
+                event.preventDefault();
+                targets[event.key].focus();
+                this.select(targets[event.key].dataset.tabName);
+            }
+        },
+    }));
 });
