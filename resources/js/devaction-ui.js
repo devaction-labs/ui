@@ -2125,6 +2125,58 @@ document.addEventListener('alpine:init', () => {
      * Diff com comentários: + abre o comentário novo na linha; conversas existentes abrem e fecham;
      * Resolver recolhe. Comentar dispara diff-comment e, com comment, chama o Livewire com (linha, texto).
      */
+    /**
+     * Visualizador de documento: uma página por vez, miniaturas, zoom de 50% a 200% e ← → para trocar de página.
+     */
+    Alpine.data('uiPdfViewer', ({ page = 1, zoom = 100 } = {}) => ({
+        current: page,
+        zoom,
+        pages: [],
+        thumbs: [],
+
+        get total() {
+            return this.pages.length;
+        },
+
+        registerPage(element, src) {
+            this.pages.push(element);
+            this.thumbs.push({ src, fields: element.querySelector('[data-pdf-field]') !== null });
+        },
+
+        isCurrent(element) {
+            return this.pages.indexOf(element) + 1 === this.current;
+        },
+
+        go(number) {
+            this.current = Math.min(Math.max(1, number), this.total || 1);
+        },
+
+        previous() {
+            this.go(this.current - 1);
+        },
+
+        next() {
+            this.go(this.current + 1);
+        },
+
+        zoomIn() {
+            this.zoom = Math.min(200, this.zoom + 25);
+        },
+
+        zoomOut() {
+            this.zoom = Math.max(50, this.zoom - 25);
+        },
+
+        goToMine() {
+            const index = this.pages.findIndex((element) => element.querySelector('[data-pdf-field][data-mine]'));
+
+            if (index >= 0) {
+                this.go(index + 1);
+                this.$nextTick(() => this.pages[index].querySelector('[data-pdf-field][data-mine]')?.focus());
+            }
+        },
+    }));
+
     Alpine.data('uiDiff', ({ comment = null } = {}) => ({
         draftLine: null,
         threads: {},
