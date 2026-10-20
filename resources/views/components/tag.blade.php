@@ -7,10 +7,12 @@
     <x-ui::tag color="risk" icon="git-pull-request" :uppercase="false">#142</x-ui::tag>
 
     color: plain (padrão) · risk · warn · ok · info
+    size:  sm (11 px, para tendências e metadados) · base (12 px, padrão)
 --}}
 @props([
     'color' => 'plain',
     'icon' => null,
+    'size' => 'base',
     'uppercase' => true,
 ])
 
@@ -25,12 +27,14 @@
 @endphp
 
 <span {{ $attributes->class([
-    'inline-flex items-center gap-1.5 rounded-md border px-[9px] py-1 font-mono text-xs leading-none',
+    'inline-flex items-center gap-1.5 rounded-md border font-mono leading-none',
+    'px-[9px] py-1 text-xs' => $size !== 'sm',
+    'px-[7px] py-[3px] text-[11px]' => $size === 'sm',
     'tracking-[.06em] uppercase' => $uppercase,
     $colorClasses,
 ]) }}>
     @if ($icon)
-        <x-ui::icon :name="$icon" class="size-3.5" />
+        <x-ui::icon :name="$icon" :class="$size === 'sm' ? 'size-3' : 'size-3.5'" />
     @endif
     {{ $slot }}
 </span>
