@@ -1963,6 +1963,265 @@ document.addEventListener('alpine:init', () => {
      * Date picker: data única ('2026-10-16') ou faixa ({ start, end }), com min, max e atalhos.
      * value é x-modelable. Datas em texto ISO, sem fuso, para não andar um dia.
      */
+    /**
+     * Intervalo de datas: dois meses, atalhos, horário opcional e Aplicar/Cancelar.
+     * value é x-modelable: { start, end } (mais start_time e end_time com horário).
+     */
+    Alpine.data('uiDateRange', ({ value = null, min = null, max = null, locale = 'pt-BR', today = null, time = false, step = 15, presets = [], inline = false } = {}) => {
+        const pad = (number) => String(number).padStart(2, '0');
+        const toIso = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+        const fromIso = (iso) => {
+            const [year, month, day] = String(iso).split('-').map(Number);
+
+            return new Date(year, month - 1, day);
+        };
+        const toMinutes = (clock) => {
+            const [hours, minutes] = String(clock ?? '00:00').split(':').map(Number);
+
+            return hours * 60 + minutes;
+        };
+        const empty = () => ({ start: null, end: null, ...(time ? { start_time: '09:00', end_time: '10:00' } : {}) });
+
+        return {
+            open: inline,
+            value: { ...empty(), ...(value ?? {}) },
+            draft: null,
+            today: today ?? toIso(new Date()),
+            month: null,
+            hovered: null,
+            activePreset: null,
+            timeFocus: 'start',
+
+            init() {
+                this.draft = { ...this.value };
+                this.month = (this.value.start ?? this.today).slice(0, 7);
+                this.$watch('value', (next) => {
+                    if (! this.open || inline) {
+                        this.draft = { ...empty(), ...(next ?? {}) };
+                    }
+                });
+            },
+
+            monthAt(offset) {
+                const date = fromIso(`${this.month}-01`);
+                date.setMonth(date.getMonth() + offset);
+
+                return toIso(date).slice(0, 7);
+            },
+
+            monthLabel(offset) {
+                return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(fromIso(`${this.monthAt(offset)}-01`));
+            },
+
+            weekdays() {
+                const sunday = new Date(2026, 9, 4);
+
+                return [...Array(7)].map((_, index) => {
+                    const date = new Date(sunday);
+                    date.setDate(sunday.getDate() + index);
+
+                    return new Intl.DateTimeFormat(locale, { weekday: 'narrow' }).format(date);
+                });
+            },
+
+            days(offset) {
+                const month = this.monthAt(offset);
+                const first = fromIso(`${month}-01`);
+                const total = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+                const blanks = [...Array(first.getDay())].map((_, index) => ({ key: `${month}-blank-${index}`, iso: null, column: index }));
+
+                return blanks.concat([...Array(total)].map((_, index) => {
+                    const iso = `${month}-${pad(index + 1)}`;
+
+                    return { key: iso, iso, day: index + 1, column: (first.getDay() + index) % 7 };
+                }));
+            },
+
+            shift(step) {
+                this.month = this.monthAt(step);
+            },
+
+            isDisabled(iso) {
+                return (min !== null && iso < min) || (max !== null && iso > max);
+            },
+
+            isEdge(iso) {
+                return iso !== null && (iso === this.draft.start || iso === this.draft.end);
+            },
+
+            rangeEnd() {
+                return this.draft.end ?? (this.draft.start && this.hovered && this.hovered > this.draft.start ? this.hovered : null);
+            },
+
+            inBand(iso) {
+                const end = this.rangeEnd();
+
+                return iso !== null && this.draft.start !== null && end !== null && iso >= this.draft.start && iso <= end && this.draft.start !== end;
+            },
+
+            bandShape(cell) {
+                if (! this.inBand(cell.iso)) {
+                    return '';
+                }
+
+                const end = this.rangeEnd();
+                const startsRow = cell.iso === this.draft.start || cell.column === 0;
+                const endsRow = cell.iso === end || cell.column === 6;
+
+                return ['bg-wrap', startsRow ? 'rounded-l-[10px]' : '', endsRow ? 'rounded-r-[10px]' : ''].join(' ');
+            },
+
+            pick(iso) {
+                if (iso === null || this.isDisabled(iso)) {
+                    return;
+                }
+
+                this.activePreset = 'custom';
+
+                if (! this.draft.start || this.draft.end) {
+                    this.draft = { ...this.draft, start: iso, end: null };
+                } else if (iso < this.draft.start) {
+                    this.draft = { ...this.draft, start: iso, end: this.draft.start };
+                } else {
+                    this.draft = { ...this.draft, end: iso };
+                }
+
+                if (inline && this.draft.end) {
+                    this.apply();
+                }
+            },
+
+            presetList() {
+                const date = fromIso(this.today);
+                const firstOfMonth = toIso(new Date(date.getFullYear(), date.getMonth(), 1));
+                const lastMonthStart = toIso(new Date(date.getFullYear(), date.getMonth() - 1, 1));
+                const lastMonthEnd = toIso(new Date(date.getFullYear(), date.getMonth(), 0));
+                const quarterStart = toIso(new Date(date.getFullYear(), Math.floor(date.getMonth() / 3) * 3, 1));
+                const weekAgo = new Date(date);
+                weekAgo.setDate(date.getDate() - 6);
+
+                return [
+                    { key: 'today', label: 'Hoje', start: this.today, end: this.today },
+                    { key: '7d', label: 'Últimos 7 dias', start: toIso(weekAgo), end: this.today },
+                    { key: 'month', label: 'Este mês', start: firstOfMonth, end: this.today },
+                    { key: 'last-month', label: 'Mês passado', start: lastMonthStart, end: lastMonthEnd },
+                    { key: 'quarter', label: 'Este trimestre', start: quarterStart, end: this.today },
+                    ...presets.map((preset, index) => ({ key: `custom-${index}`, ...preset })),
+                ];
+            },
+
+            choosePreset(preset) {
+                this.activePreset = preset.key;
+                this.draft = { ...this.draft, start: preset.start, end: preset.end };
+                this.month = preset.start.slice(0, 7);
+
+                if (inline) {
+                    this.apply();
+                }
+            },
+
+            slots() {
+                const list = [];
+
+                for (let minutes = 0; minutes < 24 * 60; minutes += step) {
+                    list.push(`${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`);
+                }
+
+                return list;
+            },
+
+            setTime(clock) {
+                const key = this.timeFocus === 'start' ? 'start_time' : 'end_time';
+                this.draft = { ...this.draft, [key]: clock };
+
+                if (key === 'start_time' && toMinutes(this.draft.end_time) <= toMinutes(clock)) {
+                    this.draft.end_time = this.slots()[Math.min(this.slots().indexOf(clock) + 4, this.slots().length - 1)];
+                }
+
+                if (inline) {
+                    this.apply();
+                }
+            },
+
+            slotHint(clock) {
+                const minutes = toMinutes(clock) - toMinutes(this.draft.start_time);
+
+                return this.timeFocus === 'end' && minutes > 0 ? this.formatDuration(minutes) : '';
+            },
+
+            formatDuration(minutes) {
+                return `${Math.floor(minutes / 60) ? Math.floor(minutes / 60) + ' h ' : ''}${minutes % 60 ? (minutes % 60) + ' min' : ''}`.trim() || '0 min';
+            },
+
+            duration() {
+                return this.formatDuration(Math.max(0, toMinutes(this.draft.end_time) - toMinutes(this.draft.start_time)));
+            },
+
+            dayCount() {
+                if (! this.draft.start || ! this.draft.end) {
+                    return 0;
+                }
+
+                return Math.round((fromIso(this.draft.end) - fromIso(this.draft.start)) / 86400000) + 1;
+            },
+
+            short(iso) {
+                return iso ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(fromIso(iso)).replace('.', '') : '…';
+            },
+
+            label() {
+                if (! this.value.start) {
+                    return '';
+                }
+
+                const year = (this.value.end ?? this.value.start).slice(0, 4);
+                const times = time && this.value.start_time ? ` · ${this.value.start_time}–${this.value.end_time}` : '';
+
+                return `${this.short(this.value.start)} – ${this.short(this.value.end)} ${year}${times}`;
+            },
+
+            dayLabel(iso) {
+                return new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(fromIso(iso));
+            },
+
+            toggle() {
+                this.open ? this.cancel() : this.show();
+            },
+
+            show() {
+                this.draft = { ...this.value };
+                this.month = (this.value.start ?? this.today).slice(0, 7);
+                this.open = true;
+                this.$nextTick(() => this.$root.querySelector('[data-time-selected]')?.scrollIntoView({ block: 'center' }));
+            },
+
+            cancel() {
+                this.draft = { ...this.value };
+
+                if (! inline) {
+                    this.open = false;
+                }
+            },
+
+            apply() {
+                if (! this.draft.start || ! this.draft.end) {
+                    return;
+                }
+
+                this.value = { ...this.draft };
+                this.$root.querySelectorAll('[data-range-raw]').forEach((input) => {
+                    input.value = this.value[input.dataset.rangeRaw] ?? '';
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+
+                if (! inline) {
+                    this.open = false;
+                    this.$refs.trigger?.focus();
+                }
+            },
+        };
+    });
+
     Alpine.data('uiDatePicker', ({ value = null, range = false, min = null, max = null, locale = 'pt-BR', today = null } = {}) => {
         const pad = (number) => String(number).padStart(2, '0');
         const toIso = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
