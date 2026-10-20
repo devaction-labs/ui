@@ -1978,6 +1978,59 @@ document.addEventListener('alpine:init', () => {
      * Árvore de arquivos: pastas abertas por padrão, filtro por texto e por tipo, setas navegam
      * (← fecha ou sobe para a pasta, → abre). value é x-modelable com o caminho escolhido.
      */
+    /**
+     * Diff com comentários: + abre o comentário novo na linha; conversas existentes abrem e fecham;
+     * Resolver recolhe. Comentar dispara diff-comment e, com comment, chama o Livewire com (linha, texto).
+     */
+    Alpine.data('uiDiff', ({ comment = null } = {}) => ({
+        draftLine: null,
+        threads: {},
+
+        registerThread(line, resolved) {
+            this.threads = { ...this.threads, [line]: ! resolved };
+        },
+
+        hasThread(line) {
+            return line in this.threads;
+        },
+
+        isThreadOpen(line) {
+            return this.threads[line] === true;
+        },
+
+        toggleDraft(line) {
+            if (this.hasThread(line)) {
+                this.threads = { ...this.threads, [line]: ! this.threads[line] };
+
+                return;
+            }
+
+            this.draftLine = this.draftLine === line ? null : line;
+            this.$nextTick(() => this.$root.querySelector(`#diff-comment-${line}-new`)?.focus());
+        },
+
+        send(line, body) {
+            const text = (body ?? '').trim();
+
+            if (text === '') {
+                return;
+            }
+
+            this.$dispatch('diff-comment', { line, body: text });
+
+            if (comment && this.$wire) {
+                this.$wire.call(comment, line, text);
+            }
+
+            this.draftLine = null;
+        },
+
+        resolveThread(line) {
+            this.threads = { ...this.threads, [line]: false };
+            this.$dispatch('thread-resolved', { line });
+        },
+    }));
+
     Alpine.data('uiFileTree', ({ value = null } = {}) => ({
         value,
         query: '',
