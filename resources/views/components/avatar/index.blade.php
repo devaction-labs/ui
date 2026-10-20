@@ -28,6 +28,8 @@
 ])
 
 @php
+    $originalAttributes = $attributes;
+    $tooltipPosition = $attributes->get('tooltip:position', 'top');
     $colorSeed = $attributes->get('color:seed');
     $badgeColor = $attributes->get('badge:color');
     $badgePosition = $attributes->get('badge:position', 'bottom right');
@@ -113,10 +115,27 @@
     $hasContent = $slot->isNotEmpty();
 @endphp
 
+@if ($tooltipText)
+    <x-ui::tooltip :content="$tooltipText" :position="$tooltipPosition">
+        <x-ui::avatar
+            :name="$name"
+            :initials="$initials"
+            :src="$src"
+            :alt="$alt"
+            :size="$size"
+            :color="$color"
+            :circle="$circle"
+            :icon="$icon"
+            :badge="$badge"
+            :href="$href"
+            :as="$as"
+            :attributes="$originalAttributes->except('tooltip:position')"
+        >{{ $slot }}</x-ui::avatar>
+    </x-ui::tooltip>
+@else
 <{{ $tag }}
     @if ($href) href="{{ $href }}" @endif
     @if ($tag === 'button') type="button" @endif
-    @if ($tooltipText) title="{{ $tooltipText }}" @endif
     data-avatar
     {{ $attributes->class([
         'relative inline-flex shrink-0 items-center justify-center font-mono font-medium select-none',
@@ -156,3 +175,4 @@
         >@unless ($badgeIsDot){{ $badge }}@endunless</span>
     @endif
 </{{ $tag }}>
+@endif

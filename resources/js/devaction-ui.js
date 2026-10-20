@@ -182,6 +182,51 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Tooltip: espera no hover, aparece na hora com o foco do teclado e Esc fecha.
+     * Liga o primeiro elemento focável ao texto com aria-describedby.
+     */
+    Alpine.data('uiTooltip', ({ delay = 400, toggleable = false, disabled = false } = {}) => ({
+        open: false,
+        timer: null,
+
+        init() {
+            const trigger = this.$el.querySelector('button, a, input, select, textarea, [tabindex]');
+
+            if (trigger) {
+                const describedBy = trigger.getAttribute('aria-describedby');
+                trigger.setAttribute('aria-describedby', [describedBy, this.$id('ui-tooltip')].filter(Boolean).join(' '));
+            }
+        },
+
+        schedule() {
+            if (disabled || toggleable) {
+                return;
+            }
+
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => (this.open = true), delay);
+        },
+
+        show() {
+            if (!disabled) {
+                clearTimeout(this.timer);
+                this.open = true;
+            }
+        },
+
+        hide() {
+            clearTimeout(this.timer);
+            this.open = false;
+        },
+
+        toggle() {
+            if (toggleable && !disabled) {
+                this.open = !this.open;
+            }
+        },
+    }));
+
+    /**
      * Grupo de abas: guarda a aba ativa para os painéis (tab.panel).
      */
     Alpine.data('uiTabGroup', () => ({

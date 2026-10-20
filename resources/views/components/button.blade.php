@@ -9,12 +9,14 @@
     <x-ui::button variant="primary" icon:trailing="arrow-right-01" href="/docs">Começar a usar</x-ui::button>
     <x-ui::button icon="more-horizontal" aria-label="Mais ações" />
     <x-ui::button variant="ghost" size="sm" icon="cancel-01" inset="top bottom" aria-label="Fechar" />
+    <x-ui::button icon="archive-02" tooltip="Arquivar" tooltip:kbd="E" />
 
     variant: outline (padrão) · primary · filled · danger (vermelho suave) · destructive (vermelho sólido) · ghost · subtle · ai · info
     size:    xs (24) · sm (32) · base (38, padrão) · lg (46)
     square:  força o formato quadrado (automático quando só tem ícone)
     inset:   top · bottom · left · right — margem negativa para alinhar botões ghost ao texto
     loading: automático com wire:click (o Livewire marca data-loading); true força, false desliga
+    tooltip: envolve o botão num x-ui::tooltip (tooltip:position, tooltip:kbd); só com ícone vira o aria-label
 --}}
 @props([
     'variant' => 'outline',
@@ -27,11 +29,14 @@
     'disabled' => false,
     'href' => null,
     'type' => 'button',
+    'tooltip' => null,
 ])
 
 @php
     $iconTrailing ??= $attributes->get('icon:trailing');
-    $attributes = $attributes->except(['icon:trailing']);
+    $tooltipPosition = $attributes->get('tooltip:position', 'top');
+    $tooltipKbd = $attributes->get('tooltip:kbd');
+    $attributes = $attributes->except(['icon:trailing', 'tooltip:position', 'tooltip:kbd']);
 
     $square ??= $slot->isEmpty() && ($icon || $iconTrailing);
 
@@ -83,6 +88,23 @@
     $iconSwapClasses = $showsLoading ? ' group-data-loading/button:hidden' : '';
 @endphp
 
+@if ($tooltip)
+    <x-ui::tooltip :content="$tooltip" :position="$tooltipPosition" :kbd="$tooltipKbd">
+        <x-ui::button
+            :variant="$variant"
+            :size="$size"
+            :icon="$icon"
+            :icon-trailing="$iconTrailing"
+            :square="$square"
+            :inset="$inset"
+            :loading="$loading"
+            :disabled="$disabled"
+            :href="$href"
+            :type="$type"
+            :attributes="$square && ! $attributes->has('aria-label') ? $attributes->merge(['aria-label' => $tooltip]) : $attributes"
+        >{{ $slot }}</x-ui::button>
+    </x-ui::tooltip>
+@else
 @if ($href)
     <a
         href="{{ $href }}"
@@ -115,4 +137,5 @@
     </a>
 @else
     </button>
+@endif
 @endif
