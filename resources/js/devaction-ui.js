@@ -64,6 +64,55 @@ document.addEventListener('alpine:init', () => {
     Alpine.magic('toast', () => window.DevActionUI.toast);
 
     /**
+     * Sidebar: recolhida no desktop (lembrada no navegador) e em drawer abaixo de 768 px.
+     * $store.uiSidebar.toggle() faz a coisa certa para o tamanho da tela.
+     */
+    Alpine.store('uiSidebar', {
+        collapsed: false,
+        open: false,
+        desktop: true,
+
+        init() {
+            const media = window.matchMedia('(min-width: 768px)');
+            this.desktop = media.matches;
+            media.addEventListener('change', (event) => {
+                this.desktop = event.matches;
+                this.open = false;
+            });
+
+            try {
+                this.collapsed = window.localStorage.getItem('ui-sidebar-collapsed') === '1';
+            } catch {
+                this.collapsed = false;
+            }
+        },
+
+        isCollapsed() {
+            return this.desktop && this.collapsed;
+        },
+
+        toggle() {
+            if (!this.desktop) {
+                this.open = !this.open;
+
+                return;
+            }
+
+            this.collapsed = !this.collapsed;
+
+            try {
+                window.localStorage.setItem('ui-sidebar-collapsed', this.collapsed ? '1' : '0');
+            } catch {
+                // Sem armazenamento local: a escolha vale só nesta página.
+            }
+        },
+
+        close() {
+            this.open = false;
+        },
+    });
+
+    /**
      * Pilha de toasts: fechada mostra o da frente e até 2 espiam atrás; mouse ou foco abre em lista.
      * Timers pausam com a pilha aberta ou a aba escondida. Alt+T foca a pilha; Esc fecha o focado.
      */
