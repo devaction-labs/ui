@@ -29,7 +29,7 @@
     $comboboxId = $attributes->get('id') ?? 'ui-combobox-'.($fieldName ? \Illuminate\Support\Str::slug($fieldName) : substr(md5($label.$placeholder), 0, 8));
 @endphp
 
-<div data-field class="flex min-w-0 flex-col gap-1.5">
+<div data-field @class(['flex min-w-0 flex-col gap-1.5', $attributes->get('class')])>
     @if ($label)
         <x-ui::label :for="$comboboxId">{{ $label }}</x-ui::label>
     @endif
@@ -40,7 +40,7 @@
         x-modelable="value"
         x-on:click.outside="close()"
         x-on:keydown.escape="if (open) { $event.preventDefault(); $event.stopPropagation(); close(true) }"
-        {{ $attributes->except('id')->class(['relative w-full']) }}
+        {{ $attributes->except(['id', 'class'])->class(['relative w-full']) }}
     >
         <button
             type="button"
