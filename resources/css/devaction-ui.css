@@ -443,3 +443,9 @@
         border-radius: 9999px;
     }
 }
+
+/* Campo de busca: o kit tem o próprio botão de limpar (clearable) */
+[data-input] input[type='search']::-webkit-search-cancel-button,
+[data-input] input[type='search']::-webkit-search-decoration {
+    appearance: none;
+}

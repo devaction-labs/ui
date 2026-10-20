@@ -55,7 +55,7 @@
 @endphp
 
 @if ($hasField)
-    <x-ui::field>
+    <x-ui::field :class="$attributes->get('class')">
         @if ($label)
             <x-ui::label :for="$inputId">{{ $label }}</x-ui::label>
         @endif
@@ -71,7 +71,7 @@
             :viewable="$viewable"
             :prefix="$prefix"
             :suffix="$suffix"
-            :attributes="$attributes->merge(['id' => $inputId, 'aria-describedby' => $inputId.'-hint'])"
+            :attributes="$attributes->except('class')->merge(['id' => $inputId, 'aria-describedby' => $inputId.'-hint'])"
         />
         @if ($description && ! $errorMessage)
             <x-ui::description :id="$inputId.'-hint'">{{ $description }}</x-ui::description>
@@ -86,6 +86,8 @@
     @if ($needsAlpine) x-data="{ revealed: false, copied: false }" @endif
     @class([
         'flex w-full min-w-0 items-center gap-2.5 border transition',
+        'has-[input:placeholder-shown]:[&_[data-input-clear]]:hidden' => $clearable,
+        $attributes->get('class'),
         $heightClasses,
         $paddingClasses,
         $radiusClasses,
@@ -106,7 +108,7 @@
         x-ref="input"
         @if ($viewable) x-bind:type="revealed ? 'text' : 'password'" @endif
         @if ($invalid) aria-invalid="true" @endif
-        {{ $attributes->merge(['type' => 'text'])->class([
+        {{ $attributes->except('class')->merge(['type' => 'text'])->merge($clearable && ! $attributes->has('placeholder') ? ['placeholder' => "\u{00A0}"] : [])->class([
             'h-full min-w-0 flex-1 bg-transparent text-ink outline-none placeholder:text-muted disabled:cursor-not-allowed',
             $textClasses,
             'font-mono text-[13px] text-ink-2' => $isReadonly,
@@ -120,7 +122,7 @@
         <x-ui::kbd>{{ $kbd }}</x-ui::kbd>
     @endif
     @if ($clearable)
-        <button type="button" aria-label="Limpar" x-on:click="$refs.input.value = ''; $refs.input.dispatchEvent(new Event('input', { bubbles: true })); $refs.input.focus()" class="-mr-1.5 inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-wrap hover:text-ink">
+        <button type="button" aria-label="Limpar" data-input-clear x-on:click="$refs.input.value = ''; $refs.input.dispatchEvent(new Event('input', { bubbles: true })); $refs.input.focus()" class="-mr-1.5 inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-wrap hover:text-ink">
             <x-ui::icon name="cancel-01" class="size-4" />
         </button>
     @endif
