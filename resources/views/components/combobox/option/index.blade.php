@@ -12,6 +12,8 @@
     'color' => null,
     'meta' => null,
     'search' => null,
+    'selectedLabel' => null,
+    'filterable' => true,
 ])
 
 @php
@@ -25,18 +27,22 @@
     role="option"
     data-combobox-option
     data-value="{{ $value }}"
-    data-label="{{ $label }}"
+    data-label="{{ $selectedLabel ?? $label }}"
     data-search="{{ trim($label.' '.$meta.' '.$search) }}"
     x-bind:id="$el.closest('[data-combobox-id]').dataset.comboboxId + '-option-' + $el.dataset.value"
+    @if (! $filterable) data-combobox-unfiltered @endif
     x-show="isVisible($el)"
     x-on:click="choose($el)"
     x-on:mouseenter="activeValue = $el.dataset.value"
-    x-bind:aria-selected="String(value ?? '') === $el.dataset.value"
+    x-bind:aria-selected="isSelected($el.dataset.value)"
     x-bind:class="activeValue === $el.dataset.value && 'bg-wrap'"
     tabindex="-1"
     @disabled($isDisabled)
     {{ $attributes->except('disabled')->class(['flex min-h-[38px] w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-[9px] px-2.5 text-left text-sm text-ink disabled:cursor-not-allowed disabled:opacity-50']) }}
 >
+    <span x-show="isMultiple" x-bind:class="isSelected($el.closest('[data-combobox-option]').dataset.value) ? 'border-ink bg-ink text-on-ink' : 'border-line-strong bg-card text-transparent'" class="flex size-4 shrink-0 items-center justify-center rounded-[5px] border transition" aria-hidden="true">
+        <x-ui::icon name="tick-02" class="size-3" stroke-width="2.5" />
+    </span>
     <span data-combobox-label class="flex min-w-0 flex-1 items-center gap-2.5">
         @if ($color)
             <span class="size-2.5 shrink-0 rounded-[3px]" style="background: {{ $color }}"></span>
@@ -49,5 +55,5 @@
     @if ($meta)
         <span class="shrink-0 font-mono text-[11px] text-muted">{{ $meta }}</span>
     @endif
-    <x-ui::icon name="tick-02" class="size-4 shrink-0 text-ink" x-show="String(value ?? '') === $el.closest('[data-combobox-option]').dataset.value" />
+    <x-ui::icon name="tick-02" class="size-4 shrink-0 text-ink" x-show="! isMultiple && isSelected($el.closest('[data-combobox-option]').dataset.value)" />
 </button>

@@ -9,6 +9,13 @@
 
     class vai para o campo; wire:model, name e os outros atributos vão para o input; o valor é o texto digitado ou o item escolhido.
     min-chars: quantos caracteres abrem as sugestões (padrão 1)
+
+    Busca no servidor: :filter="false" mostra os itens como vieram; o wire:model.live do input leva o texto.
+    <x-ui::autocomplete wire:model.live.debounce.250ms="contactSearch" :filter="false" placeholder="Buscar contato…">
+        @foreach ($this->contactResults as $contact)
+            <x-ui::autocomplete.item :value="$contact->name" keep wire:click="pickContact({{ $contact->id }})" />
+        @endforeach
+    </x-ui::autocomplete>
 --}}
 @props([
     'label' => null,
@@ -17,6 +24,7 @@
     'icon' => 'search-01',
     'minChars' => 1,
     'empty' => null,
+    'filter' => true,
 ])
 
 @php
@@ -35,7 +43,7 @@
 
     <div
         data-autocomplete
-        x-data="uiAutocomplete({ minChars: {{ (int) $minChars }} })"
+        x-data="uiAutocomplete({ minChars: {{ (int) $minChars }}, filter: @js((bool) $filter) })"
         x-on:click.outside="open = false"
         class="relative w-full"
     >

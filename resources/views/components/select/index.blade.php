@@ -7,6 +7,13 @@
     </x-ui::select>
 
     size: sm (36) · base (44, padrão) · lg (52)
+
+    variant="listbox" (como no Flux): lista própria em vez do select nativo, com busca e várias opções.
+    <x-ui::select variant="listbox" searchable multiple wire:model.live="industries" placeholder="Setores">
+        <x-ui::select.option value="saude">Saúde</x-ui::select.option>
+    </x-ui::select>
+    searchable · multiple · :filter="false" (busca no servidor, com o slot input) · search-placeholder · empty
+    variant="combobox" é o mesmo listbox já com a busca ligada.
 --}}
 @props([
     'label' => null,
@@ -16,6 +23,12 @@
     'size' => 'base',
     'invalid' => null,
     'bare' => false,
+    'variant' => 'default',
+    'searchable' => false,
+    'multiple' => false,
+    'filter' => true,
+    'searchPlaceholder' => 'Filtrar…',
+    'empty' => 'Nada encontrado.',
 ])
 
 @php
@@ -35,7 +48,29 @@
     };
 @endphp
 
-@if ($hasField)
+@if (in_array($variant, ['listbox', 'combobox'], true))
+    <x-ui::combobox
+        :label="$label"
+        :description="$description"
+        :error="$error"
+        :placeholder="$placeholder ?? 'Selecione…'"
+        :search-placeholder="$searchPlaceholder"
+        :multiple="$multiple"
+        :searchable="$searchable || $variant === 'combobox'"
+        :filter="$filter"
+        :value="$attributes->get('value')"
+        :name="$attributes->get('name')"
+        :attributes="$attributes->except(['value', 'name'])"
+    >
+        @isset($input)
+            <x-slot:input>{{ $input }}</x-slot:input>
+        @endisset
+        @if ($empty instanceof \Illuminate\View\ComponentSlot)
+            <x-slot:empty>{{ $empty }}</x-slot:empty>
+        @endif
+        {{ $slot }}
+    </x-ui::combobox>
+@elseif ($hasField)
     <x-ui::field :class="$attributes->get('class')">
         @if ($label)
             <x-ui::label :for="$selectId">{{ $label }}</x-ui::label>

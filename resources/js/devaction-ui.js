@@ -726,42 +726,98 @@ document.addEventListener('alpine:init', () => {
      * Combobox: seleção única com busca. value é x-modelable; o input escondido leva o name.
      * ↑↓ navega, ↵ escolhe, Esc fecha e devolve o foco ao gatilho.
      */
-    Alpine.data('uiCombobox', ({ value = null } = {}) => ({
+    Alpine.data('uiCombobox', ({ value = null, multiple = false, filter = true, clearQuery = false } = {}) => ({
         open: false,
         query: '',
-        value,
+        value: multiple ? (Array.isArray(value) ? value.map(String) : []) : value,
         activeValue: null,
-        selectedLabel: '',
-        selectedHtml: '',
+        labels: {},
+        revision: 0,
+        isMultiple: multiple,
 
         init() {
-            this.$watch('value', () => this.refreshSelected());
             this.$watch('query', () => this.$nextTick(() => (this.activeValue = this.options()[0]?.dataset.value ?? null)));
-            this.$nextTick(() => this.refreshSelected());
+            this.rememberLabels();
+
+            // Opções que chegam do servidor (busca com :filter="false") entram sem recarregar a página
+            let signature = this.optionSignature();
+            const observer = new MutationObserver(() => {
+                const next = this.optionSignature();
+
+                if (next !== signature) {
+                    signature = next;
+                    this.revision++;
+                    this.rememberLabels();
+                }
+            });
+            observer.observe(this.$root, { childList: true, subtree: true });
+        },
+
+        optionSignature() {
+            return [...this.$root.querySelectorAll('[data-combobox-option]')].map((option) => option.dataset.value + ':' + option.dataset.label).join('|');
         },
 
         normalize(text) {
             return (text ?? '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
         },
 
+        allOptions() {
+            this.revision;
+
+            return [...this.$root.querySelectorAll('[data-combobox-option]')];
+        },
+
+        rememberLabels() {
+            const labels = { ...this.labels };
+
+            this.allOptions().forEach((option) => {
+                labels[option.dataset.value] = {
+                    text: option.dataset.label,
+                    html: option.querySelector('[data-combobox-label]')?.innerHTML ?? option.dataset.label,
+                };
+            });
+
+            this.labels = labels;
+        },
+
         isVisible(option) {
             const query = this.normalize(this.query);
 
-            return query === '' || this.normalize(option.dataset.search).includes(query);
+            return ! filter || query === '' || option.hasAttribute('data-combobox-unfiltered') || this.normalize(option.dataset.search).includes(query);
         },
 
         options() {
-            return [...this.$root.querySelectorAll('[data-combobox-option]')].filter((option) => !option.disabled && this.isVisible(option));
+            return this.allOptions().filter((option) => ! option.disabled && this.isVisible(option));
         },
 
         hasResults() {
             return this.options().length > 0;
         },
 
-        refreshSelected() {
-            const option = [...this.$root.querySelectorAll('[data-combobox-option]')].find((item) => item.dataset.value === String(this.value ?? ''));
-            this.selectedLabel = option?.dataset.label ?? '';
-            this.selectedHtml = option?.querySelector('[data-combobox-label]')?.innerHTML ?? '';
+        selectedValues() {
+            if (multiple) {
+                return this.value ?? [];
+            }
+
+            return this.value === null || this.value === undefined || this.value === '' ? [] : [String(this.value)];
+        },
+
+        isSelected(optionValue) {
+            return this.selectedValues().includes(String(optionValue));
+        },
+
+        get selectedLabel() {
+            return this.selectedValues().map((item) => this.labels[item]?.text ?? item).join(', ');
+        },
+
+        get selectedHtml() {
+            const values = this.selectedValues();
+
+            if (values.length === 1 || ! multiple) {
+                return values[0] !== undefined ? (this.labels[values[0]]?.html ?? '') : '';
+            }
+
+            return '';
         },
 
         toggle() {
@@ -770,9 +826,13 @@ document.addEventListener('alpine:init', () => {
 
         show() {
             this.open = true;
-            this.query = '';
-            this.activeValue = String(this.value ?? '') || (this.options()[0]?.dataset.value ?? null);
-            this.$nextTick(() => this.$refs.search?.focus());
+
+            if (filter) {
+                this.query = '';
+            }
+
+            this.activeValue = this.selectedValues()[0] ?? (this.options()[0]?.dataset.value ?? null);
+            this.$nextTick(() => (this.$refs.search ?? this.$root.querySelector('[data-combobox-search]'))?.focus());
         },
 
         close(restoreFocus = false) {
@@ -784,10 +844,33 @@ document.addEventListener('alpine:init', () => {
         },
 
         choose(option) {
-            this.value = option.dataset.value;
-            this.$refs.raw.value = option.dataset.value;
-            this.$refs.raw.dispatchEvent(new Event('change', { bubbles: true }));
-            this.close(true);
+            const optionValue = option.dataset.value;
+
+            if (multiple) {
+                this.value = this.isSelected(optionValue)
+                    ? this.value.filter((item) => item !== optionValue)
+                    : [...this.value, optionValue];
+            } else {
+                this.value = optionValue;
+            }
+
+            if (this.$refs.raw) {
+                this.$refs.raw.value = multiple ? this.value.join(',') : optionValue;
+                this.$refs.raw.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
+            if (! multiple) {
+                this.close(true);
+            }
+
+            if (clearQuery && this.query !== '') {
+                this.query = '';
+                this.$nextTick(() => this.$root.querySelector('[data-combobox-search]')?.dispatchEvent(new Event('input', { bubbles: true })));
+            }
+        },
+
+        unselect(optionValue) {
+            this.value = multiple ? this.value.filter((item) => item !== String(optionValue)) : null;
         },
 
         move(step) {
@@ -814,14 +897,30 @@ document.addEventListener('alpine:init', () => {
      * Autocomplete: texto livre com sugestões. Filtra os itens pelo texto, destaca o trecho
      * encontrado e, ao escolher, preenche o campo com o valor do item.
      */
-    Alpine.data('uiAutocomplete', ({ minChars = 1 } = {}) => ({
+    Alpine.data('uiAutocomplete', ({ minChars = 1, filter = true } = {}) => ({
         open: false,
         query: '',
         activeIndex: 0,
+        revision: 0,
 
         init() {
             this.query = this.$refs.input.value;
             this.$watch('query', () => (this.activeIndex = 0));
+
+            // Sugestões que chegam do servidor (:filter="false") aparecem sem esperar outra tecla
+            let signature = this.itemSignature();
+            new MutationObserver(() => {
+                const next = this.itemSignature();
+
+                if (next !== signature) {
+                    signature = next;
+                    this.revision++;
+                }
+            }).observe(this.$root, { childList: true, subtree: true });
+        },
+
+        itemSignature() {
+            return [...this.$root.querySelectorAll('[data-autocomplete-item]')].map((item) => item.dataset.value).join('|');
         },
 
         normalize(text) {
@@ -831,10 +930,12 @@ document.addEventListener('alpine:init', () => {
         matches(item) {
             const query = this.normalize(this.query.trim());
 
-            return item.hasAttribute('data-autocomplete-always') || query === '' || this.normalize(item.dataset.search).includes(query);
+            return ! filter || item.hasAttribute('data-autocomplete-always') || query === '' || this.normalize(item.dataset.search).includes(query);
         },
 
         items() {
+            this.revision;
+
             return [...this.$root.querySelectorAll('[data-autocomplete-item]')].filter((item) => this.matches(item));
         },
 
