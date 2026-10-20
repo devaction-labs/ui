@@ -556,6 +556,47 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Slider: valor único ou faixa (value = [mín, máx]) com distância mínima entre os botões.
+     * value é x-modelable, então funciona com wire:model.
+     */
+    Alpine.data('uiSlider', ({ min = 0, max = 100, range = false, minDistance = 0, value = null } = {}) => ({
+        value: value ?? (range ? [min, max] : min),
+        marks: [],
+
+        percent(number) {
+            return ((Number(number) - min) / (max - min || 1)) * 100;
+        },
+
+        low() {
+            return range ? Number(this.value[0]) : Number(this.value);
+        },
+
+        high() {
+            return range ? Number(this.value[1]) : Number(this.value);
+        },
+
+        setLow(number) {
+            const next = Math.min(Number(number), this.high() - minDistance);
+            this.value = range ? [next, this.high()] : Number(number);
+
+            return next;
+        },
+
+        setHigh(number) {
+            const next = Math.max(Number(number), this.low() + minDistance);
+            this.value = [this.low(), next];
+
+            return next;
+        },
+
+        fillStyle() {
+            return range
+                ? { background: `linear-gradient(90deg, var(--line) ${this.percent(this.low())}%, var(--ink) ${this.percent(this.low())}%, var(--ink) ${this.percent(this.high())}%, var(--line) ${this.percent(this.high())}%) center / 100% 6px no-repeat` }
+                : { '--fill': `${this.percent(this.low())}%` };
+        },
+    }));
+
+    /**
      * Campo de dinheiro: digitação preenche pelos centavos e formata no locale; o input escondido
      * guarda o número cru (1234.56), que é o que vai para o wire:model e para o formulário.
      */
