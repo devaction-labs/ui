@@ -20,6 +20,7 @@
 
 <div
     data-layout="classic"
+    @if (isset($header) || isset($actions)) data-inner-toggle @endif
     x-data
     @if ($collapsed) x-init="$store.uiSidebar.collapsed = true" @endif
     x-on:keydown.cmd.b.window.prevent="$store.uiSidebar.toggle()"

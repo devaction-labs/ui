@@ -43,3 +43,25 @@ test('topbar, split, centered and docs layouts render their regions', function (
         ->toContain('Nesta página')
         ->toContain('href="#a"');
 });
+
+test('sidebar hides its own collapse button inside a shell that already has one', function () {
+    $sidebar = Blade::render('<x-ui::sidebar>
+<x-slot:brand>
+<x-ui::sidebar.brand name="Acme" />
+</x-slot:brand>
+</x-ui::sidebar>');
+
+    expect($sidebar)->toContain('in-data-inner-toggle:hidden');
+
+    expect(Blade::render('<x-ui::layout.classic>
+<x-slot:header>
+Projects
+</x-slot:header>
+</x-ui::layout.classic>'))->toContain('data-inner-toggle');
+
+    expect(Blade::render('<x-ui::layout.classic>Content</x-ui::layout.classic>'))->not->toContain('data-inner-toggle');
+
+    expect(Blade::render('<x-ui::layout.split>Detail</x-ui::layout.split>'))
+        ->toContain('data-inner-toggle')
+        ->toContain('data-sidebar-toggle');
+});

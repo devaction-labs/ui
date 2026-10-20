@@ -15,7 +15,8 @@
         <x-ui::main>…</x-ui::main>
     </div>
 
-    collapsible: botão de recolher ao lado da marca
+    collapsible: botão de recolher ao lado da marca; some sozinho dentro de um layout que já tem o
+                 botão no painel (x-ui::layout.classic com header, x-ui::layout.split, data-inner-toggle)
     sticky:      fica preso na tela ao rolar (desktop)
     O estado vive em $store.uiSidebar (toggle(), close(), collapsed, open).
 --}}
@@ -68,7 +69,7 @@
             <div class="flex items-center justify-between gap-2 px-1.5 in-data-collapsed:flex-col in-data-collapsed:px-0">
                 {{ $brand }}
                 @if ($collapsible)
-                    <x-ui::sidebar.toggle class="max-md:hidden" />
+                    <x-ui::sidebar.toggle class="max-md:hidden in-data-inner-toggle:hidden" />
                 @endif
             </div>
         @endisset
