@@ -1,0 +1,4 @@
+# Fica fora do pacote baixado pelo Composer (composer install --prefer-dist)
+/.gitattributes export-ignore
+/.github export-ignore
+/tests export-ignore
