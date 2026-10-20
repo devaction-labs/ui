@@ -644,6 +644,109 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Autocomplete: texto livre com sugestões. Filtra os itens pelo texto, destaca o trecho
+     * encontrado e, ao escolher, preenche o campo com o valor do item.
+     */
+    Alpine.data('uiAutocomplete', ({ minChars = 1 } = {}) => ({
+        open: false,
+        query: '',
+        activeIndex: 0,
+
+        init() {
+            this.query = this.$refs.input.value;
+            this.$watch('query', () => (this.activeIndex = 0));
+        },
+
+        normalize(text) {
+            return (text ?? '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+        },
+
+        matches(item) {
+            const query = this.normalize(this.query.trim());
+
+            return item.hasAttribute('data-autocomplete-always') || query === '' || this.normalize(item.dataset.search).includes(query);
+        },
+
+        items() {
+            return [...this.$root.querySelectorAll('[data-autocomplete-item]')].filter((item) => this.matches(item));
+        },
+
+        groupHasItems(group) {
+            return [...group.querySelectorAll('[data-autocomplete-item]')].some((item) => this.matches(item));
+        },
+
+        isActive(item) {
+            return this.items()[this.activeIndex] === item;
+        },
+
+        hasResults() {
+            return this.items().some((item) => !item.hasAttribute('data-autocomplete-always'));
+        },
+
+        highlight(text) {
+            const escaped = (text ?? '').replace(/[&<>"']/g, (character) => `&#${character.charCodeAt(0)};`);
+            const query = this.query.trim();
+
+            if (query === '') {
+                return escaped;
+            }
+
+            const start = this.normalize(text).indexOf(this.normalize(query));
+
+            if (start < 0) {
+                return escaped;
+            }
+
+            const before = text.slice(0, start);
+            const match = text.slice(start, start + query.length);
+            const after = text.slice(start + query.length);
+            const escape = (part) => part.replace(/[&<>"']/g, (character) => `&#${character.charCodeAt(0)};`);
+
+            return `${escape(before)}<strong class="font-semibold">${escape(match)}</strong>${escape(after)}`;
+        },
+
+        typed() {
+            this.open = this.query.trim().length >= minChars;
+        },
+
+        move(step) {
+            const items = this.items();
+
+            if (!this.open) {
+                this.open = items.length > 0;
+
+                return;
+            }
+
+            this.activeIndex = (this.activeIndex + step + items.length) % (items.length || 1);
+            items[this.activeIndex]?.scrollIntoView({ block: 'nearest' });
+        },
+
+        choose(item) {
+            item.dispatchEvent(new CustomEvent('select', { bubbles: true, detail: { value: item.dataset.value, query: this.query } }));
+
+            if (!item.hasAttribute('data-autocomplete-keep')) {
+                this.query = item.dataset.value;
+                this.$nextTick(() => {
+                    this.$refs.input.dispatchEvent(new Event('input', { bubbles: true }));
+                    this.$refs.input.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+            }
+
+            this.open = false;
+            this.$refs.input.focus();
+        },
+
+        chooseActive() {
+            const item = this.items()[this.activeIndex];
+
+            if (this.open && item) {
+                this.choose(item);
+            }
+        },
+    }));
+
+    /**
      * Slider: valor único ou faixa (value = [mín, máx]) com distância mínima entre os botões.
      * value é x-modelable, então funciona com wire:model.
      */
