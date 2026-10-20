@@ -110,6 +110,17 @@
     --color-violet: #6a57de;
     --color-ember: #ff5240;
 
+    /* Código: o painel é escuro nos dois temas */
+    --color-code-ink: #e4e4e7;
+    --color-code-muted: #a1a1aa;
+    --color-code-line: #27272a;
+    --color-code-comment: #71717a;
+    --color-code-tag: #8ef0b4;
+    --color-code-attribute: #93c5fd;
+    --color-code-string: #f9a8d4;
+    --color-code-keyword: #c4b9ff;
+    --color-code-accent: #f4cf7e;
+
     --radius-card: 1rem;
     --radius-wrap: 1.25rem;
     --radius-panel: 1.375rem;
