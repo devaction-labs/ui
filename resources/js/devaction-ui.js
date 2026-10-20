@@ -1970,6 +1970,151 @@ document.addEventListener('alpine:init', () => {
     /**
      * Painéis redimensionáveis: tamanho do primeiro painel em %, com arrastar, teclado e duplo clique.
      */
+    /**
+     * Lista ordenável: arrastar pela alça, teclado (Espaço pega, setas movem, Espaço solta, Esc cancela)
+     * e botões. Move os elementos no DOM e avisa a nova ordem (evento reorder e, com sort, o Livewire).
+     */
+    Alpine.data('uiSortableList', ({ sort = null } = {}) => ({
+        grabbed: null,
+        origin: null,
+        message: '',
+        revision: 0,
+
+        items() {
+            this.revision;
+
+            return [...this.$refs.list.querySelectorAll(':scope > [data-sortable-item]')];
+        },
+
+        isFirst(item) {
+            return this.items()[0] === item;
+        },
+
+        isLast(item) {
+            const items = this.items();
+
+            return items[items.length - 1] === item;
+        },
+
+        place(item, index) {
+            const others = this.items().filter((other) => other !== item);
+            const target = others[index];
+
+            target ? this.$refs.list.insertBefore(item, target) : this.$refs.list.appendChild(item);
+            this.revision++;
+        },
+
+        moveBy(item, step) {
+            const index = this.items().indexOf(item);
+            const next = Math.max(0, Math.min(this.items().length - 1, index + step));
+
+            if (next === index) {
+                return;
+            }
+
+            this.place(item, next);
+
+            if (this.grabbed === null) {
+                this.commit(item);
+            } else {
+                this.announce(item);
+            }
+
+            this.$nextTick(() => item.querySelector('[data-sortable-handle]')?.focus());
+        },
+
+        announce(item) {
+            const items = this.items();
+            this.message = `${item.dataset.label} movido para a posição ${items.indexOf(item) + 1} de ${items.length}.`;
+        },
+
+        commit(item) {
+            const items = this.items();
+            const position = items.indexOf(item);
+            const order = items.map((element) => element.dataset.key);
+
+            this.announce(item);
+            this.$dispatch('reorder', { key: item.dataset.key, position, order });
+
+            if (sort && this.$wire) {
+                this.$wire.call(sort, item.dataset.key, position);
+            }
+        },
+
+        onKeydown(event, item) {
+            if (event.key === ' ' || event.key === 'Enter') {
+                event.preventDefault();
+
+                if (this.grabbed === item.dataset.key) {
+                    this.drop(item);
+                } else {
+                    this.grabbed = item.dataset.key;
+                    this.origin = this.items().indexOf(item);
+                    this.message = `${item.dataset.label} pego. Use as setas e aperte Espaço para soltar.`;
+                }
+            } else if (this.grabbed === item.dataset.key && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+                event.preventDefault();
+                this.moveBy(item, event.key === 'ArrowUp' ? -1 : 1);
+            } else if (this.grabbed === item.dataset.key && event.key === 'Escape') {
+                event.preventDefault();
+                event.stopPropagation();
+                this.place(item, this.origin);
+                this.grabbed = null;
+                this.message = `${item.dataset.label} voltou para a posição ${this.origin + 1}.`;
+                this.$nextTick(() => item.querySelector('[data-sortable-handle]')?.focus());
+            }
+        },
+
+        drop(item, silent = false) {
+            if (this.grabbed !== item.dataset.key) {
+                return;
+            }
+
+            this.grabbed = null;
+
+            if (this.items().indexOf(item) !== this.origin) {
+                this.commit(item);
+            } else if (! silent) {
+                this.message = `${item.dataset.label} ficou na posição ${this.origin + 1}.`;
+            }
+        },
+
+        startDrag(event, item) {
+            if (event.button !== 0) {
+                return;
+            }
+
+            event.preventDefault();
+            this.grabbed = item.dataset.key;
+            this.origin = this.items().indexOf(item);
+
+            const move = (moveEvent) => {
+                const others = this.items().filter((other) => other !== item);
+                const index = others.findIndex((other) => {
+                    const box = other.getBoundingClientRect();
+
+                    return moveEvent.clientY < box.top + box.height / 2;
+                });
+                const target = index === -1 ? others.length : index;
+
+                if (this.items().indexOf(item) !== target) {
+                    this.place(item, target);
+                }
+            };
+            const stop = () => {
+                window.removeEventListener('pointermove', move);
+                window.removeEventListener('pointerup', stop);
+                window.removeEventListener('pointercancel', stop);
+                this.drop(item, true);
+            };
+
+            // Na janela: mover o item no DOM faria a alça perder a captura do ponteiro
+            window.addEventListener('pointermove', move);
+            window.addEventListener('pointerup', stop);
+            window.addEventListener('pointercancel', stop);
+        },
+    }));
+
     Alpine.data('uiResizable', ({ size = 50, min = 20, max = 80, vertical = false, persist = null } = {}) => ({
         size,
         initial: size,
