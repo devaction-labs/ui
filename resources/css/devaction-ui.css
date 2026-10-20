@@ -48,6 +48,7 @@
     --plain-bg: #f4f4f5;
     --plain-fg: #3f3f46;
 
+    --ring: rgb(24 24 27 / 0.35);
     --header: rgb(255 255 255 / 0.6);
 }
 
@@ -93,6 +94,7 @@
     --plain-bg: #2a2a36;
     --plain-fg: #c9c9d6;
 
+    --ring: rgb(237 237 242 / 0.4);
     --header: rgb(21 21 28 / 0.7);
 }
 
@@ -143,6 +145,7 @@
     --color-accent: var(--accent);
     --color-code: var(--code);
     --color-header: var(--header);
+    --color-ring: var(--ring);
 
     --color-ai: var(--ai);
     --color-ai-soft: var(--ai-soft);
