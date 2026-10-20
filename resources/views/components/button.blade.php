@@ -78,7 +78,7 @@
     ];
 
     $showsLoading = $loading !== false;
-    $spinnerClasses = $iconClasses.' hidden shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent group-data-loading/button:inline-block';
+    $spinnerSize = in_array($size, ['xs', 'sm'], true) ? 'xs' : 'sm';
     $iconSwapClasses = $showsLoading ? ' group-data-loading/button:hidden' : '';
 @endphp
 
@@ -98,7 +98,7 @@
     >
 @endif
     @if ($showsLoading && ($icon || ! $iconTrailing))
-        <span aria-hidden="true" class="{{ $spinnerClasses }}"></span>
+        <span class="hidden shrink-0 group-data-loading/button:inline-flex"><x-ui::spinner :size="$spinnerSize" color="current" /></span>
     @endif
     @if ($icon)
         <x-ui::icon :name="$icon" :class="$iconClasses.$iconSwapClasses" />
@@ -106,7 +106,7 @@
     {{ $slot }}
     @if ($iconTrailing)
         @if ($showsLoading && ! $icon)
-            <span aria-hidden="true" class="{{ $spinnerClasses }}"></span>
+            <span class="hidden shrink-0 group-data-loading/button:inline-flex"><x-ui::spinner :size="$spinnerSize" color="current" /></span>
         @endif
         <x-ui::icon :name="$iconTrailing" :class="$iconClasses.$iconSwapClasses" />
     @endif
