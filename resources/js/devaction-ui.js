@@ -244,6 +244,57 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Menu de ações: setas, Home, End e busca pela letra inicial. Foca o primeiro item ao abrir.
+     * Em submenu, → abre e ← volta para o item que o abriu.
+     */
+    Alpine.data('uiMenu', ({ submenu = false } = {}) => ({
+        init() {
+            this.$watch(submenu ? 'subOpen' : 'open', (isOpen) => {
+                if (isOpen) {
+                    this.$nextTick(() => this.items()[0]?.focus());
+                }
+            });
+        },
+
+        items() {
+            return [...this.$el.querySelectorAll('[data-menu-item]')].filter(
+                (item) => item.closest('[data-menu]') === this.$el && !item.disabled && item.getClientRects().length > 0,
+            );
+        },
+
+        onKeydown(event) {
+            const items = this.items();
+            const index = items.indexOf(document.activeElement);
+            let target = null;
+
+            if (event.key === 'ArrowDown') {
+                target = items[(index + 1) % items.length];
+            } else if (event.key === 'ArrowUp') {
+                target = items[(index - 1 + items.length) % items.length];
+            } else if (event.key === 'Home') {
+                target = items[0];
+            } else if (event.key === 'End') {
+                target = items[items.length - 1];
+            } else if (event.key === 'ArrowRight' && document.activeElement?.hasAttribute('data-submenu-trigger')) {
+                document.activeElement.click();
+            } else if (event.key === 'ArrowLeft' && submenu) {
+                this.subOpen = false;
+                this.$el.closest('[data-menu-submenu]')?.querySelector('[data-submenu-trigger]')?.focus();
+            } else if (event.key.length === 1 && /\S/.test(event.key)) {
+                const letter = event.key.toLowerCase();
+                const ordered = [...items.slice(index + 1), ...items.slice(0, index + 1)];
+                target = ordered.find((item) => item.textContent.trim().toLowerCase().startsWith(letter));
+            } else {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+            target?.focus();
+        },
+    }));
+
+    /**
      * Tooltip: espera no hover, aparece na hora com o foco do teclado e Esc fecha.
      * Liga o primeiro elemento focável ao texto com aria-describedby.
      */

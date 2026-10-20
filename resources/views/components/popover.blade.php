@@ -24,21 +24,7 @@
 @php
     $isVertical = in_array($position, ['top', 'bottom'], true);
 
-    $sideClasses = match ($position) {
-        'top' => 'bottom-full mb-(--dropdown-gap)',
-        'left' => 'right-full mr-(--dropdown-gap)',
-        'right' => 'left-full ml-(--dropdown-gap)',
-        default => 'top-full mt-(--dropdown-gap)',
-    };
-
-    $alignClasses = match (true) {
-        $isVertical && $align === 'center' => 'left-1/2 -translate-x-1/2',
-        $isVertical && $align === 'end' => 'right-(--dropdown-offset)',
-        $isVertical => 'left-(--dropdown-offset)',
-        $align === 'center' => 'top-1/2 -translate-y-1/2',
-        $align === 'end' => 'bottom-(--dropdown-offset)',
-        default => 'top-(--dropdown-offset)',
-    };
+    $positionClasses = \DevAction\Ui\Support\DropdownPosition::classes($position, $align);
 
     $arrowSideClasses = match ($position) {
         'top' => '-bottom-[6px] border-r border-b',
@@ -68,8 +54,7 @@
     x-transition:leave-end="opacity-0"
     {{ $attributes->class([
         'absolute z-40 w-80 rounded-2xl border border-line bg-card p-4 text-left text-sm text-ink shadow-[0_16px_40px_rgb(24_24_27/0.14)]',
-        $sideClasses,
-        $alignClasses,
+        $positionClasses,
     ]) }}
 >
     @if ($arrow)

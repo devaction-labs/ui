@@ -1,5 +1,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* O Tailwind varre os componentes e as classes geradas em PHP do próprio kit */
+@source '../views';
+@source '../../src';
+
 /*
  * DevAction UI · tokens
  * Claro em :root, escuro em .dark. Use .light para voltar ao claro dentro de um bloco .dark.
