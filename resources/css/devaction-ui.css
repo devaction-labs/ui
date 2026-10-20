@@ -1,0 +1,206 @@
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * DevAction UI · tokens
+ * Claro em :root, escuro em .dark. Use .light para voltar ao claro dentro de um bloco .dark.
+ * Os componentes só leem tokens: nenhuma variante dark: dentro do kit.
+ */
+:root,
+.light {
+    --wrap: #f4f4f5;
+    --frame: #ededf0;
+    --panel: #ffffff;
+    --card: #ffffff;
+    --subtle: #f7f7f8;
+    --line: #e4e4e7;
+    --line-soft: #efeff1;
+    --line-strong: #dcdce0;
+    --line-hover: #d4d4d8;
+    --ink: #18181b;
+    --ink-2: #3f3f46;
+    --ink-3: #52525b;
+    --muted: #71717a;
+    --on-ink: #ffffff;
+    --accent: #a16207;
+    --code: #18181b;
+
+    --ai: #d29a1e;
+    --ai-soft: #fffdf6;
+    --missing: #c62828;
+    --done: #d4d4d8;
+    --learning: #2563eb;
+
+    --risk-line: #fbcfcf;
+    --risk-bg: #fef2f2;
+    --risk-fg: #b91c1c;
+    --warn-line: #f5dfa8;
+    --warn-bg: #fef9ec;
+    --warn-fg: #854d0e;
+    --ok-line: #bbf7d0;
+    --ok-bg: #f0fdf4;
+    --ok-fg: #15803d;
+    --info-line: #c7d7fe;
+    --info-bg: #eff4ff;
+    --info-fg: #1d4ed8;
+    --indigo-bg: #eef2ff;
+    --indigo-fg: #3730a3;
+    --plain-line: #e4e4e7;
+    --plain-bg: #f4f4f5;
+    --plain-fg: #3f3f46;
+
+    --header: rgb(255 255 255 / 0.6);
+}
+
+.dark {
+    --wrap: #15151c;
+    --frame: #101016;
+    --panel: #1a1a22;
+    --card: #20202a;
+    --subtle: #1c1c25;
+    --line: #2c2c38;
+    --line-soft: #262630;
+    --line-strong: #383846;
+    --line-hover: #4a4a58;
+    --ink: #ededf2;
+    --ink-2: #c9c9d6;
+    --ink-3: #b4b4c4;
+    --muted: #9b9bae;
+    --on-ink: #15151c;
+    --accent: #e3a72f;
+    --code: #0e0e13;
+
+    --ai: #e3a72f;
+    --ai-soft: #221d12;
+    --missing: #ff5a47;
+    --done: #4a4a58;
+    --learning: #6ea8fe;
+
+    --risk-line: #4a2a26;
+    --risk-bg: #2a1b1a;
+    --risk-fg: #ffb4aa;
+    --warn-line: #4a3a18;
+    --warn-bg: #2a2314;
+    --warn-fg: #f4cf7e;
+    --ok-line: #1e4a2e;
+    --ok-bg: #14261b;
+    --ok-fg: #8ef0b4;
+    --info-line: #2e3a66;
+    --info-bg: #1a2036;
+    --info-fg: #a9c3ff;
+    --indigo-bg: #2e2a4a;
+    --indigo-fg: #c4b9ff;
+    --plain-line: #383846;
+    --plain-bg: #2a2a36;
+    --plain-fg: #c9c9d6;
+
+    --header: rgb(21 21 28 / 0.7);
+}
+
+@theme {
+    --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'Geist Mono', ui-monospace, monospace;
+
+    /* Marca: fixas nos dois temas */
+    --color-navy: #060c1f;
+    --color-graphite: #3e4250;
+    --color-amber: #e3a72f;
+    --color-cobalt: #2a4fd6;
+    --color-violet: #6a57de;
+    --color-ember: #ff5240;
+
+    --radius-card: 1rem;
+    --radius-wrap: 1.25rem;
+    --radius-panel: 1.375rem;
+
+    --shadow-pop: 0 16px 40px rgb(24 24 27 / 0.12);
+    --shadow-float: 0 18px 40px -18px rgb(24 24 27 / 0.3);
+    --shadow-code: 0 24px 60px -24px rgb(24 24 27 / 0.45);
+
+    --animate-shimmer: shimmer 1.4s linear infinite;
+
+    @keyframes shimmer {
+        to {
+            background-position: -200% 0;
+        }
+    }
+}
+
+@theme inline {
+    --color-wrap: var(--wrap);
+    --color-frame: var(--frame);
+    --color-panel: var(--panel);
+    --color-card: var(--card);
+    --color-subtle: var(--subtle);
+    --color-line: var(--line);
+    --color-line-soft: var(--line-soft);
+    --color-line-strong: var(--line-strong);
+    --color-line-hover: var(--line-hover);
+    --color-ink: var(--ink);
+    --color-ink-2: var(--ink-2);
+    --color-ink-3: var(--ink-3);
+    --color-muted: var(--muted);
+    --color-on-ink: var(--on-ink);
+    --color-accent: var(--accent);
+    --color-code: var(--code);
+    --color-header: var(--header);
+
+    --color-ai: var(--ai);
+    --color-ai-soft: var(--ai-soft);
+    --color-missing: var(--missing);
+    --color-done: var(--done);
+    --color-learning: var(--learning);
+
+    --color-risk-line: var(--risk-line);
+    --color-risk-bg: var(--risk-bg);
+    --color-risk-fg: var(--risk-fg);
+    --color-warn-line: var(--warn-line);
+    --color-warn-bg: var(--warn-bg);
+    --color-warn-fg: var(--warn-fg);
+    --color-ok-line: var(--ok-line);
+    --color-ok-bg: var(--ok-bg);
+    --color-ok-fg: var(--ok-fg);
+    --color-info-line: var(--info-line);
+    --color-info-bg: var(--info-bg);
+    --color-info-fg: var(--info-fg);
+    --color-indigo-bg: var(--indigo-bg);
+    --color-indigo-fg: var(--indigo-fg);
+    --color-plain-line: var(--plain-line);
+    --color-plain-bg: var(--plain-bg);
+    --color-plain-fg: var(--plain-fg);
+}
+
+/* Quadriculado com as linhas do tema; combine com mask-fade-* */
+@utility bg-grid {
+    background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px),
+        repeating-conic-gradient(var(--line-soft) 0 25%, transparent 0 50%);
+    background-size: 44px 44px, 44px 44px, 88px 88px;
+    background-position: center top;
+}
+
+@utility bg-grid-sm {
+    background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px),
+        repeating-conic-gradient(var(--line-soft) 0 25%, transparent 0 50%);
+    background-size: 24px 24px, 24px 24px, 48px 48px;
+}
+
+/* Brilho âmbar da IA, usado atrás de heros */
+@utility bg-ai-glow {
+    background: radial-gradient(ellipse at center, color-mix(in srgb, var(--ai) 20%, transparent), transparent 62%);
+}
+
+@utility mask-fade-top {
+    mask-image: radial-gradient(ellipse 55% 80% at 50% 0%, #000 30%, transparent 78%);
+}
+
+@utility mask-fade-card {
+    mask-image: radial-gradient(ellipse 80% 100% at 50% 0%, #000 20%, transparent 80%);
+}
+
+/* Alpine: esconde até inicializar */
+[x-cloak] {
+    display: none !important;
+}

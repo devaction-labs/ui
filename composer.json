@@ -1,0 +1,32 @@
+{
+    "name": "devaction/ui",
+    "description": "DevAction UI: componentes Blade para Laravel/Livewire com Tailwind CSS v4 e ícones Hugeicons Stroke Rounded.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "livewire",
+        "blade",
+        "tailwindcss",
+        "ui-kit"
+    ],
+    "require": {
+        "php": "^8.3",
+        "illuminate/support": "^12.0|^13.0",
+        "illuminate/view": "^12.0|^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "DevAction\\Ui\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "DevAction\\Ui\\UiServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

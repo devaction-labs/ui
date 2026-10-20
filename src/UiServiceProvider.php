@@ -1,0 +1,25 @@
+<?php
+
+namespace DevAction\Ui;
+
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\ServiceProvider;
+
+class UiServiceProvider extends ServiceProvider
+{
+    /**
+     * Registra as views do pacote no namespace "ui" e os componentes anônimos como <x-ui::*>.
+     *
+     * Ícones podem ser adicionados ou sobrescritos pelo app em resources/views/vendor/ui/icons.
+     */
+    public function boot(): void
+    {
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'ui');
+
+        Blade::anonymousComponentPath(__DIR__.'/../resources/views/components', 'ui');
+
+        $this->publishes([
+            __DIR__.'/../resources/views/icons' => resource_path('views/vendor/ui/icons'),
+        ], 'ui-icons');
+    }
+}
