@@ -150,6 +150,15 @@
         }
     }
 
+    --animate-sheet-in: sheet-in 0.24s ease-out;
+
+    @keyframes sheet-in {
+        from {
+            opacity: 0;
+            transform: translateY(24px);
+        }
+    }
+
     @keyframes flyout-in {
         from {
             opacity: 0;
