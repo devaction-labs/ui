@@ -26,7 +26,10 @@
     @else
         aria-hidden="true"
     @endif
-    {{ $attributes->class(['size-5 shrink-0']) }}
+    {{ $attributes->class([
+        'shrink-0',
+        'size-5' => ! preg_match('/(^|\s)size-/', (string) $attributes->get('class')),
+    ]) }}
     data-icon="{{ $name }}"
 >
     @include('ui::icons.'.$name)
