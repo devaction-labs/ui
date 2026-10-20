@@ -511,6 +511,44 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Grupo de checkboxes ou radios: value é x-modelable (wire:model no grupo) e fica em sincronia
+     * com os inputs nativos de dentro, que continuam funcionando sozinhos em formulários comuns.
+     */
+    Alpine.data('uiChoiceGroup', ({ multiple = false } = {}) => ({
+        value: multiple ? [] : null,
+
+        init() {
+            const checked = this.inputs().filter((input) => input.checked).map((input) => input.value);
+
+            if (multiple ? checked.length : checked[0] !== undefined) {
+                this.value = multiple ? checked : checked[0];
+            }
+
+            this.$watch('value', () => this.sync());
+            this.$nextTick(() => this.sync());
+        },
+
+        inputs() {
+            return [...this.$root.querySelectorAll('input[type=checkbox], input[type=radio]')].filter(
+                (input) => input.closest('[data-choice-group]') === this.$root,
+            );
+        },
+
+        sync() {
+            this.inputs().forEach((input) => {
+                input.checked = multiple
+                    ? Array.isArray(this.value) && this.value.map(String).includes(input.value)
+                    : this.value !== null && String(this.value) === input.value;
+            });
+        },
+
+        changed() {
+            const checked = this.inputs().filter((input) => input.checked).map((input) => input.value);
+            this.value = multiple ? checked : (checked[0] ?? null);
+        },
+    }));
+
+    /**
      * Paleta de comandos: filtra as opções pelo texto digitado, ↑↓ navega e ↵ escolhe.
      */
     Alpine.data('uiCommand', () => ({
