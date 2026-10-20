@@ -32,7 +32,7 @@
     $checkedClasses = match ($color) {
         'ai' => 'peer-checked:bg-ai',
         'ok' => 'peer-checked:bg-ok-fg',
-        default => 'peer-checked:bg-ink',
+        default => 'peer-checked:bg-primary',
     };
 
     $hasText = $label || $description;

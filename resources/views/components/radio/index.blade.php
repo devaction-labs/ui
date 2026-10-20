@@ -22,7 +22,7 @@
 @if ($variant === 'cards')
     <label @class([
         'relative flex cursor-pointer flex-col gap-2 rounded-[14px] border-[1.5px] border-line-strong bg-card p-3.5 text-left transition',
-        'has-checked:border-ink has-checked:bg-wrap has-focus-visible:ring-2 has-focus-visible:ring-ring',
+        'has-checked:border-primary has-checked:bg-primary-soft has-focus-visible:ring-2 has-focus-visible:ring-ring',
         'cursor-not-allowed opacity-60' => $isDisabled,
     ])>
         <span class="flex items-center justify-between">
@@ -31,7 +31,7 @@
             @else
                 <span></span>
             @endif
-            <input {{ $inputAttributes->class(['size-[18px] cursor-pointer appearance-none rounded-full border-[1.5px] border-muted bg-card transition checked:border-[6px] checked:border-ink focus-visible:outline-none disabled:cursor-not-allowed']) }} />
+            <input {{ $inputAttributes->class(['size-[18px] cursor-pointer appearance-none rounded-full border-[1.5px] border-muted bg-card transition checked:border-[6px] checked:border-primary focus-visible:outline-none disabled:cursor-not-allowed']) }} />
         </span>
         @if ($label)
             <span class="text-sm font-semibold text-ink">{{ $label }}</span>
@@ -47,7 +47,7 @@
         'cursor-not-allowed text-muted' => $isDisabled,
     ])>
         <input {{ $inputAttributes->class([
-            'mt-px size-5 shrink-0 cursor-pointer appearance-none rounded-full border-[1.5px] border-muted bg-card transition checked:border-[6px] checked:border-ink',
+            'mt-px size-5 shrink-0 cursor-pointer appearance-none rounded-full border-[1.5px] border-muted bg-card transition checked:border-[6px] checked:border-primary',
             'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card focus-visible:outline-none',
             'disabled:cursor-not-allowed disabled:border-line disabled:bg-wrap',
         ]) }} />

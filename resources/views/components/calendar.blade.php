@@ -175,7 +175,7 @@
                 >
                     <span @class([
                         'flex h-6 min-w-6 items-center justify-center self-start rounded-full px-1 text-xs',
-                        'bg-ink font-semibold text-on-ink' => $isToday,
+                        'bg-primary font-semibold text-on-primary' => $isToday,
                         'font-semibold text-ink' => $isSelected && ! $isToday,
                         'text-ink' => $inMonth && ! $isToday && ! $isSelected,
                         'text-line-hover' => ! $inMonth,

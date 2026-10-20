@@ -46,7 +46,7 @@
             <li data-state="{{ $state }}" @if (in_array($state, ['current', 'error'], true)) aria-current="step" @endif class="flex min-w-0 flex-col gap-2.5">
                 <span @class([
                     'h-1 rounded-full',
-                    'bg-ink' => $state === 'done',
+                    'bg-primary' => $state === 'done',
                     'bg-missing' => $state === 'error',
                     'bg-ai' => $state === 'current',
                     'bg-line' => $state === 'todo',
@@ -54,7 +54,7 @@
                 <span class="flex min-w-0 items-center gap-2.5">
                     <span @class([
                         'flex size-7 flex-none items-center justify-center rounded-full font-mono text-xs',
-                        'bg-ink text-on-ink' => $state === 'done',
+                        'bg-primary text-on-primary' => $state === 'done',
                         'border-2 border-missing bg-card text-missing' => $state === 'error',
                         'border-2 border-ink bg-card text-ink' => $state === 'current',
                         'border-[1.5px] border-line-hover bg-card text-muted' => $state === 'todo',

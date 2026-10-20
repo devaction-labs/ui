@@ -35,7 +35,7 @@
             'rounded-full' => $single,
             'rounded-[5px]' => ! $single,
         ])
-        x-bind:class="isChecked(@js($name), @js($value)) ? 'border-ink bg-ink text-on-ink' : 'border-line-hover bg-card text-transparent'"
+        x-bind:class="isChecked(@js($name), @js($value)) ? 'border-primary bg-primary text-on-primary' : 'border-line-hover bg-card text-transparent'"
         aria-hidden="true"
     >
         <x-ui::icon name="tick-02" class="size-3" />

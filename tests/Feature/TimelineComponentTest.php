@@ -48,7 +48,7 @@ test('item status styles the indicator and the connector', function (string $sta
 
     expect($html)->toContain($indicatorClass)->toContain($connectorClass)->toContain("data-status=\"{$status}\"");
 })->with([
-    ['complete', 'bg-ink text-on-ink', 'hidden bg-ink'],
+    ['complete', 'bg-primary text-on-primary', 'hidden bg-primary'],
     ['current', 'ring-2 ring-ink', 'hidden bg-line'],
     ['incomplete', 'border border-line-strong bg-card text-muted', 'hidden bg-line'],
 ]);

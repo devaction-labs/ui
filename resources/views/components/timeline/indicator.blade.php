@@ -38,7 +38,7 @@
     };
 
     $statusClasses = match ($status) {
-        'complete' => 'bg-ink text-on-ink',
+        'complete' => 'bg-primary text-on-primary',
         'current' => 'bg-card text-ink ring-2 ring-ink ring-offset-2 ring-offset-card',
         'incomplete' => 'border border-line-strong bg-card text-muted',
         default => null,
@@ -46,7 +46,7 @@
 
     $toneClasses = $solidClasses ?? $statusClasses ?? ($isDot ? 'bg-line-hover' : 'border border-line bg-wrap text-ink-3');
 
-    $connectorClasses = $status === 'complete' ? 'bg-ink' : 'bg-line';
+    $connectorClasses = $status === 'complete' ? 'bg-primary' : 'bg-line';
 @endphp
 
 <div

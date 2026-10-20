@@ -25,6 +25,9 @@
     --ink-3: #52525b;
     --muted: #71717a;
     --on-ink: #ffffff;
+    --primary: #18181b;
+    --on-primary: #ffffff;
+    --primary-soft: #f4f4f5;
     --accent: #a16207;
     --code: #18181b;
 
@@ -72,6 +75,9 @@
     --ink-3: #b4b4c4;
     --muted: #9b9bae;
     --on-ink: #15151c;
+    --primary: #ededf2;
+    --on-primary: #15151c;
+    --primary-soft: #2a2a36;
     --accent: #e3a72f;
     --code: #0e0e13;
 
@@ -104,6 +110,8 @@
     --shadow-modal: 0 16px 32px -12px rgb(0 0 0 / 0.6);
     --header: rgb(21 21 28 / 0.7);
 }
+
+@import './themes.css';
 
 @theme {
     --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
@@ -229,6 +237,9 @@
     --color-ink-3: var(--ink-3);
     --color-muted: var(--muted);
     --color-on-ink: var(--on-ink);
+    --color-primary: var(--primary);
+    --color-on-primary: var(--on-primary);
+    --color-primary-soft: var(--primary-soft);
     --color-accent: var(--accent);
     --color-code: var(--code);
     --color-header: var(--header);

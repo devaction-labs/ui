@@ -41,7 +41,7 @@
     $square ??= $slot->isEmpty() && ($icon || $iconTrailing);
 
     $variantClasses = match ($variant) {
-        'primary' => 'border-ink bg-ink text-on-ink hover:bg-ink/90',
+        'primary' => 'border-primary bg-primary text-on-primary hover:bg-primary/90',
         'filled' => 'border-transparent bg-wrap text-ink hover:bg-line-soft',
         'danger' => 'border-risk-line bg-risk-bg text-risk-fg hover:border-risk-fg/40',
         'destructive' => 'border-missing bg-missing text-white hover:bg-missing/90',

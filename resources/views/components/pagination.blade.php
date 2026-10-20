@@ -62,7 +62,7 @@
                 @endif
 
                 @if ($page === $current)
-                    <span class="{{ $baseLink }} bg-ink font-medium text-on-ink tabular-nums" aria-current="page">{{ $page }}</span>
+                    <span class="{{ $baseLink }} bg-primary font-medium text-on-primary tabular-nums" aria-current="page">{{ $page }}</span>
                 @elseif ($livewire)
                     <button type="button" wire:click="setPage({{ $page }}, @js($pageName))" @if ($scrollScript) x-on:click="{{ $scrollScript }}" @endif class="{{ $baseLink }} cursor-pointer tabular-nums hover:bg-wrap" aria-label="{{ __('Page :page', ['page' => $page]) }}">{{ $page }}</button>
                 @else

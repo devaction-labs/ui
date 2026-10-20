@@ -21,7 +21,7 @@
         'red', 'rose', 'pink' => 'bg-missing',
         'blue', 'sky', 'cyan' => 'bg-learning',
         'indigo', 'violet', 'purple', 'fuchsia' => 'bg-violet',
-        default => 'bg-ink',
+        default => 'bg-primary',
     };
 @endphp
 

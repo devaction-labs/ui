@@ -75,7 +75,7 @@
                     'block h-full',
                     'bg-ok-fg' => $status === 'done',
                     'bg-risk-fg' => $isFailed,
-                    'bg-ink' => ! $isFailed && $status !== 'done',
+                    'bg-primary' => ! $isFailed && $status !== 'done',
                 ]) style="width: {{ $percent }}%"></span>
             </span>
             <span class="min-w-[92px] flex-none text-right font-mono text-[11px] text-muted">{{ $meta }}</span>

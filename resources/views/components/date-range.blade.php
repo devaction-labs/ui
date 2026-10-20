@@ -152,7 +152,7 @@
                                                 x-bind:aria-pressed="isEdge(cell.iso)"
                                                 x-bind:aria-label="dayLabel(cell.iso)"
                                                 x-bind:aria-current="cell.iso === today ? 'date' : null"
-                                                x-bind:class="isEdge(cell.iso) ? 'bg-ink font-semibold text-on-ink' : 'text-ink hover:bg-subtle'"
+                                                x-bind:class="isEdge(cell.iso) ? 'bg-primary font-semibold text-on-primary' : 'text-ink hover:bg-subtle'"
                                                 class="relative size-[38px] cursor-pointer rounded-[10px] transition disabled:cursor-default disabled:text-line-hover"
                                             ></button>
                                         </template>
@@ -188,7 +188,7 @@
                                     x-on:click="setTime(clock)"
                                     x-bind:aria-selected="(draft[timeFocus + '_time'] === clock).toString()"
                                     x-bind:data-time-selected="draft[timeFocus + '_time'] === clock ? '' : null"
-                                    x-bind:class="draft[timeFocus + '_time'] === clock ? 'bg-ink text-on-ink' : 'text-ink hover:bg-subtle'"
+                                    x-bind:class="draft[timeFocus + '_time'] === clock ? 'bg-primary text-on-primary' : 'text-ink hover:bg-subtle'"
                                     class="flex h-8 w-full cursor-pointer items-center rounded-[7px] px-2.5 text-left font-mono text-[13px]"
                                 ><span x-text="clock"></span><span class="ml-auto font-sans text-xs opacity-70" x-text="slotHint(clock)"></span></button>
                             </template>

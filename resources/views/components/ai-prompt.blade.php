@@ -96,7 +96,7 @@
                 x-bind:disabled="! isBusy() && ! canSend()"
                 x-bind:aria-label="isBusy() ? @js(__('Stop response')) : @js(__('Send'))"
                 aria-label="{{ __('Send') }}"
-                class="flex size-[34px] cursor-pointer items-center justify-center rounded-[10px] bg-ink text-on-ink transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-line disabled:text-muted"
+                class="flex size-[34px] cursor-pointer items-center justify-center rounded-[10px] bg-primary text-on-primary transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-line disabled:text-muted"
             >
                 <x-ui::icon name="stop" class="size-4" x-show="isBusy()" x-cloak />
                 <x-ui::icon name="arrow-up-02" class="size-4" x-show="! isBusy()" />

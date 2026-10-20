@@ -20,7 +20,7 @@ test('calendar month view renders a monday-first grid with events', function () 
         ->toContain('Entrega M3')
         ->toContain('bg-info-bg')
         ->toContain('calendar-day')
-        ->toContain('bg-ink font-semibold text-on-ink')
+        ->toContain('bg-primary font-semibold text-on-primary')
         ->toContain('month=2026-11')
         ->toMatch('/>Entrega\s*<\/span>/');
 });

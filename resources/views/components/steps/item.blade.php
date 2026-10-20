@@ -17,7 +17,7 @@
     <span class="flex flex-col items-center">
         <span @class([
             'flex size-6 flex-none items-center justify-center rounded-full text-on-ink',
-            'bg-ink' => $state === 'done',
+            'bg-primary' => $state === 'done',
             'border-2 border-ink bg-card' => $state === 'current',
             'border-2 border-missing bg-card text-missing' => $state === 'error',
             'border-[1.5px] border-line-hover bg-card' => $state === 'todo',
@@ -32,7 +32,7 @@
         </span>
         <span @class([
             'min-h-[18px] w-0.5 flex-1 group-last/step:invisible',
-            'bg-ink' => $state === 'done',
+            'bg-primary' => $state === 'done',
             'bg-line' => $state !== 'done',
         ])></span>
     </span>

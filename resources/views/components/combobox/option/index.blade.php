@@ -40,7 +40,7 @@
     @disabled($isDisabled)
     {{ $attributes->except('disabled')->class(['flex min-h-[38px] w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-[9px] px-2.5 text-left text-sm text-ink disabled:cursor-not-allowed disabled:opacity-50']) }}
 >
-    <span x-show="isMultiple" x-bind:class="isSelected($el.closest('[data-combobox-option]').dataset.value) ? 'border-ink bg-ink text-on-ink' : 'border-line-strong bg-card text-transparent'" class="flex size-4 shrink-0 items-center justify-center rounded-[5px] border transition" aria-hidden="true">
+    <span x-show="isMultiple" x-bind:class="isSelected($el.closest('[data-combobox-option]').dataset.value) ? 'border-primary bg-primary text-on-primary' : 'border-line-strong bg-card text-transparent'" class="flex size-4 shrink-0 items-center justify-center rounded-[5px] border transition" aria-hidden="true">
         <x-ui::icon name="tick-02" class="size-3" stroke-width="2.5" />
     </span>
     <span data-combobox-label class="flex min-w-0 flex-1 items-center gap-2.5">

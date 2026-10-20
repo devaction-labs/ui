@@ -25,7 +25,7 @@
         'disabled:cursor-not-allowed disabled:opacity-45',
     ]) }}
 >
-    <span class="flex size-4 items-center justify-center rounded-[5px] border border-line-strong group-aria-checked/check:border-ink group-aria-checked/check:bg-ink group-aria-checked/check:text-on-ink">
+    <span class="flex size-4 items-center justify-center rounded-[5px] border border-line-strong group-aria-checked/check:border-primary group-aria-checked/check:bg-primary group-aria-checked/check:text-on-primary">
         <x-ui::icon name="tick-02" stroke-width="2.2" class="size-3 opacity-0 group-aria-checked/check:opacity-100" />
     </span>
     <span class="min-w-0 flex-1 truncate">{{ $slot }}</span>

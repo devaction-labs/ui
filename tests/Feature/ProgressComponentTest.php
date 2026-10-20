@@ -11,7 +11,7 @@ test('progress renders an accessible bar with the computed width', function () {
         ->toContain('aria-valuemax="100"')
         ->toContain('aria-valuenow="75"')
         ->toContain('--progress: 75%')
-        ->toContain('bg-ink h-full w-(--progress)')
+        ->toContain('bg-primary h-full w-(--progress)')
         ->toContain('h-1.5');
 });
 
@@ -53,7 +53,7 @@ test('segmented progress draws one pill per step and marks the current one', fun
     expect($html)
         ->toContain('grid-template-columns: repeat(5, minmax(0, 1fr))')
         ->toContain('aria-valuenow="2"');
-    expect(substr_count($html, 'rounded-full bg-ink'))->toBe(2);
+    expect(substr_count($html, 'rounded-full bg-primary'))->toBe(2);
     expect(substr_count($html, 'rounded-full bg-ai'))->toBe(1);
     expect(substr_count($html, 'rounded-full bg-line'))->toBe(2);
 });

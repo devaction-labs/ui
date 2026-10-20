@@ -11,7 +11,7 @@ test('switch renders a native checkbox with switch role', function () {
         ->toContain('wire:model.live="auto"')
         ->toMatch('/\schecked[\s>="]/')
         ->toContain('h-6 w-10')
-        ->toContain('peer-checked:bg-ink')
+        ->toContain('peer-checked:bg-primary')
         ->toContain('peer-checked:translate-x-4')
         ->toContain('Review automático')
         ->toContain('A IA revisa.');

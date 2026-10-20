@@ -11,7 +11,7 @@ test('checkbox renders a native styled input with label and description', functi
         ->toContain('wire:model="auto"')
         ->toMatch('/\schecked[\s>="]/')
         ->toContain('appearance-none rounded-md border-[1.5px]')
-        ->toContain('checked:bg-ink')
+        ->toContain('checked:bg-primary')
         ->toContain('data-icon="tick-02"')
         ->toContain('Review automático')
         ->toContain('A IA revisa.');
@@ -51,7 +51,7 @@ test('radio group shares the name and renders cards', function () {
         ->toContain('wire:model="model"')
         ->toContain('type="radio"')
         ->toContain('name="modelo"')
-        ->toContain('has-checked:border-ink has-checked:bg-wrap')
+        ->toContain('has-checked:border-primary has-checked:bg-primary-soft')
         ->toContain('data-icon="file-edit"')
         ->toContain('checked:border-[6px]');
     expect(substr_count($html, 'name="modelo"'))->toBe(2);

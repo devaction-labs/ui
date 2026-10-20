@@ -76,7 +76,7 @@
             <span class="text-[13px] text-muted" x-show="! dragging && ! summary">{{ $text }}</span>
         @endif
         <span x-show="uploading" x-cloak class="absolute inset-x-4 bottom-3 h-1 overflow-hidden rounded-sm bg-line-soft" role="progressbar" aria-label="{{ __('Uploading') }}" x-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
-            <span class="block h-full bg-ink transition-[width]" x-bind:style="{ width: progress + '%' }"></span>
+            <span class="block h-full bg-primary transition-[width]" x-bind:style="{ width: progress + '%' }"></span>
         </span>
     </label>
 

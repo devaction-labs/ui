@@ -41,7 +41,7 @@
                         x-bind:aria-current="cell.iso === today ? 'date' : null"
                         class="h-9 w-full cursor-pointer rounded-lg text-[13px] text-ink transition outline-none hover:bg-subtle focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:text-line-hover disabled:hover:bg-transparent"
                         x-bind:class="{
-                            'bg-ink! font-semibold text-on-ink!': isSelected(cell.iso),
+                            'bg-primary! font-semibold text-on-primary!': isSelected(cell.iso),
                             'font-semibold ring-1 ring-ink ring-inset': cell.iso === today && ! isSelected(cell.iso),
                             'rounded-none hover:bg-transparent': isInRange(cell.iso),
                         }"

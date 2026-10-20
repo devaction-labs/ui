@@ -17,7 +17,7 @@ test('button maps each variant to tokens', function (string $variant, string $ex
 
     expect($html)->toContain($expectedClass);
 })->with([
-    ['primary', 'bg-ink text-on-ink'],
+    ['primary', 'bg-primary text-on-primary'],
     ['filled', 'bg-wrap text-ink'],
     ['danger', 'bg-risk-bg text-risk-fg'],
     ['ghost', 'text-ink-2'],
