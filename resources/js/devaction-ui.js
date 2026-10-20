@@ -556,6 +556,94 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Combobox: seleção única com busca. value é x-modelable; o input escondido leva o name.
+     * ↑↓ navega, ↵ escolhe, Esc fecha e devolve o foco ao gatilho.
+     */
+    Alpine.data('uiCombobox', ({ value = null } = {}) => ({
+        open: false,
+        query: '',
+        value,
+        activeValue: null,
+        selectedLabel: '',
+        selectedHtml: '',
+
+        init() {
+            this.$watch('value', () => this.refreshSelected());
+            this.$watch('query', () => this.$nextTick(() => (this.activeValue = this.options()[0]?.dataset.value ?? null)));
+            this.$nextTick(() => this.refreshSelected());
+        },
+
+        normalize(text) {
+            return (text ?? '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+        },
+
+        isVisible(option) {
+            const query = this.normalize(this.query);
+
+            return query === '' || this.normalize(option.dataset.search).includes(query);
+        },
+
+        options() {
+            return [...this.$root.querySelectorAll('[data-combobox-option]')].filter((option) => !option.disabled && this.isVisible(option));
+        },
+
+        hasResults() {
+            return this.options().length > 0;
+        },
+
+        refreshSelected() {
+            const option = [...this.$root.querySelectorAll('[data-combobox-option]')].find((item) => item.dataset.value === String(this.value ?? ''));
+            this.selectedLabel = option?.dataset.label ?? '';
+            this.selectedHtml = option?.querySelector('[data-combobox-label]')?.innerHTML ?? '';
+        },
+
+        toggle() {
+            this.open ? this.close() : this.show();
+        },
+
+        show() {
+            this.open = true;
+            this.query = '';
+            this.activeValue = String(this.value ?? '') || (this.options()[0]?.dataset.value ?? null);
+            this.$nextTick(() => this.$refs.search?.focus());
+        },
+
+        close(restoreFocus = false) {
+            this.open = false;
+
+            if (restoreFocus) {
+                this.$refs.trigger.focus();
+            }
+        },
+
+        choose(option) {
+            this.value = option.dataset.value;
+            this.$refs.raw.value = option.dataset.value;
+            this.$refs.raw.dispatchEvent(new Event('change', { bubbles: true }));
+            this.close(true);
+        },
+
+        move(step) {
+            const options = this.options();
+            const index = options.findIndex((option) => option.dataset.value === this.activeValue);
+            const next = options[(index + step + options.length) % options.length];
+
+            if (next) {
+                this.activeValue = next.dataset.value;
+                next.scrollIntoView({ block: 'nearest' });
+            }
+        },
+
+        chooseActive() {
+            const option = this.options().find((item) => item.dataset.value === this.activeValue);
+
+            if (option) {
+                this.choose(option);
+            }
+        },
+    }));
+
+    /**
      * Slider: valor único ou faixa (value = [mín, máx]) com distância mínima entre os botões.
      * value é x-modelable, então funciona com wire:model.
      */
