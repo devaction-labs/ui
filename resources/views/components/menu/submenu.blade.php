@@ -42,6 +42,7 @@
         role="menu"
         x-data="uiMenu({ submenu: true })"
         x-show="subOpen"
+        x-ui-float="{ placement: 'right', gap: 4, offset: -6 }"
         x-cloak
         x-on:keydown="onKeydown($event)"
         class="absolute top-0 left-full z-50 -mt-1.5 ml-1 flex w-56 flex-col rounded-[14px] border border-line bg-card p-1.5 shadow-pop"

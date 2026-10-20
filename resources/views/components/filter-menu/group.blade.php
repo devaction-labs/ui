@@ -44,9 +44,10 @@
         aria-label="{{ $label }}"
         data-filter-group="{{ $name }}"
         x-show="activeGroup === @js($name)"
+        x-ui-float="{ placement: 'right', gap: 6 }"
         x-cloak
         x-on:keydown.arrow-left.prevent.stop="escape()"
-        class="absolute top-0 left-full z-10 ml-1.5 flex max-h-72 w-[230px] flex-col overflow-y-auto rounded-[14px] border border-line bg-card p-1.5 shadow-[0_16px_40px_rgb(24_24_27/0.14)]"
+        class="absolute top-0 left-full z-50 ml-1.5 flex max-h-72 w-[230px] flex-col overflow-y-auto rounded-[14px] border border-line bg-card p-1.5 shadow-[0_16px_40px_rgb(24_24_27/0.14)]"
         data-single="{{ $single ? 'true' : 'false' }}"
     >
         {{ $slot }}

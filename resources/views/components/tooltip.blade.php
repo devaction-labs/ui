@@ -70,6 +70,7 @@
         role="tooltip"
         x-bind:id="$id('ui-tooltip')"
         x-show="open"
+        x-ui-float="{ placement: @js($position), align: @js($align), gap: {{ (int) $gap }} }"
         x-cloak
         x-transition.opacity.duration.100ms
         @class([

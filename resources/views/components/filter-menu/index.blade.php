@@ -50,6 +50,7 @@
         role="menu"
         aria-label="{{ $label }}"
         x-show="open"
+        x-ui-float="{ align: @js($align === 'end' ? 'end' : 'start') }"
         x-cloak
         x-transition.opacity.duration.100ms
         @class([

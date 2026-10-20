@@ -104,6 +104,7 @@
                 role="dialog"
                 aria-label="{{ $label ?? 'Escolher data' }}"
                 x-show="open"
+                x-ui-float="{ reference: $refs.trigger }"
                 x-cloak
                 x-transition.opacity.duration.100ms
                 class="absolute top-full left-0 z-50 mt-1.5 rounded-[14px] border border-line bg-card p-3.5 shadow-[0_16px_40px_rgb(24_24_27/0.10)]"

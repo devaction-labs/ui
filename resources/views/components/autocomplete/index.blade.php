@@ -73,6 +73,7 @@
             role="listbox"
             @if ($label) aria-label="{{ $label }}" @endif
             x-show="open && items().length"
+            x-ui-float="{ match: true }"
             x-cloak
             x-transition.opacity.duration.100ms
             class="absolute inset-x-0 top-full z-50 mt-1.5 flex max-h-80 flex-col overflow-y-auto rounded-[14px] border border-line bg-card p-1.5 shadow-[0_16px_40px_rgb(24_24_27/0.12)]"

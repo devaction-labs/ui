@@ -21,6 +21,8 @@
 @aware([
     'position' => 'bottom',
     'align' => 'start',
+    'gap' => 6,
+    'offset' => 0,
 ])
 
 @props([
@@ -34,6 +36,7 @@
     @if ($keepOpen) data-keep-open @endif
     x-data="uiMenu"
     x-show="open"
+    x-ui-float="{ placement: @js($position), align: @js($align), gap: {{ (int) $gap }}, offset: {{ (int) $offset }} }"
     x-cloak
     x-on:keydown="onKeydown($event)"
     x-transition:enter="transition duration-150 ease-out motion-reduce:transition-none"

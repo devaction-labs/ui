@@ -86,6 +86,7 @@
             aria-label="Seletor de cor"
             @unless ($inline)
                 x-show="open"
+                x-ui-float
                 x-cloak
                 x-transition.opacity.duration.100ms
             @endunless

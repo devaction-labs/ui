@@ -15,6 +15,8 @@
 @aware([
     'position' => 'bottom',
     'align' => 'start',
+    'gap' => 6,
+    'offset' => 0,
 ])
 
 @props([
@@ -47,6 +49,7 @@
     data-popover
     data-dropdown-panel
     x-show="open"
+    x-ui-float="{ placement: @js($position), align: @js($align), gap: {{ (int) $gap }}, offset: {{ (int) $offset }} }"
     x-cloak
     x-transition:enter="transition duration-150 ease-out motion-reduce:transition-none"
     x-transition:enter-start="opacity-0 scale-[.98]"

@@ -58,10 +58,128 @@ const unlockScroll = () => {
     }
 };
 
+/**
+ * Ancestral que vira o "viewport" de um elemento fixed (transform, filter, contain…); null = a janela.
+ */
+const fixedContainingBlock = (el) => {
+    for (let node = el.parentElement; node && node !== document.documentElement; node = node.parentElement) {
+        const style = getComputedStyle(node);
+
+        if (
+            style.transform !== 'none' || style.translate !== 'none' || style.scale !== 'none' || style.filter !== 'none'
+            || (style.backdropFilter && style.backdropFilter !== 'none') || style.perspective !== 'none'
+            || /paint|layout|strict|content/.test(style.contain) || /transform|filter|perspective/.test(style.willChange)
+        ) {
+            return node;
+        }
+    }
+
+    return null;
+};
+
+/**
+ * Posiciona um painel flutuante (dropdown, popover, calendário, tooltip…) a partir do gatilho.
+ * Usa position: fixed, então nenhum overflow-hidden dos pais corta o painel; vira para o lado
+ * oposto quando não cabe e acompanha rolagem e redimensionamento enquanto está visível.
+ */
+const floatPanel = (el, reference, { placement = 'bottom', align = 'start', gap = 6, offset = 0, match = false } = {}, container = null) => {
+    const margin = 8;
+    const anchor = reference.getBoundingClientRect();
+
+    if (match) {
+        el.style.width = `${anchor.width}px`;
+    }
+
+    Object.assign(el.style, { position: 'fixed', margin: '0', translate: 'none', right: 'auto', bottom: 'auto' });
+
+    const width = el.offsetWidth;
+    const height = el.offsetHeight;
+    const viewport = { width: document.documentElement.clientWidth, height: window.innerHeight };
+
+    const fits = {
+        top: anchor.top - gap - height >= margin,
+        bottom: anchor.bottom + gap + height <= viewport.height - margin,
+        left: anchor.left - gap - width >= margin,
+        right: anchor.right + gap + width <= viewport.width - margin,
+    };
+    const opposite = { top: 'bottom', bottom: 'top', left: 'right', right: 'left' };
+    const side = ! fits[placement] && fits[opposite[placement]] ? opposite[placement] : placement;
+    const isVertical = side === 'top' || side === 'bottom';
+
+    let top;
+    let left;
+
+    if (isVertical) {
+        top = side === 'bottom' ? anchor.bottom + gap : anchor.top - gap - height;
+        left = align === 'end'
+            ? anchor.right - width - offset
+            : align === 'center' ? anchor.left + (anchor.width - width) / 2 : anchor.left + offset;
+    } else {
+        left = side === 'right' ? anchor.right + gap : anchor.left - gap - width;
+        top = align === 'end'
+            ? anchor.bottom - height - offset
+            : align === 'center' ? anchor.top + (anchor.height - height) / 2 : anchor.top + offset;
+    }
+
+    left = Math.min(Math.max(left, margin), Math.max(margin, viewport.width - width - margin));
+    top = Math.min(Math.max(top, margin), Math.max(margin, viewport.height - height - margin));
+
+    if (container) {
+        const box = container.getBoundingClientRect();
+        top -= box.top - container.scrollTop;
+        left -= box.left - container.scrollLeft;
+    }
+
+    el.style.top = `${Math.round(top)}px`;
+    el.style.left = `${Math.round(left)}px`;
+    el.dataset.side = side;
+};
+
 document.addEventListener('alpine:init', () => {
     const Alpine = window.Alpine;
 
     Alpine.magic('toast', () => window.DevActionUI.toast);
+
+    /**
+     * x-ui-float="{ placement: 'bottom', align: 'start', gap: 6, offset: 0, match: false, reference: $refs.trigger }"
+     * Sem reference, ancora no elemento pai (o wrapper relative do gatilho).
+     */
+    Alpine.directive('ui-float', (el, { expression }, { evaluate, cleanup }) => {
+        let frame = null;
+        let container = null;
+
+        const isVisible = () => el.getClientRects().length > 0;
+        const place = () => {
+            const options = expression ? evaluate(expression) : {};
+            floatPanel(el, options.reference ?? el.parentElement, options, container);
+        };
+        const tick = () => {
+            if (! isVisible()) {
+                frame = null;
+
+                return;
+            }
+
+            place();
+            frame = requestAnimationFrame(tick);
+        };
+        const start = () => {
+            if (frame === null && isVisible()) {
+                container = fixedContainingBlock(el);
+                place();
+                frame = requestAnimationFrame(tick);
+            }
+        };
+
+        const observer = new MutationObserver(start);
+        observer.observe(el, { attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
+        start();
+
+        cleanup(() => {
+            observer.disconnect();
+            cancelAnimationFrame(frame);
+        });
+    });
 
     /**
      * Sidebar: recolhida no desktop (lembrada no navegador) e em drawer abaixo de 768 px.

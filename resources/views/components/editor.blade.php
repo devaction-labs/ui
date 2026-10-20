@@ -97,7 +97,7 @@
                                 <span x-text="@js($blocks)[block] ?? 'Parágrafo'">Parágrafo</span>
                                 <x-ui::icon name="arrow-down-01" class="size-3.5" />
                             </button>
-                            <div x-show="menu" x-cloak role="menu" class="absolute top-full left-0 z-20 mt-1 flex w-44 flex-col rounded-xl border border-line bg-card p-1.5 shadow-[0_16px_40px_rgb(24_24_27/0.12)]">
+                            <div x-show="menu" x-ui-float="{ gap: 4 }" x-cloak role="menu" class="absolute top-full left-0 z-50 mt-1 flex w-44 flex-col rounded-xl border border-line bg-card p-1.5 shadow-[0_16px_40px_rgb(24_24_27/0.12)]">
                                 @foreach ($blocks as $tag => $blockLabel)
                                     <button
                                         type="button"
