@@ -511,6 +511,60 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Paleta de comandos: filtra as opções pelo texto digitado, ↑↓ navega e ↵ escolhe.
+     */
+    Alpine.data('uiCommand', () => ({
+        query: '',
+        activeId: null,
+
+        init() {
+            this.$watch('query', () => this.$nextTick(() => this.activateFirst()));
+            this.$nextTick(() => this.activateFirst());
+        },
+
+        normalize(text) {
+            return (text ?? '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+        },
+
+        isVisible(element) {
+            const query = this.normalize(this.query);
+
+            return query === '' || this.normalize(element.dataset.search).includes(query);
+        },
+
+        options() {
+            return [...this.$root.querySelectorAll('[data-command-item]')].filter((item) => !item.disabled && this.isVisible(item));
+        },
+
+        hasResults() {
+            return this.options().length > 0;
+        },
+
+        groupHasResults(group) {
+            return [...group.querySelectorAll('[data-command-item]')].some((item) => this.isVisible(item));
+        },
+
+        activateFirst() {
+            this.activeId = this.options()[0]?.id ?? null;
+        },
+
+        move(step) {
+            const options = this.options();
+            const index = options.findIndex((option) => option.id === this.activeId);
+            const next = options[(index + step + options.length) % options.length];
+
+            if (next) {
+                this.activeId = next.id;
+                next.scrollIntoView({ block: 'nearest' });
+            }
+        },
+
+        choose() {
+            document.getElementById(this.activeId)?.click();
+        },
+    }));
+
+    /**
      * Tooltip: espera no hover, aparece na hora com o foco do teclado e Esc fecha.
      * Liga o primeiro elemento focável ao texto com aria-describedby.
      */
