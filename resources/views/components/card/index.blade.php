@@ -31,11 +31,20 @@
         default => ['p-[22px]', 'rounded-card', 'gap-4'],
     };
 
+    // Tabelas com bleed usam este valor para ir até a borda do card
+    $bleedClass = match ($size) {
+        'xs' => '[--ui-bleed:0.75rem]',
+        'sm' => '[--ui-bleed:1rem]',
+        'lg' => '[--ui-bleed:2rem]',
+        default => '[--ui-bleed:22px]',
+    };
+
     $classes = [
         'flex flex-col text-ink',
         $paddingClasses,
         $radiusClasses,
         $gapClasses,
+        $bleedClass,
         $variant === 'soft' ? 'bg-wrap' : 'border border-line bg-card',
     ];
 @endphp

@@ -23,7 +23,11 @@
     selectable: caixa por linha e no cabeçalho; wire:model recebe as chaves marcadas; slot bulk vira a barra de ações
     expandable: reserva a coluna da seta para linhas com slot detail
     stack:      abaixo de 640 px cada linha vira um card (cell primary vira o título, label nomeia as outras)
-    paginator:  mostra x-ui::pagination no rodapé (slot footer para outro conteúdo)
+    paginate:   paginator do Laravel; mostra x-ui::pagination no rodapé (paginator também vale; slot footer para outro conteúdo)
+                dentro de um componente Livewire os botões usam setPage() sozinhos (force com :livewire="false")
+    pagination:scroll-to: seletor rolado ao trocar de página (padrão body)
+    container:class: classes do contêiner que rola (ex.: max-h-80, junto com columns sticky)
+    bleed:      dentro de um card com padding, as linhas vão até a borda e a 1ª/última coluna alinham com o conteúdo (--ui-bleed, padrão 1.5rem)
 --}}
 @props([
     'variant' => 'default',
@@ -33,16 +37,28 @@
     'expandable' => false,
     'stack' => false,
     'paginator' => null,
-    'livewire' => false,
+    'paginate' => null,
+    'livewire' => null,
+    'bleed' => false,
 ])
+
+@php
+    $paginator ??= $paginate;
+    $livewire ??= class_exists(\Livewire\Livewire::class) && (bool) \Livewire\Livewire::current();
+    $scrollTo = $attributes->get('pagination:scroll-to', 'body');
+    $containerClass = $attributes->get('container:class');
+    $attributes = $attributes->except(['pagination:scroll-to', 'container:class']);
+@endphp
 
 <div
     data-table
     x-data="uiTable"
     x-modelable="selected"
+    @if ($bleed) style="--ui-table-bleed: var(--ui-bleed, 1.5rem)" @endif
     {{ $attributes->class([
         'relative w-full min-w-0',
-        'overflow-hidden rounded-xl border border-line bg-card' => $variant !== 'minimal',
+        'overflow-hidden rounded-xl border border-line bg-card' => $variant !== 'minimal' && ! $bleed,
+        '-mx-(--ui-table-bleed) w-[calc(100%+var(--ui-table-bleed)*2)] [&_tr>*:first-child]:pl-(--ui-table-bleed) [&_tr>*:last-child]:pr-(--ui-table-bleed)' => $bleed,
     ]) }}
 >
     @isset($bulk)
@@ -64,7 +80,7 @@
         </div>
     @endisset
 
-    <div class="overflow-x-auto">
+    <div @class(['overflow-auto' => $containerClass, 'overflow-x-auto' => ! $containerClass, $containerClass])>
         <table @class([
             'w-full border-separate border-spacing-0 text-left text-sm text-ink',
             'max-sm:block' => $stack,
@@ -80,7 +96,7 @@
         ])>
             {{ $footer ?? '' }}
             @if ($paginator)
-                <x-ui::pagination :paginator="$paginator" :livewire="$livewire" class="flex-1" />
+                <x-ui::pagination :paginator="$paginator" :livewire="$livewire" :scroll-to="$scrollTo" class="flex-1" />
             @endif
         </div>
     @endif

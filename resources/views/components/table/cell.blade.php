@@ -8,6 +8,7 @@
     primary: texto em destaque; no modo stack vira o título do card
     label:   nome da coluna mostrado no card do modo stack
     sticky:  presa à esquerda (ou "end", à direita) ao rolar para o lado
+    variant: default · strong (texto em destaque, como primary sem virar título no stack)
 --}}
 @aware([
     'variant' => 'default',
@@ -20,9 +21,11 @@
     'primary' => false,
     'label' => null,
     'sticky' => false,
+    'variant' => 'default',
 ])
 
 @php
+    $isStrong = $primary || $variant === 'strong';
     $stickySide = $sticky === 'end' ? 'end' : ($sticky ? 'start' : null);
 @endphp
 
@@ -32,8 +35,8 @@
         'border-b border-line-soft px-3.5',
         'h-12' => $density !== 'compact',
         'h-9 text-[13px]' => $density === 'compact',
-        'font-medium text-ink' => $primary,
-        'text-ink-2' => ! $primary,
+        'font-medium text-ink' => $isStrong,
+        'text-ink-2' => ! $isStrong,
         'text-left' => $align === 'start',
         'text-center' => $align === 'center',
         'text-right tabular-nums' => $align === 'end',

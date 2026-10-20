@@ -16,6 +16,7 @@
 
 @props([
     'key' => null,
+    'sticky' => false,
 ])
 
 @php
@@ -30,6 +31,7 @@
     @if ($selectable && $rowKey !== '') x-bind:class="isSelected(@js($rowKey)) && 'bg-subtle!'" @endif
     {{ $attributes->class([
         'transition-colors hover:bg-subtle/60',
+        '[&>td]:sticky [&>td]:top-10 [&>td]:z-[2] [&>td]:bg-card' => $sticky,
         'max-sm:relative max-sm:grid max-sm:grid-cols-2 max-sm:gap-x-2.5 max-sm:gap-y-1.5 max-sm:rounded-[14px] max-sm:border max-sm:border-line max-sm:bg-card max-sm:px-3.5 max-sm:py-3' => $stack,
     ]) }}
 >

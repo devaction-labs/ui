@@ -2,6 +2,7 @@
     Cabeçalho da tabela.
 
     <x-ui::table.columns>…colunas…</x-ui::table.columns>
+    <x-ui::table.columns sticky>…</x-ui::table.columns>   cabeçalho preso no topo ao rolar (use container:class="max-h-80" na tabela)
 --}}
 @aware([
     'variant' => 'default',
@@ -11,9 +12,16 @@
     'stack' => false,
 ])
 
+@props([
+    'sticky' => false,
+])
+
 <thead @class(['max-sm:hidden' => $stack])>
     <tr {{ $attributes->class([
         'bg-subtle' => $variant !== 'minimal',
+        '[&>th]:sticky [&>th]:top-0 [&>th]:z-[3]' => $sticky,
+        '[&>th]:bg-subtle' => $sticky && $variant !== 'minimal',
+        '[&>th]:bg-card' => $sticky && $variant === 'minimal',
     ]) }}>
         @if ($selectable)
             <th scope="col" @class([
