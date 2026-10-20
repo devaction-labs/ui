@@ -142,3 +142,5 @@ composer test        # tudo
 ## Licença
 
 DevAction UI foi criado pela [DevAction Labs](https://github.com/devaction-labs) e é distribuído sob a [licença MIT](LICENSE).
+
+<p align="center"><sub>All honor <b>and glory</b> to the Lord Jesus.</sub></p>
