@@ -747,6 +747,103 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Menu de filtros: grupos com submenu de opções. Marcar não fecha o menu; as escolhas ficam
+     * num rascunho até Aplicar. value (x-modelable) é { grupo: [valores] }.
+     */
+    Alpine.data('uiFilterMenu', ({ value = {} } = {}) => ({
+        open: false,
+        activeGroup: null,
+        value: value && typeof value === 'object' && !Array.isArray(value) ? value : {},
+        draft: {},
+
+        toggle() {
+            this.open ? this.close() : this.show();
+        },
+
+        show() {
+            this.draft = JSON.parse(JSON.stringify(this.value ?? {}));
+            this.open = true;
+            this.$nextTick(() => this.$root.querySelector('[data-filter-group-trigger]')?.focus());
+        },
+
+        close(restoreFocus = false) {
+            this.open = false;
+            this.activeGroup = null;
+
+            if (restoreFocus) {
+                this.$refs.trigger.focus();
+            }
+        },
+
+        escape() {
+            if (this.activeGroup !== null) {
+                const group = this.activeGroup;
+                this.activeGroup = null;
+                this.$root.querySelector(`[data-filter-group-trigger="${group}"]`)?.focus();
+
+                return;
+            }
+
+            this.close(true);
+        },
+
+        openGroup(name, focus = false) {
+            this.activeGroup = name;
+
+            if (focus) {
+                this.$nextTick(() => this.$root.querySelector(`[data-filter-group="${name}"] [data-filter-option]`)?.focus());
+            }
+        },
+
+        selected(group) {
+            return Array.isArray(this.draft[group]) ? this.draft[group] : [];
+        },
+
+        isChecked(group, option) {
+            return this.selected(group).includes(option);
+        },
+
+        toggleOption(group, option, single = false) {
+            const current = this.selected(group);
+
+            if (single) {
+                this.draft = { ...this.draft, [group]: current.includes(option) ? [] : [option] };
+
+                return;
+            }
+
+            this.draft = { ...this.draft, [group]: current.includes(option) ? current.filter((item) => item !== option) : [...current, option] };
+        },
+
+        groupCount(group) {
+            return this.selected(group).length;
+        },
+
+        appliedCount() {
+            return Object.values(this.value ?? {}).reduce((total, items) => total + (Array.isArray(items) ? items.length : 0), 0);
+        },
+
+        clear() {
+            this.draft = {};
+        },
+
+        apply() {
+            this.value = Object.fromEntries(Object.entries(this.draft).filter(([, items]) => Array.isArray(items) && items.length));
+            this.$dispatch('filters-applied', this.value);
+            this.close(true);
+        },
+
+        focusSibling(step) {
+            const current = document.activeElement;
+            const isOption = current.hasAttribute('data-filter-option');
+            const scope = isOption ? current.closest('[data-filter-group]') : this.$root;
+            const items = [...scope.querySelectorAll(isOption ? '[data-filter-option]' : '[data-filter-group-trigger]')];
+            const index = items.indexOf(current);
+            items[(index + step + items.length) % items.length]?.focus();
+        },
+    }));
+
+    /**
      * Seletor de cor: área de saturação/brilho, matiz, opacidade opcional, conta-gotas e cores prontas.
      * value (x-modelable) sai sempre em hex: #RRGGBB, ou #RRGGBBAA com alpha.
      */
