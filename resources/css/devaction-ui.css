@@ -142,8 +142,11 @@
     }
 
     @keyframes shimmer {
+        from {
+            background-position: -400px 0;
+        }
         to {
-            background-position: -200% 0;
+            background-position: 400px 0;
         }
     }
 }
@@ -231,4 +234,9 @@
 
 @utility mask-fade-center {
     mask-image: radial-gradient(ellipse 70% 90% at 50% 50%, #000 25%, transparent 85%);
+}
+
+/* Brilho do skeleton: gradiente que desliza sobre o fundo line-soft */
+@utility skeleton-shimmer {
+    background: linear-gradient(90deg, var(--line-soft) 0, var(--subtle) 50%, var(--line-soft) 100%) 0 0 / 800px 100%;
 }
