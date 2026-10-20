@@ -4,8 +4,118 @@
  * O Alpine já vem com o Livewire 4. Importe este arquivo no app.js do projeto:
  *   import '../../vendor/devaction/ui/resources/js/devaction-ui.js';
  */
+/**
+ * Controle de modais fora do Alpine: DevActionUI.modal('nome').show(), DevActionUI.modals().close().
+ * Do Livewire: $this->dispatch('ui-modal', name: 'nome', action: 'show').
+ */
+const modalControl = (name) => ({
+    show: () => window.dispatchEvent(new CustomEvent('ui-modal', { detail: { name, action: 'show' } })),
+    close: () => window.dispatchEvent(new CustomEvent('ui-modal', { detail: { name, action: 'close' } })),
+});
+
+window.DevActionUI = {
+    ...(window.DevActionUI ?? {}),
+    modal: modalControl,
+    modals: () => ({ close: () => window.dispatchEvent(new CustomEvent('ui-modal', { detail: { action: 'close-all' } })) }),
+};
+
+/**
+ * Trava a rolagem da página enquanto houver pelo menos um modal aberto.
+ */
+let openModals = 0;
+
+const lockScroll = () => {
+    openModals += 1;
+    document.documentElement.style.overflow = 'hidden';
+};
+
+const unlockScroll = () => {
+    openModals = Math.max(0, openModals - 1);
+
+    if (openModals === 0) {
+        document.documentElement.style.overflow = '';
+    }
+};
+
 document.addEventListener('alpine:init', () => {
     const Alpine = window.Alpine;
+
+    Alpine.magic('modal', () => modalControl);
+    Alpine.magic('modals', () => window.DevActionUI.modals);
+
+    /**
+     * Modal sobre <dialog>: showModal() deixa o resto da página inerte e trata o Esc.
+     * open é x-modelable, então funciona com wire:model.
+     */
+    Alpine.data('uiModal', ({ name = null, open = false, dismissible = true, escapable = true } = {}) => ({
+        name,
+        open,
+        dismissible,
+        escapable,
+
+        init() {
+            this.$watch('open', (isOpen) => (isOpen ? this.showDialog() : this.$refs.dialog.close()));
+
+            if (this.open) {
+                this.$nextTick(() => this.showDialog());
+            }
+
+            this.onWindowEvent = (event) => {
+                const { name: target, action } = event.detail ?? {};
+
+                if (action === 'close-all') {
+                    this.open = false;
+                } else if (target !== null && target === this.name) {
+                    this.open = action === 'show';
+                }
+            };
+
+            window.addEventListener('ui-modal', this.onWindowEvent);
+        },
+
+        destroy() {
+            window.removeEventListener('ui-modal', this.onWindowEvent);
+
+            if (this.$refs.dialog?.open) {
+                unlockScroll();
+            }
+        },
+
+        showDialog() {
+            const dialog = this.$refs.dialog;
+
+            if (!dialog.open) {
+                dialog.showModal();
+                lockScroll();
+            }
+        },
+
+        /**
+         * O <dialog> fechou (botão, Esc, clique fora ou open = false).
+         */
+        closed() {
+            unlockScroll();
+            this.open = false;
+            this.$root.dispatchEvent(new CustomEvent('close'));
+        },
+
+        cancel(event) {
+            if (!this.escapable) {
+                event.preventDefault();
+
+                return;
+            }
+
+            this.$root.dispatchEvent(new CustomEvent('cancel'));
+        },
+
+        clickOutside(event) {
+            if (event.target === this.$refs.dialog && this.dismissible) {
+                this.$root.dispatchEvent(new CustomEvent('cancel'));
+                this.open = false;
+            }
+        },
+    }));
 
     Alpine.data('uiAccordion', ({ exclusive = false } = {}) => ({
         exclusive,
