@@ -1308,7 +1308,15 @@ document.addEventListener('alpine:init', () => {
      * com estado (aria-pressed) e menu de comandos ao digitar "/" numa linha vazia.
      * value (x-modelable) é o HTML; sanitize no servidor antes de exibir para outras pessoas.
      */
-    Alpine.data('uiEditor', ({ value = '' } = {}) => ({
+    Alpine.data('uiEditor', ({ value = '', mentionSearch = null } = {}) => ({
+        mentionOpen: false,
+        mentionQuery: '',
+        mentionIndex: 0,
+        mentionTop: 0,
+        mentionLeft: 0,
+        mentionNode: null,
+        mentionOffset: 0,
+
         value,
         active: {},
         block: 'p',
@@ -1410,7 +1418,138 @@ document.addEventListener('alpine:init', () => {
             return [...this.$root.querySelectorAll('[data-slash-item]')].filter((item) => item.dataset.label.toLowerCase().includes(query));
         },
 
+        mentionItems() {
+            const query = (this.mentionQuery ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+            return [...this.$root.querySelectorAll('[data-mention-item]')].filter((item) => item.dataset.search.includes(query));
+        },
+
+        openMention() {
+            const selection = window.getSelection();
+
+            if (! selection?.rangeCount) {
+                return;
+            }
+
+            const range = selection.getRangeAt(0);
+            const caret = range.getBoundingClientRect();
+            const box = this.$refs.content.getBoundingClientRect();
+
+            this.mentionNode = selection.anchorNode;
+            this.mentionOffset = selection.anchorOffset;
+            this.mentionTop = (caret?.bottom || box.top) - box.top + 6;
+            this.mentionLeft = Math.max(0, (caret?.left || box.left) - box.left - 6);
+            this.mentionQuery = '';
+            this.mentionIndex = 0;
+            this.mentionOpen = true;
+            this.searchMentions();
+        },
+
+        trackMention() {
+            const selection = window.getSelection();
+
+            if (! selection || selection.anchorNode !== this.mentionNode || selection.anchorOffset < this.mentionOffset) {
+                this.mentionOpen = false;
+
+                return;
+            }
+
+            const query = (this.mentionNode.textContent ?? '').slice(this.mentionOffset, selection.anchorOffset);
+
+            if (query.length > 30 || /\s{2,}|\n/.test(query)) {
+                this.mentionOpen = false;
+
+                return;
+            }
+
+            this.mentionQuery = query;
+            this.mentionIndex = 0;
+            this.searchMentions();
+        },
+
+        searchMentions() {
+            if (mentionSearch && this.$wire) {
+                this.$wire.set(mentionSearch, this.mentionQuery);
+            }
+        },
+
+        chooseMention(item) {
+            const selection = window.getSelection();
+            const node = this.mentionNode;
+
+            if (! node || ! selection) {
+                return;
+            }
+
+            const end = selection.anchorNode === node ? selection.anchorOffset : this.mentionOffset + this.mentionQuery.length;
+            const range = document.createRange();
+            range.setStart(node, Math.max(0, this.mentionOffset - 1));
+            range.setEnd(node, Math.min(end, node.textContent.length));
+            range.deleteContents();
+
+            const mention = document.createElement('span');
+            mention.dataset.mention = item.dataset.value;
+            mention.contentEditable = 'false';
+            mention.textContent = `@${item.dataset.label}`;
+
+            const space = document.createTextNode('\u00a0');
+            range.insertNode(space);
+            range.insertNode(mention);
+
+            const caret = document.createRange();
+            caret.setStartAfter(space);
+            caret.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(caret);
+
+            this.mentionOpen = false;
+            this.sync();
+            this.$dispatch('editor-mention', { value: item.dataset.value, label: item.dataset.label });
+        },
+
+        runCommand(name) {
+            const line = this.closestBlock();
+
+            if (line) {
+                line.textContent = '';
+            }
+
+            this.slashOpen = false;
+            this.sync();
+            this.$dispatch('editor-command', { name });
+        },
+
         keydown(event) {
+            if (this.mentionOpen) {
+                const items = this.mentionItems();
+
+                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    this.mentionIndex = (this.mentionIndex + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % (items.length || 1);
+
+                    return;
+                }
+
+                if ((event.key === 'Enter' || event.key === 'Tab') && items.length) {
+                    event.preventDefault();
+                    this.chooseMention(items[this.mentionIndex] ?? items[0]);
+
+                    return;
+                }
+
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.mentionOpen = false;
+
+                    return;
+                }
+            }
+
+            if (event.key === '@' && ! this.mentionOpen && this.$root.querySelector('[data-mention-item], [role=listbox][aria-label=Pessoas]')) {
+                this.$nextTick(() => this.openMention());
+            }
+
             if (this.slashOpen) {
                 const items = this.slashItems();
 
@@ -1448,6 +1587,10 @@ document.addEventListener('alpine:init', () => {
 
         input() {
             this.sync();
+
+            if (this.mentionOpen) {
+                this.trackMention();
+            }
 
             if (this.slashOpen) {
                 const text = this.closestBlock()?.textContent ?? '';

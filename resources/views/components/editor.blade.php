@@ -6,7 +6,13 @@
 
     toolbar: itens separados por espaço, grupos por |
              heading bold italic strike code bullet ordered blockquote codeblock link undo redo
-    "/" numa linha vazia abre o menu de comandos (título, lista, citação, código).
+    "/" numa linha vazia abre o menu de comandos (título, lista, citação, código e os seus em commands).
+    "@" abre as pessoas de mentions e insere a menção (<span data-mention="valor">@Nome</span>).
+
+    mentions:       [['value' => 'alex', 'label' => 'Alex', 'description' => 'Dev · online agora']]
+    mention-search: propriedade do Livewire que recebe o texto depois do @ (para buscar pessoas no servidor)
+    commands:       comandos extras do "/": [['label' => '/tarefa', 'description' => 'Criar tarefa', 'icon' => 'task-01', 'name' => 'task']]
+                    disparam editor-command com { name } e apagam o texto do comando
     Slot actions: botões no fim da barra (ex.: IA). wire:model recebe o HTML; sanitize no servidor.
 --}}
 @props([
@@ -17,6 +23,9 @@
     'toolbar' => 'heading | bold italic strike code | bullet ordered blockquote codeblock | link | undo redo',
     'value' => '',
     'name' => null,
+    'mentions' => [],
+    'mentionSearch' => null,
+    'commands' => [],
 ])
 
 @php
@@ -53,6 +62,15 @@
         ['label' => 'Citação', 'icon' => 'quote-down', 'hint' => '>', 'click' => "chooseSlash('formatBlock', 'blockquote')"],
         ['label' => 'Bloco de código', 'icon' => 'code', 'hint' => '```', 'click' => "chooseSlash('formatBlock', 'pre')"],
     ];
+
+    foreach ($commands as $command) {
+        $slashItems[] = [
+            'label' => $command['label'],
+            'icon' => $command['icon'] ?? 'command',
+            'hint' => $command['description'] ?? '',
+            'click' => 'runCommand('.\Illuminate\Support\Js::from($command['name'] ?? ltrim($command['label'], '/')).')',
+        ];
+    }
 @endphp
 
 <div data-field @class(['flex min-w-0 flex-col gap-1.5', $attributes->get('class')])>
@@ -65,7 +83,7 @@
 
     <div
         data-editor
-        x-data="uiEditor({ value: @js($value) })"
+        x-data="uiEditor({ value: @js($value), mentionSearch: @js($mentionSearch) })"
         x-modelable="value"
         {{ $attributes->except(['id', 'class'])->class([
             'relative mt-1 rounded-xl border bg-card transition',
@@ -150,7 +168,7 @@
                 x-on:input="input()"
                 x-on:keydown="keydown($event)"
                 x-on:paste="paste($event)"
-                x-on:blur="slashOpen = false"
+                x-on:blur="slashOpen = false; mentionOpen = false"
                 @class([
                     'min-h-40 px-5 py-4 text-[15px] leading-relaxed text-ink-2 outline-none',
                     'data-empty:before:pointer-events-none data-empty:before:absolute data-empty:before:top-4 data-empty:before:left-5 data-empty:before:text-muted data-empty:before:content-[attr(data-placeholder)]',
@@ -162,6 +180,7 @@
                     '[&_pre]:mb-3 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-wrap [&_pre]:p-3 [&_pre]:font-mono [&_pre]:text-[13px]',
                     '[&_code]:rounded-[5px] [&_code]:bg-wrap [&_code]:px-1.5 [&_code]:py-px [&_code]:font-mono [&_code]:text-[13px]',
                     '[&_a]:text-info-fg [&_a]:underline-offset-2 hover:[&_a]:underline [&_strong]:font-semibold [&_strong]:text-ink',
+                    '[&_[data-mention]]:rounded-[5px] [&_[data-mention]]:bg-info-bg [&_[data-mention]]:px-1 [&_[data-mention]]:font-medium [&_[data-mention]]:text-info-fg',
                 ])
             ></div>
 
@@ -192,6 +211,44 @@
                     </button>
                 @endforeach
             </div>
+
+            @if ($mentions !== [] || $mentionSearch)
+                <div
+                    x-show="mentionOpen && mentionItems().length"
+                    x-cloak
+                    role="listbox"
+                    aria-label="Pessoas"
+                    class="absolute z-20 flex w-[330px] max-w-[calc(100%-1rem)] flex-col rounded-xl border border-line bg-card p-1.5 shadow-[0_16px_40px_-12px_rgb(24_24_27/0.28)]"
+                    x-bind:style="{ top: mentionTop + 'px', left: mentionLeft + 'px' }"
+                >
+                    <span class="px-2 pt-1 pb-1.5 font-mono text-[10px] tracking-[0.08em] text-muted">PESSOAS</span>
+                    @foreach ($mentions as $mention)
+                        <button
+                            type="button"
+                            role="option"
+                            data-mention-item
+                            data-value="{{ $mention['value'] }}"
+                            data-label="{{ $mention['label'] }}"
+                            data-search="{{ \Illuminate\Support\Str::squish(\Illuminate\Support\Str::lower(\Illuminate\Support\Str::ascii($mention['label'].' '.($mention['description'] ?? '').' '.$mention['value']))) }}"
+                            x-show="mentionItems().includes($el)"
+                            x-on:mousedown.prevent
+                            x-on:click="chooseMention($el)"
+                            x-bind:aria-selected="(mentionItems()[mentionIndex] === $el).toString()"
+                            x-bind:class="mentionItems()[mentionIndex] === $el && 'bg-wrap'"
+                            class="flex h-10 cursor-pointer items-center gap-2.5 rounded-lg px-2 text-left text-sm"
+                        >
+                            <x-ui::avatar :name="$mention['label']" :src="$mention['avatar'] ?? null" :icon="$mention['icon'] ?? null" :color="$mention['color'] ?? 'auto'" size="xs" class="size-[26px]" />
+                            <span class="min-w-0 flex-1">
+                                <span class="block truncate font-medium text-ink">{{ $mention['label'] }}</span>
+                                @if (! empty($mention['description']))
+                                    <span class="block truncate text-xs text-muted">{{ $mention['description'] }}</span>
+                                @endif
+                            </span>
+                            <kbd class="font-mono text-[11px] text-muted" x-show="mentionItems()[mentionIndex] === $el.closest('[data-mention-item]')">↵</kbd>
+                        </button>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </div>
 
