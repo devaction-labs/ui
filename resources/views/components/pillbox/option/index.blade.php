@@ -6,4 +6,14 @@
 
     selected-label: texto da pílula quando escolhida · filterable: false nunca some no filtro
 --}}
-<x-ui::combobox.option :attributes="$attributes">{{ $slot }}</x-ui::combobox.option>
+@props([
+    'value' => null,
+    'icon' => null,
+    'color' => null,
+    'meta' => null,
+    'search' => null,
+    'selectedLabel' => null,
+    'filterable' => true,
+])
+
+<x-ui::combobox.option :value="$value" :icon="$icon" :color="$color" :meta="$meta" :search="$search" :selected-label="$selectedLabel" :filterable="$filterable" :attributes="$attributes">{{ $slot }}</x-ui::combobox.option>

@@ -3,4 +3,9 @@
 
     <x-slot:search><x-ui::pillbox.search wire:model.live="search" placeholder="Buscar tags…" /></x-slot:search>
 --}}
-<x-ui::combobox.input :attributes="$attributes" />
+@props([
+    'placeholder' => 'Filtrar…',
+    'listbox' => null,
+])
+
+<x-ui::combobox.input :placeholder="$placeholder" :listbox="$listbox" :attributes="$attributes" />

@@ -42,7 +42,7 @@ class IconCommand extends Command
 
     public function handle(Filesystem $files): int
     {
-        $icons = $this->argument('icons') ?: preg_split('/[\s,]+/', (string) $this->ask('Quais ícones? (separe por espaço, ex.: calendar-add-01 user-star-01)'), flags: PREG_SPLIT_NO_EMPTY);
+        $icons = $this->iconNames();
 
         if ($icons === []) {
             $this->components->error('Informe pelo menos um ícone.');
@@ -52,7 +52,7 @@ class IconCommand extends Command
 
         $path = $this->option('path');
         $directory = match (true) {
-            blank($path) => resource_path('views/vendor/ui/icons'),
+            ! is_string($path) || $path === '' => resource_path('views/vendor/ui/icons'),
             str_starts_with($path, '/') => $path,
             default => base_path($path),
         };
@@ -86,6 +86,24 @@ class IconCommand extends Command
         $this->components->info('Use com <x-ui::icon name="'.$this->normalizeName($icons[0]).'" />. Lista completa em hugeicons.com/icons?style=Stroke&type=Rounded');
 
         return $failed === 0 ? self::SUCCESS : self::FAILURE;
+    }
+
+    /**
+     * Nomes passados no comando ou, sem nenhum, perguntados.
+     *
+     * @return list<string>
+     */
+    protected function iconNames(): array
+    {
+        $argument = $this->argument('icons');
+
+        if (is_array($argument) && $argument !== []) {
+            return array_values(array_filter($argument, is_string(...)));
+        }
+
+        $answer = $this->ask('Quais ícones? (separe por espaço, ex.: calendar-add-01 user-star-01)');
+
+        return is_string($answer) ? (preg_split('/[\s,]+/', $answer, flags: PREG_SPLIT_NO_EMPTY) ?: []) : [];
     }
 
     /**

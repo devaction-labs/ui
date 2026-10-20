@@ -23,7 +23,7 @@
         {{ $slot }}
         <div class="p-3">
             <x-ui::diff.composer :line="(int) $line" reply>
-                <x-ui::button size="sm" x-on:click="resolveThread({{ (int) $line }})" @if ($resolve) wire:click="{{ $resolve }}" @endif>Resolver</x-ui::button>
+                <x-ui::button size="sm" x-on:click="resolveThread({{ (int) $line }})" :wire:click="$resolve">Resolver</x-ui::button>
             </x-ui::diff.composer>
         </div>
     </div>

@@ -12,12 +12,12 @@
 --}}
 @aware([
     'variant' => 'default',
-    'expanded' => false,
-    'disabled' => false,
 ])
 
 @props([
     'trailing' => null,
+    'expanded' => false,
+    'disabled' => false,
 ])
 
 @php
