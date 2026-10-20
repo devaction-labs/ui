@@ -747,6 +747,148 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Seletor de cor: área de saturação/brilho, matiz, opacidade opcional, conta-gotas e cores prontas.
+     * value (x-modelable) sai sempre em hex: #RRGGBB, ou #RRGGBBAA com alpha.
+     */
+    Alpine.data('uiColorPicker', ({ value = '#18181B', alpha = false } = {}) => {
+        const clamp = (number, low, high) => Math.min(high, Math.max(low, number));
+        const toHex = (number) => Math.round(number).toString(16).padStart(2, '0').toUpperCase();
+        const hsvToRgb = (h, s, v) => {
+            const f = (n) => {
+                const k = (n + h / 60) % 6;
+
+                return v - v * s * Math.max(0, Math.min(k, 4 - k, 1));
+            };
+
+            return [f(5) * 255, f(3) * 255, f(1) * 255];
+        };
+        const rgbToHsv = (r, g, b) => {
+            [r, g, b] = [r / 255, g / 255, b / 255];
+            const max = Math.max(r, g, b);
+            const delta = max - Math.min(r, g, b);
+            let h = 0;
+
+            if (delta) {
+                h = max === r ? ((g - b) / delta) % 6 : max === g ? (b - r) / delta + 2 : (r - g) / delta + 4;
+            }
+
+            return [(h * 60 + 360) % 360, max ? delta / max : 0, max];
+        };
+
+        return {
+            open: false,
+            value,
+            text: value,
+            hue: 0,
+            saturation: 0,
+            brightness: 0,
+            opacity: 100,
+            dragging: false,
+
+            init() {
+                this.parse(this.value);
+                this.$watch('value', (next) => {
+                    if (next && next.toUpperCase() !== this.hex().toUpperCase()) {
+                        this.parse(next);
+                    }
+                });
+            },
+
+            parse(hex) {
+                const clean = String(hex ?? '').replace('#', '').trim();
+
+                if (!/^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(clean)) {
+                    return false;
+                }
+
+                const full = clean.length === 3 ? clean.split('').map((character) => character + character).join('') : clean;
+                const [r, g, b] = [0, 2, 4].map((index) => parseInt(full.slice(index, index + 2), 16));
+                [this.hue, this.saturation, this.brightness] = rgbToHsv(r, g, b);
+                this.opacity = full.length === 8 ? Math.round((parseInt(full.slice(6, 8), 16) / 255) * 100) : 100;
+                this.text = this.hex();
+
+                return true;
+            },
+
+            solid() {
+                return `#${hsvToRgb(this.hue, this.saturation, this.brightness).map(toHex).join('')}`;
+            },
+
+            hueColor() {
+                return `#${hsvToRgb(this.hue, 1, 1).map(toHex).join('')}`;
+            },
+
+            hex() {
+                return alpha && this.opacity < 100 ? `${this.solid()}${toHex((this.opacity / 100) * 255)}` : this.solid();
+            },
+
+            sync() {
+                this.value = this.hex();
+                this.text = this.value;
+            },
+
+            typed() {
+                const candidate = this.text.startsWith('#') ? this.text : `#${this.text}`;
+
+                if (this.parse(candidate)) {
+                    this.value = this.hex();
+                }
+            },
+
+            blurred() {
+                this.text = this.hex();
+            },
+
+            pointer(event) {
+                const box = this.$refs.area.getBoundingClientRect();
+                this.saturation = clamp((event.clientX - box.left) / box.width, 0, 1);
+                this.brightness = 1 - clamp((event.clientY - box.top) / box.height, 0, 1);
+                this.sync();
+            },
+
+            startDrag(event) {
+                this.dragging = true;
+                this.$refs.area.setPointerCapture(event.pointerId);
+                this.pointer(event);
+            },
+
+            drag(event) {
+                if (this.dragging) {
+                    this.pointer(event);
+                }
+            },
+
+            areaKey(dx, dy) {
+                this.saturation = clamp(this.saturation + dx, 0, 1);
+                this.brightness = clamp(this.brightness + dy, 0, 1);
+                this.sync();
+            },
+
+            choose(hex) {
+                this.parse(hex);
+                this.sync();
+            },
+
+            isCurrent(hex) {
+                return this.solid().toUpperCase() === hex.toUpperCase();
+            },
+
+            canPickFromScreen() {
+                return 'EyeDropper' in window;
+            },
+
+            async pickFromScreen() {
+                try {
+                    const { sRGBHex } = await new window.EyeDropper().open();
+                    this.choose(sRGBHex);
+                } catch {
+                    // A pessoa cancelou o conta-gotas.
+                }
+            },
+        };
+    });
+
+    /**
      * Date picker: data única ('2026-10-16') ou faixa ({ start, end }), com min, max e atalhos.
      * value é x-modelable. Datas em texto ISO, sem fuso, para não andar um dia.
      */
