@@ -747,6 +747,154 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Timer: conta segundos a partir de seconds; com started-at (timestamp) retoma depois de recarregar.
+     * value (x-modelable) são os segundos. Dispara timer-started, timer-paused e timer-stopped.
+     */
+    Alpine.data('uiTimer', ({ seconds = 0, running = false, startedAt = null } = {}) => ({
+        value: Number(seconds) || 0,
+        running: false,
+        base: Number(seconds) || 0,
+        since: null,
+        ticker: null,
+
+        init() {
+            if (running) {
+                this.since = startedAt ? Number(startedAt) * 1000 : Date.now();
+                this.run();
+            }
+        },
+
+        destroy() {
+            clearInterval(this.ticker);
+        },
+
+        run() {
+            this.running = true;
+            this.tick();
+            this.ticker = setInterval(() => this.tick(), 1000);
+        },
+
+        tick() {
+            this.value = this.base + Math.floor((Date.now() - this.since) / 1000);
+        },
+
+        toggle() {
+            this.running ? this.pause() : this.start();
+        },
+
+        start() {
+            this.base = this.value;
+            this.since = Date.now();
+            this.run();
+            this.$dispatch('timer-started', { seconds: this.value });
+        },
+
+        pause() {
+            clearInterval(this.ticker);
+            this.running = false;
+            this.$dispatch('timer-paused', { seconds: this.value });
+        },
+
+        stop() {
+            clearInterval(this.ticker);
+            this.running = false;
+            this.$dispatch('timer-stopped', { seconds: this.value });
+            this.base = 0;
+            this.value = 0;
+        },
+
+        format(withSeconds = true) {
+            const hours = Math.floor(this.value / 3600);
+            const minutes = Math.floor((this.value % 3600) / 60);
+            const secs = this.value % 60;
+            const parts = [hours, minutes].concat(withSeconds ? [secs] : []);
+
+            return parts.map((part) => String(part).padStart(2, '0')).join(':');
+        },
+    }));
+
+    /**
+     * Campo de assinatura: desenhar (traços viram paths SVG) ou digitar o nome.
+     * value (x-modelable) é o SVG da assinatura, ou '' quando vazio.
+     */
+    Alpine.data('uiSignature', ({ mode = 'draw', name = '' } = {}) => ({
+        mode,
+        name,
+        strokes: [],
+        current: null,
+        value: '',
+
+        point(event) {
+            const box = this.$refs.pad.getBoundingClientRect();
+
+            return [Math.round(((event.clientX - box.left) / box.width) * 600), Math.round(((event.clientY - box.top) / box.height) * 200)];
+        },
+
+        down(event) {
+            this.$refs.pad.setPointerCapture(event.pointerId);
+            this.current = [this.point(event)];
+        },
+
+        move(event) {
+            if (this.current) {
+                this.current.push(this.point(event));
+                this.$refs.live.setAttribute('d', this.path(this.current));
+            }
+        },
+
+        up() {
+            if (this.current && this.current.length > 1) {
+                this.strokes = [...this.strokes, this.current];
+                this.sync();
+            }
+
+            this.current = null;
+            this.$refs.live.setAttribute('d', '');
+        },
+
+        path(points) {
+            return points.map(([x, y], index) => `${index ? 'L' : 'M'}${x} ${y}`).join(' ');
+        },
+
+        paths() {
+            return this.strokes.map((points) => this.path(points));
+        },
+
+        isEmpty() {
+            return this.mode === 'draw' ? this.strokes.length === 0 : this.name.trim() === '';
+        },
+
+        sync() {
+            if (this.isEmpty()) {
+                this.value = '';
+
+                return;
+            }
+
+            if (this.mode === 'draw') {
+                const body = this.paths().map((d) => `<path d="${d}" fill="none" stroke="#18181B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+                this.value = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200">${body}</svg>`;
+
+                return;
+            }
+
+            const escaped = this.name.replace(/[&<>"']/g, (character) => `&#${character.charCodeAt(0)};`);
+            this.value = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200"><text x="24" y="150" font-family="Caveat, 'Segoe Script', cursive" font-size="72" fill="#18181B">${escaped}</text></svg>`;
+        },
+
+        setMode(next) {
+            this.mode = next;
+            this.sync();
+        },
+
+        clear() {
+            this.strokes = [];
+            this.name = '';
+            this.sync();
+        },
+    }));
+
+    /**
      * Menu de filtros: grupos com submenu de opções. Marcar não fecha o menu; as escolhas ficam
      * num rascunho até Aplicar. value (x-modelable) é { grupo: [valores] }.
      */
