@@ -193,6 +193,25 @@
             background-position: 400px 0;
         }
     }
+
+    --animate-aura-spin: aura-spin 3.2s linear infinite;
+    --animate-aura-glow: aura-glow 2s ease-in-out infinite;
+
+    @keyframes aura-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes aura-glow {
+        0%,
+        100% {
+            box-shadow: 0 0 0 1px var(--aura-color), 0 0 10px -2px var(--aura-color);
+        }
+        50% {
+            box-shadow: 0 0 0 1px var(--aura-color), 0 0 26px 2px var(--aura-color);
+        }
+    }
 }
 
 @theme inline {
