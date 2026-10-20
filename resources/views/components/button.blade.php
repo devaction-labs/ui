@@ -10,7 +10,7 @@
     <x-ui::button icon="more-horizontal" aria-label="Mais ações" />
     <x-ui::button variant="ghost" size="sm" icon="cancel-01" inset="top bottom" aria-label="Fechar" />
 
-    variant: outline (padrão) · primary · filled · danger · ghost · subtle · ai · info
+    variant: outline (padrão) · primary · filled · danger (vermelho suave) · destructive (vermelho sólido) · ghost · subtle · ai · info
     size:    xs (24) · sm (32) · base (38, padrão) · lg (46)
     square:  força o formato quadrado (automático quando só tem ícone)
     inset:   top · bottom · left · right — margem negativa para alinhar botões ghost ao texto
@@ -39,6 +39,7 @@
         'primary' => 'border-ink bg-ink text-on-ink hover:bg-ink/90',
         'filled' => 'border-transparent bg-wrap text-ink hover:bg-line-soft',
         'danger' => 'border-risk-line bg-risk-bg text-risk-fg hover:border-risk-fg/40',
+        'destructive' => 'border-missing bg-missing text-white hover:bg-missing/90',
         'ghost' => 'border-transparent text-ink-2 hover:bg-wrap hover:text-ink',
         'subtle' => 'border-transparent text-muted hover:bg-wrap hover:text-ink',
         'ai' => 'border-warn-line bg-warn-bg text-warn-fg hover:border-ai',
