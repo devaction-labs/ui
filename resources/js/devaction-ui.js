@@ -684,6 +684,48 @@ document.addEventListener('alpine:init', () => {
         },
     }));
 
+    /**
+     * Aviso de cookies: guarda a escolha no cookie ui_cookie_consent (1 ano) e não aparece de novo.
+     */
+    Alpine.data('uiCookieConsent', ({ categories = [], force = false } = {}) => ({
+        visible: false,
+        preferences: false,
+        choices: Object.fromEntries(categories.map((key) => [key, false])),
+
+        init() {
+            const saved = this.read();
+
+            if (saved) {
+                categories.forEach((key) => (this.choices[key] = Boolean(saved[key])));
+            }
+
+            this.visible = force || ! saved;
+        },
+
+        read() {
+            const match = document.cookie.split('; ').find((item) => item.startsWith('ui_cookie_consent='));
+
+            try {
+                return match ? JSON.parse(decodeURIComponent(match.split('=').slice(1).join('='))) : null;
+            } catch (error) {
+                return null;
+            }
+        },
+
+        save(all = null) {
+            if (all !== null) {
+                categories.forEach((key) => (this.choices[key] = all));
+            }
+
+            const consent = { necessary: true, ...this.choices, at: new Date().toISOString() };
+            document.cookie = `ui_cookie_consent=${encodeURIComponent(JSON.stringify(consent))}; max-age=31536000; path=/; SameSite=Lax`;
+
+            this.$dispatch('cookie-consent-updated', consent);
+            this.visible = force;
+            this.preferences = false;
+        },
+    }));
+
     Alpine.data('uiMenu', ({ submenu = false } = {}) => ({
         init() {
             this.$watch(submenu ? 'subOpen' : 'open', (isOpen) => {
