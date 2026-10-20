@@ -65,3 +65,10 @@ Projects
         ->toContain('data-inner-toggle')
         ->toContain('data-sidebar-toggle');
 });
+
+test('classic layout keeps the x-data passed by the page', function () {
+    $html = Blade::render('<x-ui::layout.classic x-data="{ risk: \'all\' }">Content</x-ui::layout.classic>');
+
+    expect(substr_count($html, 'x-data'))->toBe(1)
+        ->and($html)->toContain('risk:');
+});
