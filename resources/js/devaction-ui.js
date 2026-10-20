@@ -22,6 +22,21 @@ window.DevActionUI = {
 /**
  * Trava a rolagem da página enquanto houver pelo menos um modal aberto.
  */
+/**
+ * Toasts: DevActionUI.toast({ text, heading, variant, duration, id, action }).
+ * Do Livewire: $this->toast(...) (trait InteractsWithToasts) dispara o mesmo evento ui-toast.
+ * Mesmo id atualiza o toast existente (carregando → sucesso).
+ */
+window.DevActionUI.toast = (toast) => {
+    const detail = typeof toast === 'string' ? { text: toast } : toast;
+
+    window.dispatchEvent(new CustomEvent('ui-toast', { detail }));
+
+    return detail.id;
+};
+
+window.DevActionUI.dismissToast = (id) => window.dispatchEvent(new CustomEvent('ui-toast-dismiss', { detail: { id } }));
+
 let openModals = 0;
 
 const lockScroll = () => {
@@ -39,6 +54,201 @@ const unlockScroll = () => {
 
 document.addEventListener('alpine:init', () => {
     const Alpine = window.Alpine;
+
+    Alpine.magic('toast', () => window.DevActionUI.toast);
+
+    /**
+     * Pilha de toasts: fechada mostra o da frente e até 2 espiam atrás; mouse ou foco abre em lista.
+     * Timers pausam com a pilha aberta ou a aba escondida. Alt+T foca a pilha; Esc fecha o focado.
+     */
+    Alpine.data('uiToastGroup', ({ max = 12, peek = 3, toasts = [] } = {}) => ({
+        toasts: [],
+        expanded: false,
+        heights: {},
+        sequence: 0,
+
+        init() {
+            this.onToast = (event) => this.add(event.detail ?? {});
+            this.onDismiss = (event) => this.dismiss(event.detail?.id);
+            this.onVisibility = () => (document.hidden ? this.pauseAll() : this.resumeAll());
+
+            window.addEventListener('ui-toast', this.onToast);
+            window.addEventListener('ui-toast-dismiss', this.onDismiss);
+            document.addEventListener('visibilitychange', this.onVisibility);
+
+            toasts.forEach((toast) => this.add(toast));
+        },
+
+        destroy() {
+            window.removeEventListener('ui-toast', this.onToast);
+            window.removeEventListener('ui-toast-dismiss', this.onDismiss);
+            document.removeEventListener('visibilitychange', this.onVisibility);
+            this.toasts.forEach((toast) => clearTimeout(toast.timer));
+        },
+
+        add(detail) {
+            const id = detail.id ?? `ui-toast-${++this.sequence}`;
+            const variant = detail.variant ?? 'default';
+            const persistent = variant === 'loading' || detail.duration === 0;
+            const toast = {
+                id,
+                text: detail.text ?? '',
+                heading: detail.heading ?? null,
+                variant,
+                action: detail.action ?? null,
+                progress: detail.progress ?? null,
+                duration: persistent ? 0 : (detail.duration ?? 5000),
+                remaining: persistent ? 0 : (detail.duration ?? 5000),
+                startedAt: null,
+                timer: null,
+                offsetX: 0,
+            };
+
+            const existing = this.toasts.findIndex((item) => item.id === id);
+
+            if (existing !== -1) {
+                clearTimeout(this.toasts[existing].timer);
+                this.toasts[existing] = toast;
+            } else {
+                this.toasts = [toast, ...this.toasts].slice(0, max);
+            }
+
+            if (!this.expanded && !document.hidden) {
+                this.start(toast);
+            }
+
+            if (toast.progress !== null && toast.progress >= 100 && detail.dismissOnComplete !== false) {
+                toast.remaining = 1200;
+                toast.duration = 1200;
+                this.start(toast);
+            }
+        },
+
+        start(toast) {
+            if (!toast.duration) {
+                return;
+            }
+
+            clearTimeout(toast.timer);
+            toast.startedAt = Date.now();
+            toast.timer = setTimeout(() => this.dismiss(toast.id), toast.remaining);
+        },
+
+        pause(toast) {
+            if (!toast.duration || !toast.startedAt) {
+                return;
+            }
+
+            clearTimeout(toast.timer);
+            toast.remaining = Math.max(0, toast.remaining - (Date.now() - toast.startedAt));
+            toast.startedAt = null;
+        },
+
+        pauseAll() {
+            this.toasts.forEach((toast) => this.pause(toast));
+        },
+
+        resumeAll() {
+            if (!this.expanded && !document.hidden) {
+                this.toasts.forEach((toast) => this.start(toast));
+            }
+        },
+
+        expand() {
+            this.expanded = true;
+            this.pauseAll();
+        },
+
+        collapse() {
+            if (this.$root.contains(document.activeElement)) {
+                return;
+            }
+
+            this.expanded = false;
+            this.resumeAll();
+        },
+
+        dismiss(id) {
+            const toast = this.toasts.find((item) => item.id === id);
+
+            if (toast) {
+                clearTimeout(toast.timer);
+                this.toasts = this.toasts.filter((item) => item.id !== id);
+            }
+
+            if (this.toasts.length === 0) {
+                this.expanded = false;
+            }
+        },
+
+        runAction(toast) {
+            if (toast.action?.event) {
+                window.dispatchEvent(new CustomEvent(toast.action.event, { detail: toast.action.params ?? {}, bubbles: true }));
+            }
+
+            this.dismiss(toast.id);
+        },
+
+        focusStack() {
+            this.$root.querySelector('[data-toast]')?.focus();
+        },
+
+        /**
+         * Distância do toast até a base da pilha, conforme ela está fechada ou aberta.
+         */
+        offset(index) {
+            if (!this.expanded) {
+                return index * 12;
+            }
+
+            return this.toasts.slice(0, index).reduce((total, toast) => total + (this.heights[toast.id] ?? 52) + 12, 0);
+        },
+
+        style(toast, index, fromTop) {
+            const direction = fromTop ? 1 : -1;
+            const scale = this.expanded ? 1 : 1 - index * 0.05;
+            const visible = this.expanded || index < peek;
+
+            return {
+                transform: `translate(${toast.offsetX}px, ${direction * this.offset(index)}px) scale(${scale})`,
+                opacity: visible ? Math.max(0, 1 - Math.abs(toast.offsetX) / 160) : 0,
+                zIndex: 100 - index,
+                pointerEvents: visible ? 'auto' : 'none',
+            };
+        },
+
+        stackHeight() {
+            if (this.toasts.length === 0) {
+                return 0;
+            }
+
+            if (this.expanded) {
+                return this.offset(this.toasts.length - 1) + (this.heights[this.toasts.at(-1).id] ?? 52);
+            }
+
+            return (this.heights[this.toasts[0].id] ?? 52) + Math.min(this.toasts.length - 1, peek - 1) * 12;
+        },
+
+        swipeStart(toast, event) {
+            toast.swipeFrom = event.clientX;
+        },
+
+        swipeMove(toast, event) {
+            if (toast.swipeFrom !== undefined && toast.swipeFrom !== null) {
+                toast.offsetX = event.clientX - toast.swipeFrom;
+            }
+        },
+
+        swipeEnd(toast) {
+            if (Math.abs(toast.offsetX) > 80) {
+                this.dismiss(toast.id);
+            } else {
+                toast.offsetX = 0;
+            }
+
+            toast.swipeFrom = null;
+        },
+    }));
 
     Alpine.magic('modal', () => modalControl);
     Alpine.magic('modals', () => window.DevActionUI.modals);
