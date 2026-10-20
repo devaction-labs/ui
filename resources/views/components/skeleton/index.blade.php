@@ -18,7 +18,7 @@
     aria-hidden="true"
     {{ $attributes->class([
         'rounded-md' => ! preg_match('/(^|\s)rounded(-|\s|$)/', (string) $attributes->get('class')),
-        'bg-line' => $animate !== 'shimmer',
+        'bg-line-strong' => $animate !== 'shimmer',
         'skeleton-shimmer animate-shimmer' => $animate === 'shimmer',
         'animate-pulse' => $animate === 'pulse',
         'motion-reduce:animate-none',

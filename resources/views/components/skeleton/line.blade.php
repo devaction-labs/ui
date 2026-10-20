@@ -25,7 +25,7 @@
     <div @class([
         'w-full rounded-[4px]',
         $size === 'lg' ? 'h-4' : 'h-3',
-        'bg-line' => $animate !== 'shimmer',
+        'bg-line-strong' => $animate !== 'shimmer',
         'skeleton-shimmer animate-shimmer' => $animate === 'shimmer',
         'animate-pulse' => $animate === 'pulse',
         'motion-reduce:animate-none',

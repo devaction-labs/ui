@@ -214,6 +214,15 @@
     background-size: 24px 24px, 24px 24px, 48px 48px;
 }
 
+/* Só as linhas do quadriculado, bem suaves: fundo de prévias sem competir com o conteúdo */
+@utility bg-grid-lines {
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--line) 55%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--line) 55%, transparent) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: center;
+}
+
 /* Brilho âmbar da IA, usado atrás de heros */
 @utility bg-ai-glow {
     background: radial-gradient(ellipse at center, color-mix(in srgb, var(--ai) 20%, transparent), transparent 62%);
@@ -236,7 +245,7 @@
     mask-image: radial-gradient(ellipse 70% 90% at 50% 50%, #000 25%, transparent 85%);
 }
 
-/* Brilho do skeleton: gradiente que desliza sobre o fundo line */
+/* Brilho do skeleton: gradiente que desliza sobre o fundo line-strong */
 @utility skeleton-shimmer {
-    background: linear-gradient(90deg, var(--line) 0, var(--line-soft) 50%, var(--line) 100%) 0 0 / 800px 100%;
+    background: linear-gradient(90deg, var(--line-strong) 0, var(--line) 50%, var(--line-strong) 100%) 0 0 / 800px 100%;
 }
