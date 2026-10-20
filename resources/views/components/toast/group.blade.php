@@ -13,6 +13,7 @@
     duration: ms (padrão 5000); 0 não some
     id:       mesmo id atualiza o toast (carregando → sucesso)
     action:   { label: 'Desfazer', event: 'undo-delete', params: {...} } dispara um evento no window
+    progress: 0–100 vira o toast de progresso; ao chegar em 100 mostra o check e some
 --}}
 @props([
     'position' => 'bottom end',
@@ -70,7 +71,18 @@
                 ])
                 x-bind:class="toast.variant === 'danger' ? 'border-risk-line' : 'border-line'"
             >
-                <span class="mt-px flex shrink-0" x-show="toast.variant !== 'default'">
+                <template x-if="toast.progress !== null">
+                    <span aria-hidden="true" class="absolute inset-y-0 left-0 rounded-l-[14px] transition-[width,background-color] duration-150 ease-linear motion-reduce:transition-none" x-bind:class="toast.progress >= 100 ? 'bg-ok-fg/15' : 'bg-ai/15'" x-bind:style="{ width: Math.min(100, toast.progress) + '%' }"></span>
+                </template>
+
+                <template x-if="toast.progress !== null">
+                    <span class="relative flex size-[34px] shrink-0 items-center justify-center rounded-[10px]" x-bind:class="toast.progress >= 100 ? 'bg-ok-bg text-ok-fg' : 'bg-warn-bg text-warn-fg'">
+                        <template x-if="toast.progress >= 100"><x-ui::icon name="tick-02" stroke-width="2" class="size-[18px]" /></template>
+                        <template x-if="toast.progress < 100"><x-ui::spinner size="sm" color="ai" /></template>
+                    </span>
+                </template>
+
+                <span class="mt-px flex shrink-0" x-show="toast.variant !== 'default' && toast.progress === null">
                     <template x-if="toast.variant === 'success'"><x-ui::icon name="checkmark-circle-02" class="size-[18px] text-ok-fg" /></template>
                     <template x-if="toast.variant === 'ai'"><x-ui::icon name="sparkles" class="size-[18px] text-ai" /></template>
                     <template x-if="toast.variant === 'warning'"><x-ui::icon name="alert-02" class="size-[18px] text-warn-fg" /></template>
@@ -78,15 +90,22 @@
                     <template x-if="toast.variant === 'loading'"><x-ui::spinner size="sm" color="current" class="text-muted" /></template>
                 </span>
 
-                <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+                <div class="relative flex min-w-0 flex-1 flex-col gap-0.5">
                     <strong class="font-semibold" x-show="toast.heading" x-text="toast.heading"></strong>
                     <span x-bind:class="toast.heading ? 'text-ink-2' : ''" x-text="toast.text"></span>
-                    <template x-if="toast.progress !== null">
-                        <span class="mt-2 block h-1 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuemin="0" aria-valuemax="100" x-bind:aria-valuenow="toast.progress">
-                            <span class="block h-full rounded-full bg-ai transition-[width] duration-300 motion-reduce:transition-none" x-bind:style="{ width: Math.min(100, toast.progress) + '%' }"></span>
-                        </span>
-                    </template>
                 </div>
+
+                <template x-if="toast.progress !== null">
+                    <span
+                        class="relative self-center font-mono text-[13px] font-medium tabular-nums"
+                        role="progressbar"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        x-bind:aria-valuenow="Math.min(100, toast.progress)"
+                        x-bind:class="toast.progress >= 100 ? 'text-ok-fg' : 'text-warn-fg'"
+                        x-text="Math.min(100, Math.round(toast.progress)) + '%'"
+                    ></span>
+                </template>
 
                 <template x-if="toast.action">
                     <button

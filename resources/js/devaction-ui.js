@@ -35,6 +35,12 @@ window.DevActionUI.toast = (toast) => {
     return detail.id;
 };
 
+/**
+ * Toast de progresso: chame de novo com o mesmo id para avançar; em 100 mostra o check e some.
+ */
+window.DevActionUI.progressToast = (id, { value = 0, ...toast } = {}) =>
+    window.DevActionUI.toast({ ...toast, id, progress: value, duration: 0 });
+
 window.DevActionUI.dismissToast = (id) => window.dispatchEvent(new CustomEvent('ui-toast-dismiss', { detail: { id } }));
 
 let openModals = 0;

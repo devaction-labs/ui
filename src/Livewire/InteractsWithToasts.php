@@ -11,6 +11,7 @@ namespace DevAction\Ui\Livewire;
  * $this->toast('Gerando relatório…', variant: 'loading', id: 'relatorio');
  * $this->toast('Relatório pronto.', variant: 'success', id: 'relatorio');   substitui o de carregando
  * $this->toast('Tarefa excluída.', action: ['label' => 'Desfazer', 'event' => 'undo-delete']);
+ * $this->progressToast('importacao', 40, 'Importando contatos…', heading: 'Importação');
  */
 trait InteractsWithToasts
 {
@@ -35,6 +36,14 @@ trait InteractsWithToasts
             'action' => $action,
             'progress' => $progress,
         ], fn (mixed $value): bool => $value !== null));
+    }
+
+    /**
+     * Cria ou avança um toast de progresso. Em 100 ele mostra o check e some sozinho.
+     */
+    public function progressToast(string $id, int $value, string $text, ?string $heading = null): void
+    {
+        $this->toast($text, heading: $heading, duration: 0, id: $id, progress: $value);
     }
 
     public function dismissToast(string $id): void
