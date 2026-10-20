@@ -142,7 +142,7 @@ document.addEventListener('alpine:init', () => {
 
     /**
      * x-ui-float="{ placement: 'bottom', align: 'start', gap: 6, offset: 0, match: false, reference: $refs.trigger }"
-     * Sem reference, ancora no elemento pai (o wrapper relative do gatilho).
+     * Sem reference, ancora no floatReference do componente (ex.: o ponto do menu de contexto) ou no elemento pai.
      */
     Alpine.directive('ui-float', (el, { expression }, { evaluate, cleanup }) => {
         let frame = null;
@@ -151,7 +151,7 @@ document.addEventListener('alpine:init', () => {
         const isVisible = () => el.getClientRects().length > 0;
         const place = () => {
             const options = expression ? evaluate(expression) : {};
-            floatPanel(el, options.reference ?? el.parentElement, options, container);
+            floatPanel(el, options.reference ?? Alpine.$data(el).floatReference ?? el.parentElement, options, container);
         };
         const tick = () => {
             if (! isVisible()) {
@@ -630,6 +630,60 @@ document.addEventListener('alpine:init', () => {
      * Menu de ações: setas, Home, End e busca pela letra inicial. Foca o primeiro item ao abrir.
      * Em submenu, → abre e ← volta para o item que o abriu.
      */
+    /**
+     * Menu de contexto: botão direito (ou Shift+F10 / tecla Menu) abre o x-ui::menu no ponto do clique.
+     * Oferece open/close como o dropdown, então os itens do menu funcionam igual.
+     */
+    Alpine.data('uiContextMenu', () => ({
+        open: false,
+        x: 0,
+        y: 0,
+        target: null,
+
+        get floatReference() {
+            const x = this.x;
+            const y = this.y;
+
+            return { getBoundingClientRect: () => new DOMRect(x, y, 0, 0) };
+        },
+
+        openAt(event) {
+            if (event.target.closest('[data-dropdown-panel]')) {
+                return;
+            }
+
+            event.preventDefault();
+            this.target = event.target.closest('[tabindex], a, button, tr, li') ?? event.target;
+            this.x = event.clientX;
+            this.y = event.clientY;
+            this.open = true;
+            this.$dispatch('context-menu-open', { target: this.target });
+        },
+
+        openFromKeyboard() {
+            const element = document.activeElement && this.$root.contains(document.activeElement) ? document.activeElement : this.$root;
+            const rect = element.getBoundingClientRect();
+
+            this.target = element;
+            this.x = rect.left + 16;
+            this.y = rect.bottom;
+            this.open = true;
+            this.$dispatch('context-menu-open', { target: this.target });
+        },
+
+        close(restoreFocus = false) {
+            if (! this.open) {
+                return;
+            }
+
+            this.open = false;
+
+            if (restoreFocus) {
+                this.target?.focus?.();
+            }
+        },
+    }));
+
     Alpine.data('uiMenu', ({ submenu = false } = {}) => ({
         init() {
             this.$watch(submenu ? 'subOpen' : 'open', (isOpen) => {
