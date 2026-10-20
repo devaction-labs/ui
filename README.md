@@ -7,7 +7,7 @@
 
 # DevAction UI
 
-76 Blade components for Laravel and Livewire, built on Tailwind CSS v4, with light and dark tokens and [Hugeicons Stroke Rounded](https://hugeicons.com/icons?style=Stroke&type=Rounded) icons. The API follows [Flux](https://fluxui.dev): props, named slots and `wire:model` right where you expect them. The kit speaks English and Portuguese (pt_BR).
+80 Blade components for Laravel and Livewire, built on Tailwind CSS v4, with light and dark tokens and [Hugeicons Stroke Rounded](https://hugeicons.com/icons?style=Stroke&type=Rounded) icons. The API follows [Flux](https://fluxui.dev): props, named slots and `wire:model` right where you expect them. The kit speaks English and Portuguese (pt_BR).
 
 ```blade
 <x-ui::button variant="primary" icon="add-01" wire:click="create">New deal</x-ui::button>
@@ -60,11 +60,11 @@ The tokens use Geist and Geist Mono. Without them the kit falls back to system f
 
 | Group | Components |
 | --- | --- |
-| Base | Accordion, Alert, Avatar, Badge, Banner, Button, Callout, Code block, Description list, Empty state, Kbd, Panel, Progress, Separator, Skeleton, Spinner, Stat, Tabs, Tag, Timeline |
+| Base | Accordion, Alert, Avatar, Badge, Banner, Button, Callout, Code block, Description list, Empty state, Kbd, Panel, Progress, Reactions, Separator, Skeleton, Spinner, Stat, Tabs, Tag, Timeline |
 | Overlay | Command palette, Confirm dialog, Context menu, Cookie consent, Danger dialog, Drawer, Dropdown, Hover card, Modal, Notification center, Popover, Progress toast, Toast group, Tooltip |
 | Form | Autocomplete, Choice, Color picker, Combobox, Copy field, Date picker, Date range, Dropzone, Editor, Filter menu, Input group, Money input, Number input, OTP input, Pillbox, Segmented, Select, Signature field, Slider, Switch, Textarea, Timer |
 | Navigation | Breadcrumb, Page header, Pagination, Resizable, Sidebar, Stepper, Steps |
-| Data | Calendar, Chart, Data table, Diff, File tree, Kanban, PDF viewer, Sortable list |
+| Data | Activity, Calendar, Chart, Checklist, Data table, Diff, File tree, Kanban, PDF viewer, Properties, Sortable list |
 | AI | AI prompt, Aura, Chat bubble |
 | Templates | Auth, Pricing |
 | Layouts | Classic, Rail (classic collapsed), Top bar, List and detail, Centered, Docs |
@@ -123,6 +123,20 @@ Six ready-made shells that share the same pieces (sidebar, header, page header a
 ```
 
 `x-ui::layout.classic` (add `collapsed` for the rail), `x-ui::layout.topbar`, `x-ui::layout.split`, `x-ui::layout.centered` and `x-ui::layout.docs`.
+
+## Themes
+
+Pick a base gray and an accent color with two attributes, on the html tag or on any element:
+
+```blade
+<html lang="en" data-ui-base="slate" data-ui-accent="blue">
+```
+
+- **Base:** `zinc` (default), `slate`, `gray`, `neutral`, `stone`, `mauve`, `olive`, `mist`, `taupe`. Changes backgrounds, borders and text.
+- **Accent:** `red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, `rose`. Without it, primary actions stay graphite. Changes primary buttons, checkboxes, switches, radios, current page, selected dates, progress and the focus ring.
+- Status colors (ok, warn, risk, info) never change. Both attributes work in light and dark.
+
+Coherent pairs: slate + blue or indigo, mist + teal, olive + emerald, mauve + violet, stone + orange or amber, taupe + rose.
 
 ## Translations
 

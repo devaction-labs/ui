@@ -106,6 +106,7 @@ Each link opens the full reference: description, Blade examples, Livewire code, 
 - [Kbd](references/kbd.md) — Shows a keyboard shortcut in Geist Mono.
 - [Panel](references/panel.md) — The container for the design's panels: a 6 px frame and a card with heading, supporting line, actions and footer. Underneath, it is the Flux-style Card.
 - [Progress](references/progress.md) — Shows how much of something is done: milestone scope, hour bank, billed installments or a background process.
+- [Reactions](references/reactions.md) — Emoji reactions under a comment: one pill per emoji with its count, yours highlighted, and a button to add one.
 - [Separator](references/separator.md) — A line that separates blocks: plain, with text in the middle or vertical between items on a row.
 - [Skeleton](references/skeleton.md) — Holds the place of content while it loads, in the same shape. The shimmer stops with prefers-reduced-motion.
 - [Spinner](references/spinner.md) — Shows that something is loading when you cannot tell how much is left. For known progress, use Progress.
@@ -168,13 +169,16 @@ Each link opens the full reference: description, Blade examples, Livewire code, 
 
 ### Data
 
+- [Activity](references/activity.md) — A single conversation for a task: comments, events and the AI review on one rail, with the comment box at the end.
 - [Calendar](references/calendar.md) — Event calendar by month or week: deliveries, due dates, meetings. Rendered on the server; navigation works with links or with Livewire.
 - [Chart](references/chart.md) — Line, column, bar, donut and sparkline charts as SVG rendered on the server. No JavaScript library; the hover uses Alpine.
+- [Checklist](references/checklist.md) — A list of steps to tick off, with a progress bar and the option to hide what is already done.
 - [Data table](references/data-table.md) — Data table in a real <table>: sorting, bulk selection, expandable rows, groups, pagination, states, sticky columns and cards on mobile.
 - [Diff](references/diff.md) — A file diff with conversations pinned to lines: comment, reply, suggest a change and resolve, like in a PR review.
 - [File tree](references/file-tree.md) — Tree of the files changed in a PR: folders built from the paths, status, +/− and AI findings per file.
 - [Kanban](references/kanban.md) — Board of columns with cards: tasks, pipeline deals, candidates. Dragging between columns uses Livewire 4's wire:sort.
 - [PDF viewer](references/pdf-viewer.md) — A document to review and sign: thumbnails, zoom, pages and marked signature fields, with the signers panel.
+- [Properties](references/properties.md) — The details column next to a task, card or contract: small sections with label and value rows.
 - [Sortable list](references/sortable-list.md) — A list that reorders by dragging the handle, with the keyboard or with buttons, and announces changes to screen readers.
 
 ### AI
