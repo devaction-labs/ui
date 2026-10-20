@@ -18,11 +18,14 @@
 
 @php($attributes = $attributes->except('animate'))
 
-<div data-skeleton-line aria-hidden="true" {{ $attributes->class(['w-full py-[3px]']) }}>
+<div data-skeleton-line aria-hidden="true" {{ $attributes->class([
+    'py-[3px]',
+    'w-full' => ! preg_match('/(^|\s)w-/', (string) $attributes->get('class')),
+]) }}>
     <div @class([
         'w-full rounded-[4px]',
         $size === 'lg' ? 'h-4' : 'h-3',
-        'bg-line-soft' => $animate !== 'shimmer',
+        'bg-line' => $animate !== 'shimmer',
         'skeleton-shimmer animate-shimmer' => $animate === 'shimmer',
         'animate-pulse' => $animate === 'pulse',
         'motion-reduce:animate-none',
