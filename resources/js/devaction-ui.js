@@ -796,6 +796,47 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Tabela: seleção em massa (selected é x-modelable, então wire:model recebe as chaves marcadas)
+     * e linhas expansíveis.
+     */
+    Alpine.data('uiTable', () => ({
+        selected: [],
+        expanded: {},
+
+        keys() {
+            return [...this.$root.querySelectorAll('[data-table-select]')].map((input) => input.value);
+        },
+
+        allState() {
+            const keys = this.keys();
+            const count = keys.filter((key) => this.selected.includes(key)).length;
+
+            if (count === 0) {
+                return 'false';
+            }
+
+            return count === keys.length ? 'true' : 'mixed';
+        },
+
+        toggleAll() {
+            const keys = this.keys();
+            this.selected = this.allState() === 'true' ? this.selected.filter((key) => !keys.includes(key)) : [...new Set([...this.selected, ...keys])];
+        },
+
+        clearSelection() {
+            this.selected = [];
+        },
+
+        isSelected(key) {
+            return this.selected.includes(String(key));
+        },
+
+        toggleRow(key) {
+            this.expanded = { ...this.expanded, [key]: !this.expanded[key] };
+        },
+    }));
+
+    /**
      * Editor de texto rico sem dependências: contenteditable + execCommand, barra de formatação
      * com estado (aria-pressed) e menu de comandos ao digitar "/" numa linha vazia.
      * value (x-modelable) é o HTML; sanitize no servidor antes de exibir para outras pessoas.
