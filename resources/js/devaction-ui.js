@@ -2093,6 +2093,134 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Código de verificação: uma casa por caractere, colar distribui, Backspace volta.
+     * value é x-modelable; com submit chama o método do Livewire ao completar.
+     */
+    Alpine.data('uiOtp', ({ length = 6, numeric = true, value = '', submit = null, resend = null, cooldown = 60 } = {}) => ({
+        value: (value ?? '').toString().slice(0, length),
+        wait: resend ? cooldown : 0,
+        timer: null,
+
+        init() {
+            if (resend) {
+                this.tick();
+            }
+        },
+
+        get digits() {
+            return (this.value ?? '').toString().split('');
+        },
+
+        inputs() {
+            return [...this.$root.querySelectorAll('input')];
+        },
+
+        clean(text) {
+            const pattern = numeric ? /\D/g : /[^0-9a-z]/gi;
+
+            return (text ?? '').toString().replace(pattern, '').toUpperCase();
+        },
+
+        filled() {
+            return this.digits.length;
+        },
+
+        remaining() {
+            return length - this.digits.length;
+        },
+
+        focusAt(index) {
+            this.inputs()[Math.max(0, Math.min(length - 1, index))]?.focus();
+        },
+
+        write(index, characters) {
+            const digits = this.digits.slice(0, index);
+            const next = (digits.join('') + characters + this.digits.slice(index + characters.length).join('')).slice(0, length);
+
+            this.value = next;
+            this.$nextTick(() => {
+                this.inputs().forEach((input, position) => (input.value = this.digits[position] ?? ''));
+                this.focusAt(Math.min(index + characters.length, length - 1));
+                this.complete();
+            });
+        },
+
+        typed(event, index) {
+            const characters = this.clean(event.target.value);
+
+            if (characters === '') {
+                event.target.value = this.digits[index] ?? '';
+
+                return;
+            }
+
+            this.write(index, characters.slice(-1 * Math.min(characters.length, length - index)));
+        },
+
+        paste(event) {
+            const characters = this.clean(event.clipboardData.getData('text')).slice(0, length);
+
+            if (characters !== '') {
+                this.write(0, characters);
+            }
+        },
+
+        back(event, index) {
+            event.preventDefault();
+
+            if (this.digits[index] !== undefined) {
+                this.value = this.digits.filter((_, position) => position !== index).join('');
+                this.$nextTick(() => this.focusAt(index));
+            } else {
+                this.value = this.digits.slice(0, Math.max(0, index - 1)).join('');
+                this.$nextTick(() => this.focusAt(index - 1));
+            }
+        },
+
+        complete() {
+            if (this.digits.length !== length) {
+                return;
+            }
+
+            this.$dispatch('otp-complete', { value: this.value });
+
+            if (submit && this.$wire) {
+                this.$wire.call(submit, this.value);
+            }
+        },
+
+        tick() {
+            clearInterval(this.timer);
+            this.timer = setInterval(() => {
+                this.wait = Math.max(0, this.wait - 1);
+
+                if (this.wait === 0) {
+                    clearInterval(this.timer);
+                }
+            }, 1000);
+        },
+
+        clock() {
+            return `${Math.floor(this.wait / 60)}:${String(this.wait % 60).padStart(2, '0')}`;
+        },
+
+        sendAgain() {
+            if (this.wait > 0) {
+                return;
+            }
+
+            this.$dispatch('otp-resend');
+
+            if (resend && this.$wire) {
+                this.$wire.call(resend);
+            }
+
+            this.wait = cooldown;
+            this.tick();
+        },
+    }));
+
+    /**
      * Slider: valor único ou faixa (value = [mín, máx]) com distância mínima entre os botões.
      * value é x-modelable, então funciona com wire:model.
      */
