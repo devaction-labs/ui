@@ -2,6 +2,7 @@
 
 namespace DevAction\Ui;
 
+use DevAction\Ui\Console\IconCommand;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Blaze\Blaze;
@@ -24,6 +25,10 @@ class UiServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/views/icons' => resource_path('views/vendor/ui/icons'),
         ], 'ui-icons');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([IconCommand::class]);
+        }
     }
 
     /**
