@@ -1974,6 +1974,119 @@ document.addEventListener('alpine:init', () => {
      * Lista ordenável: arrastar pela alça, teclado (Espaço pega, setas movem, Espaço solta, Esc cancela)
      * e botões. Move os elementos no DOM e avisa a nova ordem (evento reorder e, com sort, o Livewire).
      */
+    /**
+     * Árvore de arquivos: pastas abertas por padrão, filtro por texto e por tipo, setas navegam
+     * (← fecha ou sobe para a pasta, → abre). value é x-modelable com o caminho escolhido.
+     */
+    Alpine.data('uiFileTree', ({ value = null } = {}) => ({
+        value,
+        query: '',
+        filter: 'all',
+        closed: {},
+        focusPath: null,
+
+        nodes() {
+            return [...this.$root.querySelectorAll('[data-tree-node]')];
+        },
+
+        isOpen(path) {
+            return ! this.closed[path];
+        },
+
+        fileMatches(node) {
+            const query = this.query.trim().toLowerCase();
+            const byText = query === '' || node.dataset.path.toLowerCase().includes(query);
+            const byFilter = this.filter === 'all'
+                || (this.filter === 'findings' && Number(node.dataset.findings) > 0)
+                || (this.filter === 'new' && node.dataset.status === 'A');
+
+            return byText && byFilter;
+        },
+
+        matches(node) {
+            if (! node.hasAttribute('data-directory')) {
+                return this.fileMatches(node);
+            }
+
+            const prefix = `${node.dataset.path}/`;
+
+            return this.nodes().some((other) => ! other.hasAttribute('data-directory') && other.dataset.path.startsWith(prefix) && this.fileMatches(other));
+        },
+
+        isVisible(node) {
+            const parents = node.dataset.parents ? node.dataset.parents.split('|') : [];
+            const filtering = this.query.trim() !== '' || this.filter !== 'all';
+
+            return this.matches(node) && (filtering || parents.every((parent) => this.isOpen(parent)));
+        },
+
+        hasMatches() {
+            return this.nodes().some((node) => ! node.hasAttribute('data-directory') && this.fileMatches(node));
+        },
+
+        visibleNodes() {
+            return this.nodes().filter((node) => this.isVisible(node));
+        },
+
+        isFocusTarget(node) {
+            const target = this.focusPath ?? this.value ?? this.visibleNodes()[0]?.dataset.path;
+
+            return node.dataset.path === target;
+        },
+
+        activate(node) {
+            this.focusPath = node.dataset.path;
+
+            if (node.hasAttribute('data-directory')) {
+                this.closed = { ...this.closed, [node.dataset.path]: this.isOpen(node.dataset.path) };
+
+                return;
+            }
+
+            this.value = node.dataset.path;
+            this.$dispatch('select-file', { path: node.dataset.path });
+        },
+
+        onKeydown(event) {
+            const visible = this.visibleNodes();
+            const current = event.target.closest('[data-tree-node]');
+            const index = visible.indexOf(current);
+            let target = null;
+
+            if (event.key === 'ArrowDown') {
+                target = visible[Math.min(index + 1, visible.length - 1)];
+            } else if (event.key === 'ArrowUp') {
+                target = visible[Math.max(index - 1, 0)];
+            } else if (event.key === 'Home') {
+                target = visible[0];
+            } else if (event.key === 'End') {
+                target = visible[visible.length - 1];
+            } else if (event.key === 'ArrowRight' && current?.hasAttribute('data-directory')) {
+                if (! this.isOpen(current.dataset.path)) {
+                    this.closed = { ...this.closed, [current.dataset.path]: false };
+                } else {
+                    target = visible[index + 1];
+                }
+            } else if (event.key === 'ArrowLeft' && current) {
+                if (current.hasAttribute('data-directory') && this.isOpen(current.dataset.path)) {
+                    this.closed = { ...this.closed, [current.dataset.path]: true };
+                } else {
+                    const parent = current.dataset.parents.split('|').filter(Boolean).pop();
+                    target = parent ? this.nodes().find((node) => node.dataset.path === parent) : null;
+                }
+            } else {
+                return;
+            }
+
+            event.preventDefault();
+
+            if (target) {
+                this.focusPath = target.dataset.path;
+                target.focus();
+            }
+        },
+    }));
+
     Alpine.data('uiSortableList', ({ sort = null } = {}) => ({
         grabbed: null,
         origin: null,
