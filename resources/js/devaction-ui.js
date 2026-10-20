@@ -796,6 +796,100 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Composer de IA: textarea que cresce até 8 linhas, Enter envia, Shift+Enter quebra a linha,
+     * Esc para a resposta. value é x-modelable. Com submit/stop chama o método do Livewire;
+     * sem eles, dispara ai-prompt-submit e ai-prompt-stop.
+     */
+    Alpine.data('uiPrompt', ({ max = null, submit = null, stop = null, busy = false, busyProperty = null } = {}) => ({
+        value: '',
+        busyState: busy,
+
+        isBusy() {
+            return busyProperty && this.$wire ? Boolean(this.$wire[busyProperty]) : this.busyState;
+        },
+
+        init() {
+            this.$nextTick(() => this.grow());
+            this.$watch('value', () => this.$nextTick(() => this.grow()));
+        },
+
+        grow() {
+            const area = this.$refs.input;
+            const lineHeight = parseFloat(getComputedStyle(area).lineHeight) || 23;
+            area.style.height = 'auto';
+            area.style.height = `${Math.min(area.scrollHeight, lineHeight * 8 + 2)}px`;
+            area.style.overflowY = area.scrollHeight > lineHeight * 8 + 2 ? 'auto' : 'hidden';
+        },
+
+        length() {
+            return (this.value ?? '').length;
+        },
+
+        overLimit() {
+            return max !== null && this.length() > max;
+        },
+
+        canSend() {
+            return (this.value ?? '').trim() !== '' && !this.overLimit() && !this.isBusy();
+        },
+
+        counter() {
+            const format = (number) => new Intl.NumberFormat('pt-BR').format(number);
+
+            return max === null ? '' : `${format(this.length())} / ${format(max)}`;
+        },
+
+        keydown(event) {
+            if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+                event.preventDefault();
+                this.send();
+            }
+
+            if (event.key === 'Escape' && this.isBusy()) {
+                event.preventDefault();
+                this.halt();
+            }
+        },
+
+        send() {
+            if (this.isBusy()) {
+                this.halt();
+
+                return;
+            }
+
+            if (!this.canSend()) {
+                return;
+            }
+
+            const text = this.value;
+            this.$dispatch('ai-prompt-submit', { text });
+
+            if (submit && this.$wire) {
+                this.$wire.call(submit, text);
+            }
+        },
+
+        halt() {
+            this.$dispatch('ai-prompt-stop');
+
+            if (stop && this.$wire) {
+                this.$wire.call(stop);
+            }
+        },
+
+        insert(text) {
+            const area = this.$refs.input;
+            const start = area.selectionStart ?? this.value.length;
+            this.value = this.value.slice(0, start) + text + this.value.slice(area.selectionEnd ?? start);
+            this.$nextTick(() => {
+                area.focus();
+                area.setSelectionRange(start + text.length, start + text.length);
+            });
+        },
+    }));
+
+    /**
      * Tabela: seleção em massa (selected é x-modelable, então wire:model recebe as chaves marcadas)
      * e linhas expansíveis.
      */
