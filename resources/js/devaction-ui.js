@@ -518,6 +518,13 @@ document.addEventListener('alpine:init', () => {
         value: multiple ? [] : null,
 
         init() {
+            const sharedName = `ui-choice-${Math.random().toString(36).slice(2, 10)}`;
+            this.inputs().forEach((input) => {
+                if (input.type === 'radio' && !input.name) {
+                    input.name = sharedName;
+                }
+            });
+
             const checked = this.inputs().filter((input) => input.checked).map((input) => input.value);
 
             if (multiple ? checked.length : checked[0] !== undefined) {
