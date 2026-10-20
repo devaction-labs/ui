@@ -30,8 +30,8 @@
     ]) }}
 >
     @if ($heading !== null)
-        <x-ui::accordion.heading :trailing="$trailing">{{ $heading }}</x-ui::accordion.heading>
-        <x-ui::accordion.content>{{ $slot }}</x-ui::accordion.content>
+        <x-ui::accordion.heading :trailing="$trailing" :expanded="$expanded" :disabled="$disabled">{{ $heading }}</x-ui::accordion.heading>
+        <x-ui::accordion.content :expanded="$expanded">{{ $slot }}</x-ui::accordion.content>
     @else
         {{ $slot }}
     @endif

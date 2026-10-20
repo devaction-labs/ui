@@ -207,3 +207,7 @@
 [x-cloak] {
     display: none !important;
 }
+
+@utility mask-fade-center {
+    mask-image: radial-gradient(ellipse 70% 90% at 50% 50%, #000 25%, transparent 85%);
+}
