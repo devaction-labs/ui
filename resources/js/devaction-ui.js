@@ -556,6 +556,65 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Campo numérico: − e +, setas ↑↓, limites min/max e passo. Dispara input para o wire:model.
+     */
+    Alpine.data('uiNumber', ({ min = null, max = null, step = 1 } = {}) => ({
+        current: 0,
+
+        init() {
+            this.current = this.read();
+        },
+
+        read() {
+            const value = parseFloat(String(this.$refs.input.value).replace(',', '.'));
+
+            return Number.isNaN(value) ? 0 : value;
+        },
+
+        clamp(value) {
+            const decimals = (String(step).split('.')[1] ?? '').length;
+            let result = Number(value.toFixed(decimals));
+
+            if (min !== null) {
+                result = Math.max(min, result);
+            }
+
+            if (max !== null) {
+                result = Math.min(max, result);
+            }
+
+            return result;
+        },
+
+        set(value) {
+            this.current = this.clamp(value);
+            this.$refs.input.value = this.current;
+            this.$refs.input.dispatchEvent(new Event('input', { bubbles: true }));
+            this.$refs.input.dispatchEvent(new Event('change', { bubbles: true }));
+        },
+
+        increment() {
+            this.set(this.read() + step);
+        },
+
+        decrement() {
+            this.set(this.read() - step);
+        },
+
+        normalize() {
+            this.set(this.read());
+        },
+
+        atMin() {
+            return min !== null && this.current <= min;
+        },
+
+        atMax() {
+            return max !== null && this.current >= max;
+        },
+    }));
+
+    /**
      * Paleta de comandos: filtra as opções pelo texto digitado, ↑↓ navega e ↵ escolhe.
      */
     Alpine.data('uiCommand', () => ({
