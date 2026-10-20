@@ -45,22 +45,30 @@
     $legend ??= ($type === 'line' && count($series) > 1) || $type === 'donut';
     $ariaLabel = $label ?? collect($series)->pluck('name')->implode(', ');
 
-    $width = 820;
     $chartHeight = (float) ($height ?? ($type === 'column' ? 220 : 280));
-    $plotLeft = 44;
-    $plotRight = $type === 'line' ? 744 : 800;
-    $plotTop = 16;
-    $plotBottom = $chartHeight - 30;
     $count = max(count($labels), count($first['data']), 1);
 
     $maximum = collect($series)->flatMap(fn (array $item): array => $item['data'])->max() ?? 0;
     $scale = \DevAction\Ui\Support\ChartGeometry::scale((float) $maximum);
-    $yFor = fn (float $value): float => $plotBottom - ($value / $scale['max']) * ($plotBottom - $plotTop);
 
-    $slot = ($plotRight - $plotLeft) / $count;
+    // Posições em % da área do gráfico: o SVG estica, o texto e os pontos ficam do mesmo tamanho em qualquer largura
+    $slot = 100 / $count;
+    $yFor = fn (float $value): float => round(100 - ($value / $scale['max']) * 100, 3);
     $xFor = $type === 'line'
-        ? fn (int $index): float => $count > 1 ? $plotLeft + ($plotRight - $plotLeft) * $index / ($count - 1) : ($plotLeft + $plotRight) / 2
-        : fn (int $index): float => $plotLeft + $slot * ($index + 0.5);
+        ? fn (int $index): float => $count > 1 ? round(100 * $index / ($count - 1), 3) : 50.0
+        : fn (int $index): float => round($slot * ($index + 0.5), 3);
+
+    // Valor final de cada linha, afastado no mínimo 16 px do vizinho para os rótulos não se sobreporem
+    $plotHeight = max($chartHeight - 46, 1);
+    $endLabels = collect($series)->map(fn (array $item, int $index): array => [
+        'series' => $index,
+        'value' => end($item['data']) ?: 0.0,
+        'top' => $yFor(end($item['data']) ?: 0.0) / 100 * $plotHeight,
+    ])->filter(fn (array $label): bool => $series[$label['series']]['data'] !== [])->sortBy('top')->values()->all();
+    for ($labelIndex = 1; $labelIndex < count($endLabels); $labelIndex++) {
+        $endLabels[$labelIndex]['top'] = max($endLabels[$labelIndex]['top'], $endLabels[$labelIndex - 1]['top'] + 16);
+    }
+    $endLabelTops = collect($endLabels)->mapWithKeys(fn (array $label): array => [$label['series'] => round($label['top'], 2)])->all();
 
     $tooltipRows = collect(range(0, $count - 1))->map(fn (int $index): array => [
         'title' => $labels[$index] ?? (string) ($index + 1),
@@ -69,7 +77,7 @@
             'color' => $item['color'],
             'value' => isset($item['data'][$index]) ? $fmt($item['data'][$index]) : '—',
         ])->all(),
-        'left' => round($xFor($index) / $width * 100, 2),
+        'left' => $xFor($index),
     ])->all();
 @endphp
 
@@ -93,77 +101,86 @@
 
     <div x-show="! showTable">
         @if ($type === 'line' || $type === 'column')
-            <div class="relative">
-                <svg viewBox="0 0 {{ $width }} {{ $chartHeight }}" role="img" aria-label="{{ $ariaLabel }}" class="block w-full overflow-visible" x-on:mouseleave="hover = null">
+            <div class="relative" style="height: {{ $chartHeight }}px">
+                <div @class(['absolute top-4 bottom-[30px] left-11', 'right-[76px]' => $type === 'line', 'right-5' => $type !== 'line']) x-on:mouseleave="hover = null">
                     @foreach ($scale['ticks'] as $tick)
-                        <line x1="{{ $plotLeft }}" x2="{{ $type === 'line' ? $plotRight + 56 : $plotRight }}" y1="{{ $yFor($tick) }}" y2="{{ $yFor($tick) }}" class="stroke-line-soft" stroke-width="1" />
-                        <text x="{{ $plotLeft - 8 }}" y="{{ $yFor($tick) + 4 }}" text-anchor="end" class="fill-muted font-mono text-[12px]">{{ \DevAction\Ui\Support\ChartGeometry::format($tick, ':value', $scale['step'] < 1 ? 1 : 0) }}</text>
+                        <div @class(['absolute left-0 border-t border-line-soft', '-right-14' => $type === 'line', 'right-0' => $type !== 'line']) style="top: {{ $yFor($tick) }}%"></div>
+                        <span class="absolute right-full mr-2 -translate-y-1/2 font-mono text-[12px] leading-none text-muted" style="top: {{ $yFor($tick) }}%">{{ \DevAction\Ui\Support\ChartGeometry::format($tick, ':value', $scale['step'] < 1 ? 1 : 0) }}</span>
                     @endforeach
                     @foreach ($labels as $index => $text)
-                        <text x="{{ $xFor($index) }}" y="{{ $chartHeight - 10 }}" text-anchor="middle" class="fill-muted text-[12px]" x-bind:class="hover === {{ $index }} && 'fill-ink!'">{{ $text }}</text>
+                        <span class="absolute top-full mt-2.5 -translate-x-1/2 text-[12px] leading-none whitespace-nowrap text-muted" style="left: {{ $xFor($index) }}%" x-bind:class="hover === {{ $index }} && 'text-ink!'">{{ $text }}</span>
                     @endforeach
 
                     @if ($type === 'line')
+                        @foreach (range(0, $count - 1) as $index)
+                            <div class="absolute inset-y-0 w-px bg-line-hover" style="left: {{ $xFor($index) }}%" x-show="hover === {{ $index }}" x-cloak></div>
+                        @endforeach
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="{{ $ariaLabel }}" class="absolute inset-0 size-full overflow-visible">
+                            @foreach (array_reverse($series, true) as $seriesIndex => $item)
+                                @php
+                                    $points = collect($item['data'])->map(fn (float $value, int $index): array => [$xFor($index), $yFor($value)])->all();
+                                @endphp
+                                @if ($seriesIndex === 0)
+                                    <path d="{{ \DevAction\Ui\Support\ChartGeometry::areaPath($points, 100) }}" fill="{{ $item['color'] }}" fill-opacity="0.08" />
+                                @endif
+                                <path d="{{ \DevAction\Ui\Support\ChartGeometry::linePath($points) }}" fill="none" stroke="{{ $item['color'] }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+                            @endforeach
+                        </svg>
                         @foreach (array_reverse($series, true) as $seriesIndex => $item)
                             @php
-                                $points = collect($item['data'])->map(fn (float $value, int $index): array => [$xFor($index), $yFor($value)])->all();
-                                $last = end($points) ?: [0, 0];
+                                $lastIndex = count($item['data']) - 1;
+                                $lastValue = end($item['data']) ?: 0;
                             @endphp
-                            @if ($seriesIndex === 0)
-                                <path d="{{ \DevAction\Ui\Support\ChartGeometry::areaPath($points, $plotBottom) }}" fill="{{ $item['color'] }}" fill-opacity="0.08" />
+                            @if ($lastIndex >= 0)
+                                <span class="absolute size-2.5 -translate-1/2 rounded-full border-2 border-card" style="left: {{ $xFor($lastIndex) }}%; top: {{ $yFor($lastValue) }}%; background: {{ $item['color'] }}"></span>
+                                <span @class(['absolute ml-3 -translate-y-1/2 text-[12px] leading-none whitespace-nowrap', 'font-semibold text-ink' => $seriesIndex === 0, 'text-ink-3' => $seriesIndex !== 0]) style="left: {{ $xFor($lastIndex) }}%; top: {{ $endLabelTops[$seriesIndex] ?? 0 }}px">{{ $fmt($lastValue) }}</span>
                             @endif
-                            <path d="{{ \DevAction\Ui\Support\ChartGeometry::linePath($points) }}" fill="none" stroke="{{ $item['color'] }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                            <circle cx="{{ $last[0] }}" cy="{{ $last[1] }}" r="5" fill="{{ $item['color'] }}" class="stroke-card" stroke-width="2" />
-                            <text x="{{ $last[0] + 12 }}" y="{{ $last[1] + 4 }}" @class(['text-[12px]', 'fill-ink font-semibold' => $seriesIndex === 0, 'fill-ink-3' => $seriesIndex !== 0])>{{ $fmt(end($item['data']) ?: 0) }}</text>
-                            @foreach ($points as $index => $point)
-                                <circle cx="{{ $point[0] }}" cy="{{ $point[1] }}" r="5" fill="{{ $item['color'] }}" class="stroke-card" stroke-width="2" x-show="hover === {{ $index }}" x-cloak />
+                            @foreach ($item['data'] as $index => $value)
+                                <span class="absolute size-2.5 -translate-1/2 rounded-full border-2 border-card" style="left: {{ $xFor($index) }}%; top: {{ $yFor($value) }}%; background: {{ $item['color'] }}" x-show="hover === {{ $index }}" x-cloak></span>
                             @endforeach
                         @endforeach
-                        @foreach (range(0, $count - 1) as $index)
-                            <line x1="{{ $xFor($index) }}" x2="{{ $xFor($index) }}" y1="{{ $plotTop }}" y2="{{ $plotBottom }}" class="stroke-line-hover" stroke-width="1" x-show="hover === {{ $index }}" x-cloak />
-                        @endforeach
                     @else
-                        @php
-                            $columnWidth = min(24, $slot * 0.5);
-                        @endphp
-                        @foreach ($first['data'] as $index => $value)
-                            @php
-                                $top = $yFor($value);
-                                $isLast = $index === count($first['data']) - 1;
-                            @endphp
-                            <path d="{{ \DevAction\Ui\Support\ChartGeometry::columnPath($xFor($index) - $columnWidth / 2, $top, $columnWidth, max(0.01, $plotBottom - $top)) }}" fill="{{ $first['color'] }}" x-bind:opacity="hover === null || hover === {{ $index }} ? 1 : 0.35" />
-                            <text x="{{ $xFor($index) }}" y="{{ $top - 8 }}" text-anchor="middle" class="fill-ink text-[12px] font-semibold" @if ($isLast) x-show="hover === null || hover === {{ $index }}" @else x-show="hover === {{ $index }}" x-cloak @endif>{{ $fmt($value) }}</text>
-                        @endforeach
+                        <div role="img" aria-label="{{ $ariaLabel }}" class="absolute inset-0">
+                            @foreach ($first['data'] as $index => $value)
+                                @php
+                                    $isLast = $index === count($first['data']) - 1;
+                                @endphp
+                                <div class="absolute bottom-0 -translate-x-1/2" style="left: {{ $xFor($index) }}%; width: min(24px, {{ round($slot * 0.5, 3) }}%); height: {{ round(100 - $yFor($value), 3) }}%">
+                                    <span class="absolute inset-0 rounded-t-[4px] transition-opacity" style="background: {{ $first['color'] }}" x-bind:opacity="hover === null || hover === {{ $index }} ? 1 : 0.35" x-bind:class="hover !== null && hover !== {{ $index }} && 'opacity-35'"></span>
+                                    <span class="absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 text-[12px] leading-none font-semibold whitespace-nowrap text-ink" @if ($isLast) x-show="hover === null || hover === {{ $index }}" @else x-show="hover === {{ $index }}" x-cloak @endif>{{ $fmt($value) }}</span>
+                                </div>
+                            @endforeach
+                        </div>
                     @endif
 
                     @foreach (range(0, $count - 1) as $index)
-                        <rect x="{{ $xFor($index) - $slot / 2 }}" y="0" width="{{ $slot }}" height="{{ $plotBottom }}" fill="transparent" x-on:mouseenter="hover = {{ $index }}" />
+                        <div class="absolute inset-y-0" style="left: {{ round($xFor($index) - $slot / 2, 3) }}%; width: {{ round($slot, 3) }}%" x-on:mouseenter="hover = {{ $index }}"></div>
                     @endforeach
-                </svg>
 
-                @if ($type === 'line')
-                    <div
-                        role="status"
-                        x-show="hover !== null"
-                        x-cloak
-                        class="pointer-events-none absolute top-1 flex min-w-[170px] flex-col gap-1.5 rounded-[10px] border border-line bg-card px-3 py-2.5 text-[13px] shadow-[0_10px_30px_rgb(24_24_27/0.12)]"
-                        x-data="{ rows: @js($tooltipRows) }"
-                        x-bind:style="hover !== null && { left: rows[hover].left + '%', transform: rows[hover].left > 60 ? 'translateX(calc(-100% - 12px))' : 'translateX(12px)' }"
-                    >
-                        <template x-if="hover !== null">
-                            <div class="flex flex-col gap-1.5">
-                                <strong class="font-semibold text-ink" x-text="rows[hover].title"></strong>
-                                <template x-for="row in rows[hover].values" x-bind:key="row.name">
-                                    <span class="flex items-center gap-2 text-ink-2">
-                                        <span class="size-2 rounded-full" x-bind:style="{ background: row.color }"></span>
-                                        <span x-text="row.name"></span>
-                                        <span class="ml-auto font-mono text-ink" x-text="row.value"></span>
-                                    </span>
-                                </template>
-                            </div>
-                        </template>
-                    </div>
-                @endif
+                    @if ($type === 'line')
+                        <div
+                            role="status"
+                            x-show="hover !== null"
+                            x-cloak
+                            class="pointer-events-none absolute top-0 z-10 flex min-w-[170px] flex-col gap-1.5 rounded-[10px] border border-line bg-card px-3 py-2.5 text-[13px] shadow-[0_10px_30px_rgb(24_24_27/0.12)]"
+                            x-data="{ rows: @js($tooltipRows) }"
+                            x-bind:style="hover !== null && { left: rows[hover].left + '%', transform: rows[hover].left > 60 ? 'translateX(calc(-100% - 12px))' : 'translateX(12px)' }"
+                        >
+                            <template x-if="hover !== null">
+                                <div class="flex flex-col gap-1.5">
+                                    <strong class="font-semibold text-ink" x-text="rows[hover].title"></strong>
+                                    <template x-for="row in rows[hover].values" x-bind:key="row.name">
+                                        <span class="flex items-center gap-2 text-ink-2">
+                                            <span class="size-2 rounded-full" x-bind:style="{ background: row.color }"></span>
+                                            <span x-text="row.name"></span>
+                                            <span class="ml-auto font-mono text-ink" x-text="row.value"></span>
+                                        </span>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    @endif
+                </div>
             </div>
         @elseif ($type === 'bar')
             @php

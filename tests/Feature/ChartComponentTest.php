@@ -28,7 +28,10 @@ test('line chart renders series, axis, tooltip data and table', function () {
         ->toContain('stroke="#C2850F"')
         ->toContain('fill-opacity="0.08"')
         ->toContain('R$ 66 mil')
-        ->toContain('>mar</text>')
+        ->toContain('>mar</span>')
+        ->toContain('preserveAspectRatio="none"')
+        ->toContain('vector-effect="non-scaling-stroke"')
+        ->not->toContain('viewBox="0 0 820')
         ->toContain('role="status"')
         ->toContain('Ver tabela')
         ->toContain('<table');
