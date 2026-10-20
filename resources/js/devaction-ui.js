@@ -556,6 +556,35 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Campo de dinheiro: digitação preenche pelos centavos e formata no locale; o input escondido
+     * guarda o número cru (1234.56), que é o que vai para o wire:model e para o formulário.
+     */
+    Alpine.data('uiMoney', ({ locale = 'pt-BR', decimals = 2, value = null } = {}) => ({
+        display: '',
+
+        init() {
+            if (value !== null && value !== '') {
+                this.apply(Math.round(parseFloat(value) * 10 ** decimals));
+            }
+        },
+
+        format(cents) {
+            return new Intl.NumberFormat(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(cents / 10 ** decimals);
+        },
+
+        apply(cents) {
+            this.display = cents === null ? '' : this.format(cents);
+            this.$refs.raw.value = cents === null ? '' : (cents / 10 ** decimals).toFixed(decimals);
+            this.$refs.raw.dispatchEvent(new Event('input', { bubbles: true }));
+        },
+
+        typed(event) {
+            const digits = event.target.value.replace(/\D/g, '');
+            this.apply(digits === '' ? null : parseInt(digits, 10));
+        },
+    }));
+
+    /**
      * Campo numérico: − e +, setas ↑↓, limites min/max e passo. Dispara input para o wire:model.
      */
     Alpine.data('uiNumber', ({ min = null, max = null, step = 1 } = {}) => ({
