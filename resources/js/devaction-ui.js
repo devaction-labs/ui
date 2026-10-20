@@ -747,6 +747,84 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Pillbox: lista de textos em pílulas. ↵ ou vírgula adiciona, ⌫ no campo vazio remove a última.
+     * value (array) é x-modelable; suggestions aparecem filtradas enquanto digita.
+     */
+    Alpine.data('uiPillbox', ({ value = [], suggestions = [], max = null, unique = true } = {}) => ({
+        value: Array.isArray(value) ? value : [],
+        suggestions,
+        draft: '',
+        activeIndex: -1,
+
+        normalize(text) {
+            return (text ?? '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+        },
+
+        filtered() {
+            const draft = this.normalize(this.draft);
+
+            if (draft === '') {
+                return [];
+            }
+
+            return this.suggestions
+                .filter((item) => this.normalize(item).includes(draft))
+                .filter((item) => !this.value.some((pill) => this.normalize(pill) === this.normalize(item)))
+                .slice(0, 8);
+        },
+
+        isFull() {
+            return max !== null && this.value.length >= max;
+        },
+
+        add(text = null) {
+            const pill = (text ?? (this.filtered()[this.activeIndex] || this.draft)).toString().replace(/,$/, '').trim();
+
+            if (pill === '' || this.isFull()) {
+                return;
+            }
+
+            if (unique && this.value.some((item) => this.normalize(item) === this.normalize(pill))) {
+                this.draft = '';
+
+                return;
+            }
+
+            this.value = [...this.value, pill];
+            this.draft = '';
+            this.activeIndex = -1;
+            this.$nextTick(() => this.$refs.draft.focus());
+        },
+
+        remove(index) {
+            this.value = this.value.filter((_, position) => position !== index);
+            this.$nextTick(() => this.$refs.draft.focus());
+        },
+
+        backspace() {
+            if (this.draft === '' && this.value.length) {
+                this.remove(this.value.length - 1);
+            }
+        },
+
+        typed() {
+            this.activeIndex = -1;
+
+            if (this.draft.endsWith(',')) {
+                this.add();
+            }
+        },
+
+        move(step) {
+            const total = this.filtered().length;
+
+            if (total) {
+                this.activeIndex = (this.activeIndex + step + total) % total;
+            }
+        },
+    }));
+
+    /**
      * Slider: valor único ou faixa (value = [mín, máx]) com distância mínima entre os botões.
      * value é x-modelable, então funciona com wire:model.
      */
