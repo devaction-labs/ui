@@ -726,6 +726,64 @@ document.addEventListener('alpine:init', () => {
         },
     }));
 
+    /**
+     * Central de notificações: filtra pela aba, conta as não lidas e marca como lida no clique.
+     */
+    Alpine.data('uiNotificationCenter', ({ tab = 'all', markAll = null } = {}) => ({
+        tab,
+        revision: 0,
+
+        items() {
+            this.revision;
+
+            return [...this.$root.querySelectorAll('[data-notification]')];
+        },
+
+        matches(item) {
+            return this.tab === 'all' || item.dataset.type === this.tab;
+        },
+
+        isUnread(item) {
+            this.revision;
+
+            return item?.dataset.unread === 'true';
+        },
+
+        unread(type) {
+            return this.items().filter((item) => item.dataset.unread === 'true' && (type === 'all' || item.dataset.type === type)).length;
+        },
+
+        visibleCount() {
+            return this.items().filter((item) => this.matches(item)).length;
+        },
+
+        groupHasItems(group) {
+            this.revision;
+
+            return [...group.querySelectorAll('[data-notification]')].some((item) => this.matches(item));
+        },
+
+        read(item) {
+            if (item.dataset.unread !== 'true') {
+                return;
+            }
+
+            item.dataset.unread = 'false';
+            this.revision++;
+            this.$dispatch('notification-read', { id: item.id || null });
+        },
+
+        readAll() {
+            this.items().forEach((item) => (item.dataset.unread = 'false'));
+            this.revision++;
+            this.$dispatch('notifications-read-all');
+
+            if (markAll && this.$wire) {
+                this.$wire.call(markAll);
+            }
+        },
+    }));
+
     Alpine.data('uiMenu', ({ submenu = false } = {}) => ({
         init() {
             this.$watch(submenu ? 'subOpen' : 'open', (isOpen) => {
