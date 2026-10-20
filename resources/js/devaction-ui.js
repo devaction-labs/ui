@@ -1967,6 +1967,89 @@ document.addEventListener('alpine:init', () => {
      * Intervalo de datas: dois meses, atalhos, horário opcional e Aplicar/Cancelar.
      * value é x-modelable: { start, end } (mais start_time e end_time com horário).
      */
+    /**
+     * Painéis redimensionáveis: tamanho do primeiro painel em %, com arrastar, teclado e duplo clique.
+     */
+    Alpine.data('uiResizable', ({ size = 50, min = 20, max = 80, vertical = false, persist = null } = {}) => ({
+        size,
+        initial: size,
+        min,
+        max,
+        vertical,
+
+        init() {
+            try {
+                const saved = persist ? Number(localStorage.getItem(`ui-resizable:${persist}`)) : 0;
+
+                if (saved) {
+                    this.size = this.clamp(saved);
+                }
+            } catch (error) {}
+
+            this.$watch('size', (value) => {
+                try {
+                    if (persist) {
+                        localStorage.setItem(`ui-resizable:${persist}`, String(Math.round(value)));
+                    }
+                } catch (error) {}
+            });
+        },
+
+        clamp(value) {
+            return Math.min(max, Math.max(min, value));
+        },
+
+        startDrag(event) {
+            event.preventDefault();
+            const handle = event.currentTarget;
+            const box = this.$root.getBoundingClientRect();
+
+            handle.setPointerCapture?.(event.pointerId);
+
+            const move = (moveEvent) => {
+                const ratio = vertical
+                    ? (moveEvent.clientY - box.top) / box.height
+                    : (moveEvent.clientX - box.left) / box.width;
+                this.size = this.clamp(ratio * 100);
+            };
+            const stop = () => {
+                handle.removeEventListener('pointermove', move);
+                handle.removeEventListener('pointerup', stop);
+                handle.removeEventListener('pointercancel', stop);
+                this.$dispatch('resized', { size: Math.round(this.size) });
+            };
+
+            handle.addEventListener('pointermove', move);
+            handle.addEventListener('pointerup', stop);
+            handle.addEventListener('pointercancel', stop);
+        },
+
+        onKeydown(event) {
+            const amount = event.shiftKey ? 10 : 5;
+            const keys = vertical ? { back: 'ArrowUp', forward: 'ArrowDown' } : { back: 'ArrowLeft', forward: 'ArrowRight' };
+
+            if (event.key === keys.back) {
+                this.size = this.clamp(this.size - amount);
+            } else if (event.key === keys.forward) {
+                this.size = this.clamp(this.size + amount);
+            } else if (event.key === 'Home') {
+                this.size = min;
+            } else if (event.key === 'End') {
+                this.size = max;
+            } else if (event.key === 'Enter') {
+                this.reset();
+            } else {
+                return;
+            }
+
+            event.preventDefault();
+        },
+
+        reset() {
+            this.size = this.initial;
+        },
+    }));
+
     Alpine.data('uiDateRange', ({ value = null, min = null, max = null, locale = 'pt-BR', today = null, time = false, step = 15, presets = [], inline = false } = {}) => {
         const pad = (number) => String(number).padStart(2, '0');
         const toIso = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
