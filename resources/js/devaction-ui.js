@@ -182,6 +182,68 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Dropdown: contêiner de popover e menu. O primeiro elemento focável fora do painel é o gatilho.
+     * open é x-modelable, então funciona com wire:model.
+     */
+    Alpine.data('uiDropdown', ({ hover = false } = {}) => ({
+        open: false,
+        hoverTimer: null,
+
+        init() {
+            const trigger = this.trigger();
+
+            if (trigger) {
+                trigger.setAttribute('aria-haspopup', 'true');
+                trigger.setAttribute('aria-expanded', 'false');
+                this.$watch('open', (isOpen) => trigger.setAttribute('aria-expanded', String(isOpen)));
+            }
+
+            this.$watch('open', (isOpen) => this.$root.toggleAttribute('data-open', isOpen));
+        },
+
+        trigger() {
+            return [...this.$root.querySelectorAll('button, a, [tabindex]')].find(
+                (element) => !element.closest('[data-dropdown-panel]') && element.closest('[data-dropdown]') === this.$root,
+            );
+        },
+
+        clicked(event) {
+            if (event.target.closest('[data-dropdown-panel]')?.closest('[data-dropdown]') === this.$root) {
+                return;
+            }
+
+            if (this.trigger()?.contains(event.target)) {
+                this.open = !this.open;
+            }
+        },
+
+        close(restoreFocus = false) {
+            if (!this.open) {
+                return;
+            }
+
+            this.open = false;
+
+            if (restoreFocus) {
+                this.trigger()?.focus();
+            }
+        },
+
+        enter() {
+            if (hover) {
+                clearTimeout(this.hoverTimer);
+                this.open = true;
+            }
+        },
+
+        leave() {
+            if (hover) {
+                this.hoverTimer = setTimeout(() => (this.open = false), 150);
+            }
+        },
+    }));
+
+    /**
      * Tooltip: espera no hover, aparece na hora com o foco do teclado e Esc fecha.
      * Liga o primeiro elemento focável ao texto com aria-describedby.
      */
