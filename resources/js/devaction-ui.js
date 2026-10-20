@@ -747,6 +747,216 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Editor de texto rico sem dependências: contenteditable + execCommand, barra de formatação
+     * com estado (aria-pressed) e menu de comandos ao digitar "/" numa linha vazia.
+     * value (x-modelable) é o HTML; sanitize no servidor antes de exibir para outras pessoas.
+     */
+    Alpine.data('uiEditor', ({ value = '' } = {}) => ({
+        value,
+        active: {},
+        block: 'p',
+        slashOpen: false,
+        slashQuery: '',
+        slashIndex: 0,
+        slashTop: 0,
+        slashLeft: 0,
+
+        init() {
+            this.$refs.content.innerHTML = this.value ?? '';
+            document.execCommand('defaultParagraphSeparator', false, 'p');
+            this.$watch('value', (next) => {
+                if (next !== this.$refs.content.innerHTML && document.activeElement !== this.$refs.content) {
+                    this.$refs.content.innerHTML = next ?? '';
+                }
+            });
+            this.onSelection = () => this.refreshState();
+            document.addEventListener('selectionchange', this.onSelection);
+        },
+
+        destroy() {
+            document.removeEventListener('selectionchange', this.onSelection);
+        },
+
+        refreshState() {
+            if (!this.$refs.content.contains(window.getSelection()?.anchorNode ?? null)) {
+                return;
+            }
+
+            this.active = Object.fromEntries(['bold', 'italic', 'strikeThrough', 'insertUnorderedList', 'insertOrderedList'].map((command) => [command, document.queryCommandState(command)]));
+            const format = String(document.queryCommandValue('formatBlock') || 'p').toLowerCase().replace(/[<>]/g, '');
+            this.block = format === 'div' ? 'p' : format;
+            this.active.code = Boolean(this.closest('code'));
+            this.active.link = Boolean(this.closest('a'));
+        },
+
+        closest(tag) {
+            let node = window.getSelection()?.anchorNode ?? null;
+
+            while (node && node !== this.$refs.content) {
+                if (node.nodeName?.toLowerCase() === tag) {
+                    return node;
+                }
+
+                node = node.parentNode;
+            }
+
+            return null;
+        },
+
+        sync() {
+            const html = this.$refs.content.innerHTML;
+            this.value = html === '<p><br></p>' || html === '<br>' ? '' : html;
+        },
+
+        run(command, argument = null) {
+            this.$refs.content.focus();
+            document.execCommand(command, false, argument);
+            this.sync();
+            this.refreshState();
+        },
+
+        setBlock(tag) {
+            this.run('formatBlock', `<${tag}>`);
+        },
+
+        toggleCode() {
+            const code = this.closest('code');
+
+            if (code) {
+                code.replaceWith(...code.childNodes);
+                this.sync();
+
+                return;
+            }
+
+            const text = window.getSelection()?.toString() || 'código';
+            this.run('insertHTML', `<code>${text.replace(/[&<>]/g, (character) => `&#${character.charCodeAt(0)};`)}</code>&nbsp;`);
+        },
+
+        link() {
+            if (this.closest('a')) {
+                this.run('unlink');
+
+                return;
+            }
+
+            const url = window.prompt('Endereço do link', 'https://');
+
+            if (url && url !== 'https://') {
+                this.run('createLink', url);
+            }
+        },
+
+        slashItems() {
+            const query = this.slashQuery.toLowerCase();
+
+            return [...this.$root.querySelectorAll('[data-slash-item]')].filter((item) => item.dataset.label.toLowerCase().includes(query));
+        },
+
+        keydown(event) {
+            if (this.slashOpen) {
+                const items = this.slashItems();
+
+                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    this.slashIndex = (this.slashIndex + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % (items.length || 1);
+
+                    return;
+                }
+
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    items[this.slashIndex]?.click();
+
+                    return;
+                }
+
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.slashOpen = false;
+
+                    return;
+                }
+            }
+
+            if (event.key === '/' && !this.slashOpen) {
+                const line = this.closestBlock();
+
+                if (!line || line.textContent.trim() === '') {
+                    this.$nextTick(() => this.openSlash());
+                }
+            }
+        },
+
+        input() {
+            this.sync();
+
+            if (this.slashOpen) {
+                const text = this.closestBlock()?.textContent ?? '';
+
+                if (!text.startsWith('/')) {
+                    this.slashOpen = false;
+
+                    return;
+                }
+
+                this.slashQuery = text.slice(1);
+                this.slashIndex = 0;
+            }
+        },
+
+        closestBlock() {
+            let node = window.getSelection()?.anchorNode ?? null;
+
+            while (node && node.parentNode !== this.$refs.content) {
+                node = node.parentNode;
+            }
+
+            return node && node !== this.$refs.content ? node : null;
+        },
+
+        openSlash() {
+            const range = window.getSelection()?.getRangeAt(0);
+            const caret = range?.getBoundingClientRect();
+            const box = this.$refs.content.getBoundingClientRect();
+            this.slashTop = (caret?.bottom ?? box.top) - box.top + 6;
+            this.slashLeft = Math.max(0, (caret?.left ?? box.left) - box.left - 6);
+            this.slashQuery = '';
+            this.slashIndex = 0;
+            this.slashOpen = true;
+        },
+
+        chooseSlash(command, argument = null) {
+            const line = this.closestBlock();
+
+            if (line) {
+                line.textContent = '';
+                const range = document.createRange();
+                range.setStart(line, 0);
+                range.collapse(true);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+            }
+
+            this.slashOpen = false;
+
+            if (command === 'formatBlock') {
+                this.setBlock(argument);
+            } else if (command === 'code') {
+                this.toggleCode();
+            } else {
+                this.run(command, argument);
+            }
+        },
+
+        paste(event) {
+            event.preventDefault();
+            document.execCommand('insertText', false, event.clipboardData.getData('text/plain'));
+        },
+    }));
+
+    /**
      * Dropzone: arrastar e soltar sobre um input file nativo (o wire:model do Livewire continua
      * funcionando). Mostra o resumo do que está sendo arrastado e o progresso do upload do Livewire.
      */
