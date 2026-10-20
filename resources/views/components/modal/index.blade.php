@@ -92,7 +92,7 @@
             ! $flyout ? $widthClasses : '',
             $flyout && $position !== 'bottom' && ! $isFloating ? 'w-[420px]' : '',
             $isFloating && $flyout ? 'h-full w-[420px] rounded-[18px]' : '',
-            'border border-line bg-card shadow-[0_30px_80px_rgb(9_9_11/0.28)]' => ! $isBare,
+            'border border-line bg-card shadow-(--shadow-modal)' => ! $isBare,
             'rounded-[18px]' => ! $isBare && ! $flyout,
             'rounded-t-[18px]' => ! $isBare && $flyout && $position === 'bottom',
         ]) }}>
