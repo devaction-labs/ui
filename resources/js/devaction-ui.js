@@ -747,6 +747,215 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Date picker: data única ('2026-10-16') ou faixa ({ start, end }), com min, max e atalhos.
+     * value é x-modelable. Datas em texto ISO, sem fuso, para não andar um dia.
+     */
+    Alpine.data('uiDatePicker', ({ value = null, range = false, min = null, max = null, locale = 'pt-BR', today = null } = {}) => {
+        const pad = (number) => String(number).padStart(2, '0');
+        const toIso = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+        const fromIso = (iso) => {
+            const [year, month, day] = String(iso).split('-').map(Number);
+
+            return new Date(year, month - 1, day);
+        };
+        const addDays = (iso, days) => {
+            const date = fromIso(iso);
+            date.setDate(date.getDate() + days);
+
+            return toIso(date);
+        };
+
+        return {
+            open: false,
+            value: value ?? (range ? { start: null, end: null } : null),
+            today: today ?? toIso(new Date()),
+            month: null,
+            focused: null,
+            hovered: null,
+
+            init() {
+                const anchor = (range ? this.value?.start : this.value) || this.today;
+                this.month = anchor.slice(0, 7);
+                this.focused = anchor;
+            },
+
+            start() {
+                return range ? this.value?.start ?? null : this.value;
+            },
+
+            end() {
+                return range ? this.value?.end ?? null : this.value;
+            },
+
+            monthLabel() {
+                return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(fromIso(`${this.month}-01`));
+            },
+
+            weekdays() {
+                const sunday = new Date(2026, 9, 4);
+
+                return [...Array(7)].map((_, index) => {
+                    const date = new Date(sunday);
+                    date.setDate(sunday.getDate() + index);
+
+                    return new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(date).replace('.', '').slice(0, 3);
+                });
+            },
+
+            days() {
+                const first = fromIso(`${this.month}-01`);
+                const total = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+                const blanks = [...Array(first.getDay())].map((_, index) => ({ key: `blank-${index}`, iso: null }));
+
+                return blanks.concat([...Array(total)].map((_, index) => {
+                    const iso = `${this.month}-${pad(index + 1)}`;
+
+                    return { key: iso, iso, day: index + 1 };
+                }));
+            },
+
+            shiftMonth(step) {
+                const date = fromIso(`${this.month}-01`);
+                date.setMonth(date.getMonth() + step);
+                this.month = toIso(date).slice(0, 7);
+            },
+
+            isDisabled(iso) {
+                return (min !== null && iso < min) || (max !== null && iso > max);
+            },
+
+            isSelected(iso) {
+                return iso !== null && (iso === this.start() || iso === this.end());
+            },
+
+            isInRange(iso) {
+                if (!range || iso === null) {
+                    return false;
+                }
+
+                const startIso = this.start();
+                const endIso = this.end() ?? (startIso && this.hovered && this.hovered > startIso ? this.hovered : null);
+
+                return startIso !== null && endIso !== null && iso > startIso && iso < endIso;
+            },
+
+            dayLabel(iso) {
+                return new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(fromIso(iso));
+            },
+
+            pick(iso) {
+                if (iso === null || this.isDisabled(iso)) {
+                    return;
+                }
+
+                this.focused = iso;
+
+                if (!range) {
+                    this.value = iso;
+                    this.commit();
+                    this.close(true);
+
+                    return;
+                }
+
+                const startIso = this.start();
+
+                if (startIso === null || this.end() !== null || iso < startIso) {
+                    this.value = { start: iso, end: null };
+                } else {
+                    this.value = { start: startIso, end: iso };
+                    this.commit();
+                    this.close(true);
+                }
+            },
+
+            preset(days, length = null) {
+                if (range) {
+                    const endIso = addDays(this.today, days);
+                    this.value = { start: length === null ? this.today : addDays(endIso, -length), end: endIso };
+                } else {
+                    this.value = addDays(this.today, days);
+                }
+
+                this.month = (range ? this.value.start : this.value).slice(0, 7);
+                this.commit();
+                this.close(true);
+            },
+
+            nextWeekday(weekday) {
+                const date = fromIso(this.today);
+                const distance = (weekday - date.getDay() + 7) % 7 || 7;
+
+                return distance;
+            },
+
+            clear() {
+                this.value = range ? { start: null, end: null } : null;
+                this.commit();
+            },
+
+            commit() {
+                this.$root.querySelectorAll('[data-date-raw]').forEach((input) => {
+                    input.value = input.dataset.dateRaw === 'end' ? this.end() ?? '' : this.start() ?? '';
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+            },
+
+            format(iso, options = { day: '2-digit', month: '2-digit', year: 'numeric' }) {
+                return iso ? new Intl.DateTimeFormat(locale, options).format(fromIso(iso)) : '';
+            },
+
+            relative(iso) {
+                if (!iso) {
+                    return '';
+                }
+
+                const days = Math.round((fromIso(iso) - fromIso(this.today)) / 86400000);
+
+                return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(days, 'day');
+            },
+
+            display() {
+                if (!range) {
+                    return this.format(this.start(), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+                }
+
+                return this.start() ? `${this.format(this.start())} → ${this.end() ? this.format(this.end()) : '…'}` : '';
+            },
+
+            toggle() {
+                this.open ? this.close() : this.show();
+            },
+
+            show() {
+                this.open = true;
+                this.focused = this.start() || this.today;
+                this.month = this.focused.slice(0, 7);
+                this.$nextTick(() => this.focusDay());
+            },
+
+            close(restoreFocus = false) {
+                this.open = false;
+                this.hovered = null;
+
+                if (restoreFocus && this.$refs.trigger) {
+                    this.$refs.trigger.focus();
+                }
+            },
+
+            moveFocus(days) {
+                this.focused = addDays(this.focused, days);
+                this.month = this.focused.slice(0, 7);
+                this.$nextTick(() => this.focusDay());
+            },
+
+            focusDay() {
+                this.$root.querySelector(`[data-date="${this.focused}"]`)?.focus();
+            },
+        };
+    });
+
+    /**
      * Pillbox: lista de textos em pílulas. ↵ ou vírgula adiciona, ⌫ no campo vazio remove a última.
      * value (array) é x-modelable; suggestions aparecem filtradas enquanto digita.
      */
