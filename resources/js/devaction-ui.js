@@ -747,6 +747,65 @@ document.addEventListener('alpine:init', () => {
     }));
 
     /**
+     * Dropzone: arrastar e soltar sobre um input file nativo (o wire:model do Livewire continua
+     * funcionando). Mostra o resumo do que está sendo arrastado e o progresso do upload do Livewire.
+     */
+    Alpine.data('uiDropzone', () => ({
+        dragging: false,
+        depth: 0,
+        summary: '',
+        uploading: false,
+        progress: 0,
+
+        humanSize(bytes) {
+            const units = ['B', 'KB', 'MB', 'GB'];
+            let size = bytes;
+            let unit = 0;
+
+            while (size >= 1024 && unit < units.length - 1) {
+                size /= 1024;
+                unit++;
+            }
+
+            return `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: unit ? 1 : 0 }).format(size)} ${units[unit]}`;
+        },
+
+        enter(event) {
+            this.depth++;
+            this.dragging = true;
+            const items = [...(event.dataTransfer?.items ?? [])].filter((item) => item.kind === 'file');
+            this.summary = items.length === 1 ? '1 arquivo' : `${items.length} arquivos`;
+        },
+
+        leave() {
+            this.depth = Math.max(0, this.depth - 1);
+            this.dragging = this.depth > 0;
+        },
+
+        drop(event) {
+            this.depth = 0;
+            this.dragging = false;
+            const input = this.$refs.input;
+
+            if (input.disabled || !event.dataTransfer?.files?.length) {
+                return;
+            }
+
+            const transfer = new DataTransfer();
+            const files = input.multiple ? [...event.dataTransfer.files] : [event.dataTransfer.files[0]];
+            files.forEach((file) => transfer.items.add(file));
+            input.files = transfer.files;
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        },
+
+        chosen() {
+            const files = [...this.$refs.input.files];
+            const total = files.reduce((sum, file) => sum + file.size, 0);
+            this.summary = files.length ? `${files.length === 1 ? files[0].name : files.length + ' arquivos'} · ${this.humanSize(total)}` : '';
+        },
+    }));
+
+    /**
      * Timer: conta segundos a partir de seconds; com started-at (timestamp) retoma depois de recarregar.
      * value (x-modelable) são os segundos. Dispara timer-started, timer-paused e timer-stopped.
      */
