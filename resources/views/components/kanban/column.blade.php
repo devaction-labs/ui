@@ -6,6 +6,8 @@
 
     limit:  limite de trabalho em andamento; mostra "2/3" e fica vermelho ao chegar no limite
     group:  nome do grupo do wire:sort (colunas do mesmo grupo trocam cards)
+    count-text: expressão do wire:text para a contagem (ex.: $wire.totals.review.count);
+                o número muda na hora ao arrastar, sem esperar o servidor
     footer: slot para o botão de adicionar e totais
 --}}
 @props([
@@ -16,6 +18,7 @@
     'limit' => null,
     'sort' => null,
     'group' => 'kanban',
+    'countText' => null,
 ])
 
 @php
@@ -33,14 +36,20 @@
         @endif
         <h3 class="truncate text-sm font-semibold text-ink">{{ $heading }}</h3>
         @if ($count !== null)
-            <span class="font-mono text-xs text-muted">{{ $count }}</span>
+            <span class="font-mono text-xs text-muted" @if ($countText) wire:text="{{ $countText }}" @endif>{{ $count }}</span>
         @endif
         @if ($limit !== null)
-            <span @class([
-                'ml-auto font-mono text-[11px]',
-                'text-risk-fg' => $isAtLimit,
-                'text-muted' => ! $isAtLimit,
-            ])>{{ $count ?? 0 }}/{{ $limit }}{{ $isAtLimit ? ' limite' : '' }}</span>
+            <span
+                @class([
+                    'ml-auto font-mono text-[11px]',
+                    'text-risk-fg' => $isAtLimit,
+                    'text-muted' => ! $isAtLimit,
+                ])
+                @if ($countText)
+                    wire:text="({{ $countText }}) + '/{{ (int) $limit }}' + (({{ $countText }}) >= {{ (int) $limit }} ? ' limite' : '')"
+                    x-bind:class="{ 'text-risk-fg': ({{ $countText }}) >= {{ (int) $limit }}, 'text-muted': ({{ $countText }}) < {{ (int) $limit }} }"
+                @endif
+            >{{ $count ?? 0 }}/{{ $limit }}{{ $isAtLimit ? ' limite' : '' }}</span>
         @endif
         @isset($actions)
             <span @class(['flex items-center', 'ml-auto' => $limit === null])>{{ $actions }}</span>

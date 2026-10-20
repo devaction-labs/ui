@@ -36,11 +36,11 @@
 @endphp
 
 @if ($hasField)
-    <x-ui::field>
+    <x-ui::field :class="$attributes->get('class')">
         @if ($label)
             <x-ui::label :for="$selectId">{{ $label }}</x-ui::label>
         @endif
-        <x-ui::select bare :placeholder="$placeholder" :size="$size" :invalid="$invalid" :attributes="$attributes->merge(['id' => $selectId, 'aria-describedby' => $selectId.'-hint'])">{{ $slot }}</x-ui::select>
+        <x-ui::select bare :placeholder="$placeholder" :size="$size" :invalid="$invalid" :attributes="$attributes->except('class')->merge(['id' => $selectId, 'aria-describedby' => $selectId.'-hint'])">{{ $slot }}</x-ui::select>
         @if ($description && ! $errorMessage)
             <x-ui::description :id="$selectId.'-hint'">{{ $description }}</x-ui::description>
         @endif
@@ -49,10 +49,10 @@
         @endif
     </x-ui::field>
 @else
-    <div data-select class="relative flex w-full min-w-0">
+    <div data-select @class(['relative flex min-w-0', $attributes->get('class')])>
         <select
             @if ($invalid) aria-invalid="true" @endif
-            {{ $attributes->class([
+            {{ $attributes->except('class')->class([
                 'w-full min-w-0 cursor-pointer appearance-none border bg-card text-ink outline-none transition disabled:cursor-not-allowed disabled:border-dashed disabled:bg-subtle disabled:text-muted',
                 $heightClasses,
                 $paddingClasses,
