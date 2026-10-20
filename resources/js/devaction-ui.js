@@ -2407,6 +2407,42 @@ document.addEventListener('alpine:init', () => {
      * Tooltip: espera no hover, aparece na hora com o foco do teclado e Esc fecha.
      * Liga o primeiro elemento focável ao texto com aria-describedby.
      */
+    /**
+     * Hover card: abre depois do delay no mouse ou na hora no foco; dá tempo de levar o mouse até o cartão.
+     */
+    Alpine.data('uiHoverCard', ({ delay = 400 } = {}) => ({
+        open: false,
+        timer: null,
+
+        init() {
+            const trigger = this.$el.querySelector('a, button, [tabindex]');
+
+            if (trigger) {
+                trigger.setAttribute('aria-describedby', [trigger.getAttribute('aria-describedby'), this.$id('ui-hover-card')].filter(Boolean).join(' '));
+            }
+        },
+
+        schedule() {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => (this.open = true), delay);
+        },
+
+        show() {
+            clearTimeout(this.timer);
+            this.open = true;
+        },
+
+        leave() {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => (this.open = false), 150);
+        },
+
+        hide() {
+            clearTimeout(this.timer);
+            this.open = false;
+        },
+    }));
+
     Alpine.data('uiTooltip', ({ delay = 400, toggleable = false, disabled = false } = {}) => ({
         open: false,
         timer: null,
