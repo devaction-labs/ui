@@ -24,14 +24,17 @@
     'text' => null,
     'icon' => 'alert-diamond',
     'resource' => null,
-    'prompt' => 'Digite :resource para confirmar',
-    'confirm' => 'Excluir',
-    'cancel' => 'Cancelar',
+    'prompt' => null,
+    'confirm' => null,
+    'cancel' => null,
     'size' => 'sm',
     'closeOnConfirm' => true,
 ])
 
 @php
+    $prompt ??= __('Type :resource to confirm');
+    $confirm ??= __('Delete');
+    $cancel ??= __('Cancel');
     $confirmAttributes = new \Illuminate\View\ComponentAttributeBag(
         collect($attributes->getAttributes())
             ->filter(fn ($value, string $key): bool => str_starts_with($key, 'confirm:'))

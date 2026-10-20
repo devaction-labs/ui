@@ -24,9 +24,9 @@
     'label' => null,
     'description' => null,
     'error' => null,
-    'placeholder' => 'Selecione…',
-    'searchPlaceholder' => 'Filtrar…',
-    'empty' => 'Nada encontrado.',
+    'placeholder' => null,
+    'searchPlaceholder' => null,
+    'empty' => null,
     'name' => null,
     'value' => null,
     'multiple' => false,
@@ -35,6 +35,9 @@
 ])
 
 @php
+    $placeholder ??= __('Select…');
+    $searchPlaceholder ??= __('Filter…');
+    $empty ??= __('No results.');
     $modelName = collect($attributes->getAttributes())
         ->first(fn ($attributeValue, string $key): bool => str_starts_with($key, 'wire:model'));
     $fieldName = $name ?? $modelName;

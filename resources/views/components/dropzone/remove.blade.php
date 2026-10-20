@@ -6,8 +6,12 @@
 --}}
 @props([
     'icon' => 'cancel-01',
-    'label' => 'Remover',
+    'label' => null,
 ])
+
+@php
+    $label ??= __('Remove');
+@endphp
 
 <button
     type="button"

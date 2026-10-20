@@ -14,7 +14,7 @@
     slots:          attachments (em cima do texto) · toolbar (à esquerda, depois dos botões)
 --}}
 @props([
-    'placeholder' => 'Pergunte sobre o projeto…',
+    'placeholder' => null,
     'max' => null,
     'submit' => null,
     'stop' => null,
@@ -23,8 +23,13 @@
     'attach' => true,
     'commands' => true,
     'mentions' => true,
-    'label' => 'Mensagem para a IA',
+    'label' => null,
 ])
+
+@php
+    $placeholder ??= __('Ask about the project…');
+    $label ??= __('Message to the AI');
+@endphp
 
 @php
     $config = [
@@ -65,15 +70,15 @@
 
     <div class="flex items-center gap-0.5 px-2.5 pt-2 pb-2.5">
         @if ($attach)
-            <button type="button" x-on:click="$dispatch('ai-prompt-attach')" aria-label="Anexar" title="Anexar" class="flex size-[34px] cursor-pointer items-center justify-center rounded-[10px] text-ink-3 transition hover:bg-wrap hover:text-ink">
+            <button type="button" x-on:click="$dispatch('ai-prompt-attach')" aria-label="{{ __('Attach') }}" title="{{ __('Attach') }}" class="flex size-[34px] cursor-pointer items-center justify-center rounded-[10px] text-ink-3 transition hover:bg-wrap hover:text-ink">
                 <x-ui::icon name="attachment-01" class="size-[18px]" />
             </button>
         @endif
         @if ($commands)
-            <button type="button" x-on:click="insert('/')" aria-label="Comandos" title="Comandos" class="flex size-[34px] cursor-pointer items-center justify-center rounded-[10px] text-[17px] text-ink-3 transition hover:bg-wrap hover:text-ink">/</button>
+            <button type="button" x-on:click="insert('/')" aria-label="{{ __('Commands') }}" title="{{ __('Commands') }}" class="flex size-[34px] cursor-pointer items-center justify-center rounded-[10px] text-[17px] text-ink-3 transition hover:bg-wrap hover:text-ink">/</button>
         @endif
         @if ($mentions)
-            <button type="button" x-on:click="insert('@')" aria-label="Mencionar" title="Mencionar" class="flex size-[34px] cursor-pointer items-center justify-center rounded-[10px] text-ink-3 transition hover:bg-wrap hover:text-ink">
+            <button type="button" x-on:click="insert('@')" aria-label="{{ __('Mention') }}" title="{{ __('Mention') }}" class="flex size-[34px] cursor-pointer items-center justify-center rounded-[10px] text-ink-3 transition hover:bg-wrap hover:text-ink">
                 <x-ui::icon name="at" class="size-[18px]" />
             </button>
         @endif
@@ -89,8 +94,8 @@
                 type="button"
                 x-on:click="send()"
                 x-bind:disabled="! isBusy() && ! canSend()"
-                x-bind:aria-label="isBusy() ? 'Parar resposta' : 'Enviar'"
-                aria-label="Enviar"
+                x-bind:aria-label="isBusy() ? @js(__('Stop response')) : @js(__('Send'))"
+                aria-label="{{ __('Send') }}"
                 class="flex size-[34px] cursor-pointer items-center justify-center rounded-[10px] bg-ink text-on-ink transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-line disabled:text-muted"
             >
                 <x-ui::icon name="stop" class="size-4" x-show="isBusy()" x-cloak />

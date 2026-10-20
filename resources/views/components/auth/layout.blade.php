@@ -42,10 +42,10 @@
                     {{ $aside }}
                 @else
                     <figure class="max-w-md">
-                        <blockquote class="text-2xl leading-snug font-medium tracking-[-0.02em] text-ink">“Paramos de perder negócio no meio do funil: cada lead tem dono, próximo passo e prazo.”</blockquote>
+                        <blockquote class="text-2xl leading-snug font-medium tracking-[-0.02em] text-ink">{{ __('“We stopped losing deals in the middle of the funnel: every lead has an owner, a next step and a deadline.”') }}</blockquote>
                         <figcaption class="mt-5 flex items-center gap-3 text-sm">
                             <x-ui::avatar name="Paula Ramos" size="sm" color="auto" circle />
-                            <span class="flex flex-col"><span class="font-medium text-ink">Paula Ramos</span><span class="text-muted">Diretora comercial</span></span>
+                            <span class="flex flex-col"><span class="font-medium text-ink">Paula Ramos</span><span class="text-muted">{{ __('Sales director') }}</span></span>
                         </figcaption>
                     </figure>
                 @endisset

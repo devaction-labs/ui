@@ -6,9 +6,13 @@
     Os outros atributos (wire:model, x-model…) vão para o input.
 --}}
 @props([
-    'placeholder' => 'Filtrar…',
+    'placeholder' => null,
     'listbox' => null,
 ])
+
+@php
+    $placeholder ??= __('Filter…');
+@endphp
 
 <label class="flex h-11 items-center gap-2 border-b border-line-soft px-3">
     <x-ui::icon name="search-01" class="size-3.5 text-muted" />

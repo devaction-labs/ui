@@ -111,7 +111,7 @@
                         <button
                             type="button"
                             x-on:click="open = false"
-                            aria-label="Fechar"
+                            aria-label="{{ __('Close') }}"
                             class="-mt-2 -mr-2 inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-[10px] text-muted transition outline-none hover:bg-wrap hover:text-ink focus-visible:ring-2 focus-visible:ring-ring"
                         >
                             <x-ui::icon name="cancel-01" stroke-width="1.8" class="size-[18px]" />

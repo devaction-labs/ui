@@ -39,7 +39,7 @@
         <td @class(['w-11 border-b border-line-soft px-0', $cellHeight, 'max-sm:hidden' => $stack])>
             @if ($rowKey !== '')
                 <span class="flex justify-center">
-                    <input type="checkbox" data-table-select value="{{ $rowKey }}" x-model="selected" aria-label="Selecionar linha" class="size-4 cursor-pointer rounded-[5px] accent-ink" />
+                    <input type="checkbox" data-table-select value="{{ $rowKey }}" x-model="selected" aria-label="{{ __('Select row') }}" class="size-4 cursor-pointer rounded-[5px] accent-ink" />
                 </span>
             @endif
         </td>
@@ -52,7 +52,7 @@
                         type="button"
                         x-on:click="toggleRow(@js($rowKey))"
                         x-bind:aria-expanded="Boolean(expanded[@js($rowKey)])"
-                        aria-label="Mostrar detalhes"
+                        aria-label="{{ __('Show details') }}"
                         class="flex size-7 cursor-pointer items-center justify-center rounded-lg text-ink-3 transition hover:bg-wrap hover:text-ink"
                     >
                         <x-ui::icon name="arrow-right-01" class="size-4 transition-transform" x-bind:class="expanded[@js($rowKey)] && 'rotate-90'" />

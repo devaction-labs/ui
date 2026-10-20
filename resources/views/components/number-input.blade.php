@@ -59,7 +59,7 @@
             type="button"
             x-on:click="decrement()"
             x-bind:disabled="atMin() || @js($isDisabled)"
-            aria-label="Diminuir{{ $label ? ' '.$label : '' }}"
+            aria-label="{{ trim(__('Decrease').' '.$label) }}"
             tabindex="-1"
             class="{{ $buttonClasses }} flex shrink-0 cursor-pointer items-center justify-center border-r border-line bg-subtle text-ink-2 transition hover:bg-wrap hover:text-ink disabled:cursor-not-allowed disabled:text-line-hover"
         >−</button>
@@ -92,7 +92,7 @@
             type="button"
             x-on:click="increment()"
             x-bind:disabled="atMax() || @js($isDisabled)"
-            aria-label="Aumentar{{ $label ? ' '.$label : '' }}"
+            aria-label="{{ trim(__('Increase').' '.$label) }}"
             tabindex="-1"
             class="{{ $buttonClasses }} flex shrink-0 cursor-pointer items-center justify-center border-l border-line bg-subtle text-ink-2 transition hover:bg-wrap hover:text-ink disabled:cursor-not-allowed disabled:text-line-hover"
         >+</button>

@@ -8,11 +8,11 @@
 
 <div data-date-calendar {{ $attributes->class(['flex w-full max-w-[19rem] flex-col gap-2.5']) }}>
     <div class="flex items-center justify-between">
-        <button type="button" x-on:click="shiftMonth(-1)" aria-label="Mês anterior" class="flex size-[34px] cursor-pointer items-center justify-center rounded-[9px] border border-line bg-card text-ink transition hover:bg-subtle">
+        <button type="button" x-on:click="shiftMonth(-1)" aria-label="{{ __('Previous month') }}" class="flex size-[34px] cursor-pointer items-center justify-center rounded-[9px] border border-line bg-card text-ink transition hover:bg-subtle">
             <x-ui::icon name="arrow-left-01" class="size-3.5" />
         </button>
         <span class="font-semibold text-ink first-letter:uppercase" x-text="monthLabel()" aria-live="polite"></span>
-        <button type="button" x-on:click="shiftMonth(1)" aria-label="Próximo mês" class="flex size-[34px] cursor-pointer items-center justify-center rounded-[9px] border border-line bg-card text-ink transition hover:bg-subtle">
+        <button type="button" x-on:click="shiftMonth(1)" aria-label="{{ __('Next month') }}" class="flex size-[34px] cursor-pointer items-center justify-center rounded-[9px] border border-line bg-card text-ink transition hover:bg-subtle">
             <x-ui::icon name="arrow-right-01" class="size-3.5" />
         </button>
     </div>
@@ -54,14 +54,14 @@
     @if ($presets)
         <div class="flex flex-wrap gap-1.5 border-t border-line-soft pt-2">
             @if ($range)
-                <button type="button" x-on:click="preset(0, 6)" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">Últimos 7 dias</button>
-                <button type="button" x-on:click="preset(0, 29)" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">Últimos 30 dias</button>
-                <button type="button" x-on:click="preset(6)" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">Próximos 7 dias</button>
+                <button type="button" x-on:click="preset(0, 6)" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">{{ __('Last 7 days') }}</button>
+                <button type="button" x-on:click="preset(0, 29)" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">{{ __('Last 30 days') }}</button>
+                <button type="button" x-on:click="preset(6)" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">{{ __('Next 7 days') }}</button>
             @else
-                <button type="button" x-on:click="preset(0)" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">Hoje</button>
-                <button type="button" x-on:click="preset(1)" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">Amanhã</button>
-                <button type="button" x-on:click="preset(nextWeekday(5))" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">Sexta</button>
-                <button type="button" x-on:click="preset(7)" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">+7 dias</button>
+                <button type="button" x-on:click="preset(0)" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">{{ __('Today') }}</button>
+                <button type="button" x-on:click="preset(1)" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">{{ __('Tomorrow') }}</button>
+                <button type="button" x-on:click="preset(nextWeekday(5))" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">{{ __('Friday') }}</button>
+                <button type="button" x-on:click="preset(7)" class="inline-flex h-7 cursor-pointer items-center rounded-full bg-wrap px-2.5 text-xs text-ink transition hover:bg-line">{{ __('+7 days') }}</button>
             @endif
             {{ $slot }}
         </div>

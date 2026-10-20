@@ -21,7 +21,7 @@
     </span>
     @if ($online !== null)
         <span @class(['ml-auto size-2 shrink-0 rounded-full', 'bg-ok-fg' => $online, 'bg-line-hover' => ! $online])></span>
-        <span class="sr-only">{{ $online ? 'online' : 'offline' }}</span>
+        <span class="sr-only">{{ $online ? __('online') : __('offline') }}</span>
     @endif
 </span>
 @if ($stats !== [])

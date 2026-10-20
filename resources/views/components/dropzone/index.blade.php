@@ -12,12 +12,13 @@
 --}}
 @props([
     'label' => null,
-    'heading' => 'Arraste arquivos ou clique para escolher',
+    'heading' => null,
     'text' => null,
     'error' => null,
 ])
 
 @php
+    $heading ??= __('Drag files here or click to choose');
     $modelName = collect($attributes->getAttributes())
         ->first(fn ($attributeValue, string $key): bool => str_starts_with($key, 'wire:model'));
     $fieldName = $attributes->get('name') ?? $modelName;
@@ -69,12 +70,12 @@
         >
             <x-ui::icon name="cloud-upload" class="size-5" />
         </span>
-        <span class="font-medium text-ink" x-text="dragging ? 'Solte para enviar' : @js($heading)">{{ $heading }}</span>
+        <span class="font-medium text-ink" x-text="dragging ? @js(__('Drop to upload')) : @js($heading)">{{ $heading }}</span>
         <span class="text-[13px] text-muted" x-show="dragging || summary" x-text="summary" x-cloak></span>
         @if ($text)
             <span class="text-[13px] text-muted" x-show="! dragging && ! summary">{{ $text }}</span>
         @endif
-        <span x-show="uploading" x-cloak class="absolute inset-x-4 bottom-3 h-1 overflow-hidden rounded-sm bg-line-soft" role="progressbar" aria-label="Enviando" x-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
+        <span x-show="uploading" x-cloak class="absolute inset-x-4 bottom-3 h-1 overflow-hidden rounded-sm bg-line-soft" role="progressbar" aria-label="{{ __('Uploading') }}" x-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
             <span class="block h-full bg-ink transition-[width]" x-bind:style="{ width: progress + '%' }"></span>
         </span>
     </label>

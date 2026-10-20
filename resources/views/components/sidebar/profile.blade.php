@@ -19,7 +19,7 @@
 <div data-sidebar-profile {{ $attributes->class(['border-t border-line-strong pt-2']) }}>
     @if ($hasMenu)
         <x-ui::dropdown position="top" align="start" class="w-full">
-            <button type="button" class="flex w-full cursor-pointer items-center gap-2.5 rounded-[10px] px-1.5 py-1.5 text-left transition hover:bg-wrap in-data-collapsed:justify-center in-data-collapsed:px-0" aria-label="Menu de {{ $name }}">
+            <button type="button" class="flex w-full cursor-pointer items-center gap-2.5 rounded-[10px] px-1.5 py-1.5 text-left transition hover:bg-wrap in-data-collapsed:justify-center in-data-collapsed:px-0" aria-label="{{ __(':name menu', ['name' => $name]) }}">
                 <x-ui::avatar :name="$name" :src="$avatar" size="sm" color="indigo" circle />
                 <span class="flex min-w-0 flex-1 flex-col text-[13px] whitespace-nowrap in-data-collapsed:hidden">
                     <span class="truncate font-medium text-ink">{{ $name }}</span>

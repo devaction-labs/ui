@@ -37,7 +37,7 @@
     >
         {{ $slot }}
         @if ($hidden > 0)
-            <x-ui::avatar :size="$size" circle :aria-label="$hidden.' pessoas a mais'">+{{ $hidden }}</x-ui::avatar>
+            <x-ui::avatar :size="$size" circle :aria-label="__(':count more people', ['count' => $hidden])">+{{ $hidden }}</x-ui::avatar>
         @endif
     </div>
     @if ($label)

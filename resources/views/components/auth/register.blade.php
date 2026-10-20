@@ -9,13 +9,18 @@
 @props([
     'action' => null,
     'model' => null,
-    'heading' => 'Criar conta',
-    'description' => 'Comece grátis. Leva menos de um minuto.',
+    'heading' => null,
+    'description' => null,
     'loginHref' => null,
     'termsHref' => null,
     'google' => null,
     'github' => null,
 ])
+
+@php
+    $heading ??= __('Create account');
+    $description ??= __('Start for free. It takes less than a minute.');
+@endphp
 
 <div data-auth-form="register">
     <x-ui::auth.heading :heading="$heading" :description="$description" />
@@ -25,19 +30,19 @@
         @if ($action)
             @csrf
         @endif
-        <x-ui::input name="name" :wire:model="$model ? $model.'.name' : null" label="Nome" icon="user" autocomplete="name" required autofocus />
-        <x-ui::input type="email" name="email" :wire:model="$model ? $model.'.email' : null" label="E-mail de trabalho" icon="mail-01" autocomplete="email" placeholder="voce@empresa.com" required />
-        <x-ui::input type="password" name="password" :wire:model="$model ? $model.'.password' : null" label="Senha" icon="lock-password" autocomplete="new-password" description="Pelo menos 8 caracteres." viewable required />
-        <x-ui::input type="password" name="password_confirmation" :wire:model="$model ? $model.'.password_confirmation' : null" label="Confirmar senha" icon="lock-password" autocomplete="new-password" viewable required />
+        <x-ui::input name="name" :wire:model="$model ? $model.'.name' : null" :label="__('Name')" icon="user" autocomplete="name" required autofocus />
+        <x-ui::input type="email" name="email" :wire:model="$model ? $model.'.email' : null" :label="__('Work email')" icon="mail-01" autocomplete="email" :placeholder="__('you@company.com')" required />
+        <x-ui::input type="password" name="password" :wire:model="$model ? $model.'.password' : null" :label="__('Password')" icon="lock-password" autocomplete="new-password" :description="__('At least 8 characters.')" viewable required />
+        <x-ui::input type="password" name="password_confirmation" :wire:model="$model ? $model.'.password_confirmation' : null" :label="__('Confirm password')" icon="lock-password" autocomplete="new-password" viewable required />
         @if ($termsHref)
             <x-ui::checkbox name="terms" :wire:model="$model ? $model.'.terms' : null" value="1" required>
-                <x-slot:label>Li e aceito os <a href="{{ $termsHref }}" class="font-medium text-ink underline underline-offset-4">termos de uso</a></x-slot:label>
+                <x-slot:label>{!! __('I accept the :terms', ['terms' => '<a href="'.e($termsHref).'" class="font-medium text-ink underline underline-offset-4">'.e(__('terms of use')).'</a>']) !!}</x-slot:label>
             </x-ui::checkbox>
         @endif
-        <x-ui::button type="submit" variant="primary" size="lg" class="mt-1 w-full">Criar conta</x-ui::button>
+        <x-ui::button type="submit" variant="primary" size="lg" class="mt-1 w-full">{{ __('Create account') }}</x-ui::button>
     </form>
 
     @if ($loginHref)
-        <p class="mt-6 text-center text-sm text-ink-3">Já tem conta? <a href="{{ $loginHref }}" class="font-medium text-ink underline-offset-4 hover:underline">Entrar</a></p>
+        <p class="mt-6 text-center text-sm text-ink-3">{{ __('Already have an account?') }} <a href="{{ $loginHref }}" class="font-medium text-ink underline-offset-4 hover:underline">{{ __('Sign in') }}</a></p>
     @endif
 </div>

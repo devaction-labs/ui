@@ -21,4 +21,12 @@ abstract class TestCase extends Orchestra
             UiServiceProvider::class,
         ];
     }
+
+    /**
+     * Os testes conferem os textos em português; TranslationsTest cobre o inglês.
+     */
+    protected function defineEnvironment($app): void
+    {
+        $app['config']->set('app.locale', 'pt_BR');
+    }
 }

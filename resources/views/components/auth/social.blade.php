@@ -24,7 +24,7 @@
         </div>
         @if ($divider)
             <div class="flex items-center gap-3 text-xs text-muted" role="separator">
-                <span class="h-px flex-1 bg-line"></span>ou com e-mail<span class="h-px flex-1 bg-line"></span>
+                <span class="h-px flex-1 bg-line"></span>{{ __('or with email') }}<span class="h-px flex-1 bg-line"></span>
             </div>
         @endif
     </div>

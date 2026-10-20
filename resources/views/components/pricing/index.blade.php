@@ -13,12 +13,17 @@
 --}}
 @props([
     'yearly' => true,
-    'monthlyLabel' => 'Mensal',
-    'yearlyLabel' => 'Anual',
+    'monthlyLabel' => null,
+    'yearlyLabel' => null,
     'yearlyBadge' => null,
     'heading' => null,
     'columns' => 3,
 ])
+
+@php
+    $monthlyLabel ??= __('Monthly');
+    $yearlyLabel ??= __('Yearly');
+@endphp
 
 <section
     data-pricing
@@ -30,7 +35,7 @@
         @if ($heading)
             <h2 class="text-[17px] font-semibold">{{ $heading }}</h2>
         @endif
-        <div role="radiogroup" aria-label="Período de cobrança" class="ml-auto inline-flex rounded-[10px] border border-line bg-wrap p-[3px] max-sm:mx-auto">
+        <div role="radiogroup" aria-label="{{ __('Billing period') }}" class="ml-auto inline-flex rounded-[10px] border border-line bg-wrap p-[3px] max-sm:mx-auto">
             @foreach ([false => $monthlyLabel, true => $yearlyLabel] as $isYearly => $periodLabel)
                 <button
                     type="button"

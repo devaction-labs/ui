@@ -28,16 +28,16 @@
         default => max(0, min(100, (int) $progress)),
     };
     $message ??= match ($status) {
-        'done' => 'Enviado',
+        'done' => __('Uploaded'),
         'uploading' => $percent.'%',
-        'error' => 'Falhou',
-        'waiting' => 'Na fila',
-        'invalid' => 'Tipo não aceito',
+        'error' => __('Failed'),
+        'waiting' => __('Queued'),
+        'invalid' => __('File type not allowed'),
         default => '',
     };
     $meta ??= match ($status) {
-        'uploading' => trim('enviando · '.$size, ' ·'),
-        'error' => 'parou em '.$percent.'%',
+        'uploading' => trim(__('uploading').' · '.$size, ' ·'),
+        'error' => __('stopped at :percent%', ['percent' => $percent]),
         default => $size,
     };
 @endphp
@@ -70,7 +70,7 @@
             ])>{{ $message }}</span>
         </div>
         <div class="mt-1.5 flex items-center gap-2.5">
-            <span class="h-1 flex-1 overflow-hidden rounded-sm bg-line-soft" role="progressbar" aria-label="Progresso de {{ $name }}" aria-valuenow="{{ $percent }}" aria-valuemin="0" aria-valuemax="100">
+            <span class="h-1 flex-1 overflow-hidden rounded-sm bg-line-soft" role="progressbar" aria-label="{{ __('Progress of :name', ['name' => $name]) }}" aria-valuenow="{{ $percent }}" aria-valuemin="0" aria-valuemax="100">
                 <span @class([
                     'block h-full',
                     'bg-ok-fg' => $status === 'done',

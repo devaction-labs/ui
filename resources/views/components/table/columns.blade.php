@@ -32,7 +32,7 @@
                 <span class="flex justify-center">
                     <input
                         type="checkbox"
-                        aria-label="Selecionar todas"
+                        aria-label="{{ __('Select all') }}"
                         x-bind:checked="allState() === 'true'"
                         x-effect="$el.indeterminate = allState() === 'mixed'"
                         x-on:change="toggleAll()"
@@ -42,7 +42,7 @@
             </th>
         @endif
         @if ($expandable)
-            <th scope="col" class="w-11 border-b border-line"><span class="sr-only">Detalhes</span></th>
+            <th scope="col" class="w-11 border-b border-line"><span class="sr-only">{{ __('Details') }}</span></th>
         @endif
         {{ $slot }}
     </tr>

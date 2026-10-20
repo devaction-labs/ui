@@ -42,8 +42,8 @@
         <input type="hidden" name="{{ $name }}" x-bind:value="value" />
     @endif
 
-    <div role="radiogroup" aria-label="Forma de assinar" class="flex rounded-[10px] border border-line bg-wrap p-[3px]">
-        @foreach (['draw' => 'Desenhar', 'type' => 'Digitar'] as $modeKey => $modeLabel)
+    <div role="radiogroup" aria-label="{{ __('Signing method') }}" class="flex rounded-[10px] border border-line bg-wrap p-[3px]">
+        @foreach (['draw' => __('Draw'), 'type' => __('Type')] as $modeKey => $modeLabel)
             <button
                 type="button"
                 role="radio"
@@ -59,7 +59,7 @@
         <div
             x-ref="pad"
             role="img"
-            @if ($label) aria-labelledby="{{ $fieldId }}-label" @else aria-label="Área para desenhar a assinatura" @endif
+            @if ($label) aria-labelledby="{{ $fieldId }}-label" @else aria-label="{{ __('Signature drawing area') }}" @endif
             x-on:pointerdown="down($event)"
             x-on:pointermove="move($event)"
             x-on:pointerup="up()"
@@ -77,12 +77,12 @@
                 </template>
                 <path x-ref="live" d="" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
             </svg>
-            <span x-show="isEmpty()" class="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[13px] text-muted">Assine aqui</span>
+            <span x-show="isEmpty()" class="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[13px] text-muted">{{ __('Sign here') }}</span>
         </div>
     </div>
 
     <label x-show="mode === 'type'" @if ($mode !== 'type') x-cloak @endif class="flex flex-col gap-2 text-sm font-medium text-ink">
-        Nome completo
+        {{ __('Full name') }}
         <input
             type="text"
             x-model="name"
@@ -98,8 +98,8 @@
     </label>
 
     <div class="flex items-center justify-between gap-2">
-        <x-ui::button variant="ghost" size="sm" icon="eraser" x-on:click="clear()">Limpar</x-ui::button>
-        <span class="text-xs text-muted" aria-live="polite" x-text="isEmpty() ? 'Assinatura vazia' : 'Pronto para assinar'">Assinatura vazia</span>
+        <x-ui::button variant="ghost" size="sm" icon="eraser" x-on:click="clear()">{{ __('Clear') }}</x-ui::button>
+        <span class="text-xs text-muted" aria-live="polite" x-text="isEmpty() ? @js(__('Empty signature')) : @js(__('Ready to sign'))">{{ __('Empty signature') }}</span>
     </div>
 
     @if ($errorMessage)

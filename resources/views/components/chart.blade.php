@@ -36,7 +36,7 @@
     $palette = $colors ?? \DevAction\Ui\Support\ChartGeometry::PALETTE;
     $labels = array_values($labels);
     $series = collect($series)->values()->map(fn (array $item, int $index): array => [
-        'name' => $item['name'] ?? 'Série '.($index + 1),
+        'name' => $item['name'] ?? __('Series :number', ['number' => $index + 1]),
         'data' => array_map('floatval', array_values($item['data'] ?? [])),
         'color' => $item['color'] ?? $palette[$index % count($palette)],
     ])->all();
@@ -85,7 +85,7 @@
             @endif
             @if ($table)
                 <x-ui::button size="sm" x-on:click="showTable = ! showTable" x-bind:aria-pressed="showTable">
-                    <span x-text="showTable ? 'Ver gráfico' : 'Ver tabela'">Ver tabela</span>
+                    <span x-text="showTable ? @js(__('Show chart')) : @js(__('Show table'))">{{ __('Show table') }}</span>
                 </x-ui::button>
             @endif
         </div>
@@ -234,7 +234,7 @@
             <table class="w-full border-collapse text-sm">
                 <thead>
                     <tr class="text-left font-mono text-[11px] tracking-[0.08em] text-muted uppercase">
-                        <th scope="col" class="border-b border-line px-3.5 py-2.5 font-medium">{{ $type === 'line' || $type === 'column' ? 'Período' : 'Item' }}</th>
+                        <th scope="col" class="border-b border-line px-3.5 py-2.5 font-medium">{{ $type === 'line' || $type === 'column' ? __('Period') : __('Item') }}</th>
                         @foreach ($series as $item)
                             <th scope="col" class="border-b border-line px-3.5 py-2.5 text-right font-medium">{{ $item['name'] }}</th>
                         @endforeach

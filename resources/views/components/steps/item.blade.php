@@ -24,10 +24,10 @@
         ])>
             @if ($state === 'done')
                 <x-ui::icon name="tick-02" class="size-3.5" />
-                <span class="sr-only">Feito:</span>
+                <span class="sr-only">{{ __('Done:') }}</span>
             @elseif ($state === 'error')
                 <span class="text-xs font-semibold" aria-hidden="true">!</span>
-                <span class="sr-only">Com erro:</span>
+                <span class="sr-only">{{ __('Error:') }}</span>
             @endif
         </span>
         <span @class([

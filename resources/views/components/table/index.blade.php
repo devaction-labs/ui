@@ -74,9 +74,9 @@
                 'h-[34px]' => $density === 'compact',
             ])
         >
-            <span class="mr-1.5 font-medium" x-text="selected.length + (selected.length === 1 ? ' selecionada' : ' selecionadas')"></span>
+            <span class="mr-1.5 font-medium" x-text="selected.length === 1 ? @js(__('1 selected')) : @js(__(':count selected')).replace(':count', selected.length)"></span>
             {{ $bulk }}
-            <button type="button" x-on:click="clearSelection()" class="ml-auto cursor-pointer text-[13px] text-on-ink/70 transition hover:text-on-ink">Limpar</button>
+            <button type="button" x-on:click="clearSelection()" class="ml-auto cursor-pointer text-[13px] text-on-ink/70 transition hover:text-on-ink">{{ __('Clear') }}</button>
         </div>
     @endisset
 

@@ -15,11 +15,12 @@
 --}}
 @props([
     'sort' => null,
-    'label' => 'Lista ordenável',
+    'label' => null,
     'buttons' => true,
 ])
 
 @php
+    $label ??= __('Sortable list');
     $helpId = 'ui-sortable-'.substr(md5($label), 0, 8).'-help';
 @endphp
 
@@ -27,6 +28,6 @@
     <ul role="list" aria-label="{{ $label }}" aria-describedby="{{ $helpId }}" class="flex flex-col gap-1.5" x-ref="list">
         {{ $slot }}
     </ul>
-    <p id="{{ $helpId }}" class="sr-only">Para mover um item, foque a alça, aperte Espaço, use as setas e aperte Espaço de novo. Esc cancela.</p>
+    <p id="{{ $helpId }}" class="sr-only">{{ __('To move an item, focus its handle, press Space, use the arrow keys and press Space again. Esc cancels.') }}</p>
     <p class="min-h-[18px] text-[13px] text-ink-3" aria-live="polite" x-text="message"></p>
 </div>

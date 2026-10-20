@@ -27,11 +27,13 @@
     'searchable' => false,
     'multiple' => false,
     'filter' => true,
-    'searchPlaceholder' => 'Filtrar…',
-    'empty' => 'Nada encontrado.',
+    'searchPlaceholder' => null,
+    'empty' => null,
 ])
 
 @php
+    $searchPlaceholder ??= __('Filter…');
+    $empty ??= __('No results found.');
     $modelName = collect($attributes->getAttributes())
         ->first(fn ($value, string $key): bool => str_starts_with($key, 'wire:model'));
     $fieldName = $attributes->get('name') ?? $modelName;
@@ -53,7 +55,7 @@
         :label="$label"
         :description="$description"
         :error="$error"
-        :placeholder="$placeholder ?? 'Selecione…'"
+        :placeholder="$placeholder ?? __('Select…')"
         :search-placeholder="$searchPlaceholder"
         :multiple="$multiple"
         :searchable="$searchable || $variant === 'combobox'"

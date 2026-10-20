@@ -20,10 +20,14 @@
     O estado vive em $store.uiSidebar (toggle(), close(), collapsed, open).
 --}}
 @props([
-    'label' => 'Principal',
+    'label' => null,
     'collapsible' => true,
     'sticky' => true,
 ])
+
+@php
+    $label ??= __('Main');
+@endphp
 
 <div data-sidebar-root class="contents">
     <div class="sticky top-0 z-30 flex items-center gap-3 border-b border-line-soft bg-frame/90 px-4 py-3 backdrop-blur md:hidden">

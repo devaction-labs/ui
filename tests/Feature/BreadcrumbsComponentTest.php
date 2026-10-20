@@ -12,7 +12,7 @@ test('breadcrumbs render an ordered list with links and the current page', funct
         BLADE);
 
     expect($html)
-        ->toContain('aria-label="Breadcrumb"')
+        ->toContain('aria-label="Trilha"')
         ->toContain('<ol')
         ->toContain('href="/hoje"')
         ->toMatch('/href="\/sge"[^>]*wire:navigate/s')

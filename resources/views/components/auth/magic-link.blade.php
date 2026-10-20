@@ -22,8 +22,8 @@
             <span class="mb-5 flex size-14 items-center justify-center rounded-2xl bg-warn-bg text-warn-fg">
                 <x-ui::icon name="mail-open-01" class="size-7" />
             </span>
-            <x-ui::auth.heading heading="Confira seu e-mail" class="items-center">
-                <p class="text-sm text-ink-3">Enviamos um link de acesso para @if ($email)<strong class="font-medium text-ink">{{ $email }}</strong>@else o seu e-mail @endif. Ele vale por 15 minutos.</p>
+            <x-ui::auth.heading :heading="__('Check your email')" class="items-center">
+                <p class="text-sm text-ink-3">{!! __('We sent a sign-in link to :email. It expires in 15 minutes.', ['email' => $email ? '<strong class="font-medium text-ink">'.e($email).'</strong>' : e(__('your email'))]) !!}</p>
             </x-ui::auth.heading>
             <div class="flex w-full flex-col gap-2">
                 @if ($resendAction)
@@ -32,26 +32,26 @@
                         @if ($email)
                             <input type="hidden" name="email" value="{{ $email }}" />
                         @endif
-                        <x-ui::button type="submit" class="w-full">Reenviar link</x-ui::button>
+                        <x-ui::button type="submit" class="w-full">{{ __('Resend link') }}</x-ui::button>
                     </form>
                 @endif
                 {{ $slot }}
                 @if ($loginHref)
-                    <x-ui::button :href="$loginHref" variant="ghost" class="w-full">Entrar com senha</x-ui::button>
+                    <x-ui::button :href="$loginHref" variant="ghost" class="w-full">{{ __('Sign in with password') }}</x-ui::button>
                 @endif
             </div>
         </div>
     @else
-        <x-ui::auth.heading heading="Entrar com link mágico" description="Mandamos um link para o seu e-mail. Sem senha para lembrar." />
+        <x-ui::auth.heading :heading="__('Sign in with a magic link')" :description="__('We\'ll email you a link. No password to remember.')" />
         <form @if ($action) method="POST" action="{{ $action }}" @endif {{ $attributes->class(['flex flex-col gap-4']) }}>
             @if ($action)
                 @csrf
             @endif
-            <x-ui::input type="email" name="email" :wire:model="$model ? $model.'.email' : null" label="E-mail" icon="mail-01" autocomplete="email" placeholder="voce@empresa.com" required autofocus />
-            <x-ui::button type="submit" variant="primary" size="lg" icon="mail-01" class="w-full">Enviar link</x-ui::button>
+            <x-ui::input type="email" name="email" :wire:model="$model ? $model.'.email' : null" :label="__('Email')" icon="mail-01" autocomplete="email" :placeholder="__('you@company.com')" required autofocus />
+            <x-ui::button type="submit" variant="primary" size="lg" icon="mail-01" class="w-full">{{ __('Send link') }}</x-ui::button>
         </form>
         @if ($loginHref)
-            <p class="mt-6 text-center text-sm text-ink-3"><a href="{{ $loginHref }}" class="font-medium text-ink underline-offset-4 hover:underline">Entrar com senha</a></p>
+            <p class="mt-6 text-center text-sm text-ink-3"><a href="{{ $loginHref }}" class="font-medium text-ink underline-offset-4 hover:underline">{{ __('Sign in with password') }}</a></p>
         @endif
     @endif
 </div>

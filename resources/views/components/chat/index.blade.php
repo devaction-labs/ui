@@ -7,8 +7,12 @@
     </x-ui::chat>
 --}}
 @props([
-    'label' => 'Conversa',
+    'label' => null,
 ])
+
+@php
+    $label ??= __('Conversation');
+@endphp
 
 <div data-chat role="log" aria-live="polite" aria-label="{{ $label }}" {{ $attributes->class(['flex flex-col gap-5']) }}>
     {{ $slot }}

@@ -12,20 +12,25 @@
     Dispara cookie-consent-updated com { necessary, analytics, … } no detail.
 --}}
 @props([
-    'categories' => [
-        'analytics' => ['Análise', 'Páginas visitadas, sem identificar você.'],
-        'marketing' => ['Marketing', 'Medir campanhas de anúncios.'],
-    ],
+    'categories' => null,
     'policy' => null,
-    'heading' => 'Usamos cookies.',
+    'heading' => null,
     'fixed' => true,
     'force' => false,
 ])
 
+@php
+    $categories ??= [
+        'analytics' => [__('Analytics'), __('Pages visited, without identifying you.')],
+        'marketing' => [__('Marketing'), __('Measure ad campaigns.')],
+    ];
+    $heading ??= __('We use cookies.');
+@endphp
+
 <section
     data-cookie-consent
     role="region"
-    aria-label="Aviso de cookies"
+    aria-label="{{ __('Cookie notice') }}"
     x-data="uiCookieConsent({ categories: @js(array_keys($categories)), force: @js((bool) $force) })"
     x-show="visible"
     x-cloak
@@ -39,26 +44,26 @@
         <p class="min-w-[240px] flex-1 text-sm leading-[1.55] text-ink-2">
             <strong class="font-semibold text-ink">{{ $heading }}</strong>
             @if ($slot->isEmpty())
-                Os necessários mantêm você conectado. Os de análise nos ajudam a melhorar o site e só ligam se você aceitar.
+                {{ __('Necessary cookies keep you signed in. Analytics cookies help us improve the site and only turn on if you accept.') }}
             @else
                 {{ $slot }}
             @endif
             @if ($policy)
-                <a href="{{ $policy }}" class="underline underline-offset-[3px] hover:text-ink">Política de privacidade</a>
+                <a href="{{ $policy }}" class="underline underline-offset-[3px] hover:text-ink">{{ __('Privacy policy') }}</a>
             @endif
         </p>
         <div class="flex shrink-0 flex-wrap gap-2">
-            <x-ui::button size="sm" x-on:click="preferences = ! preferences" x-bind:aria-expanded="preferences.toString()">Preferências</x-ui::button>
-            <x-ui::button size="sm" x-show="! preferences" x-on:click="save(false)">Só necessários</x-ui::button>
-            <x-ui::button size="sm" variant="primary" x-show="! preferences" x-on:click="save(true)">Aceitar todos</x-ui::button>
-            <x-ui::button size="sm" variant="primary" x-show="preferences" x-cloak x-on:click="save()">Salvar escolha</x-ui::button>
+            <x-ui::button size="sm" x-on:click="preferences = ! preferences" x-bind:aria-expanded="preferences.toString()">{{ __('Preferences') }}</x-ui::button>
+            <x-ui::button size="sm" x-show="! preferences" x-on:click="save(false)">{{ __('Necessary only') }}</x-ui::button>
+            <x-ui::button size="sm" variant="primary" x-show="! preferences" x-on:click="save(true)">{{ __('Accept all') }}</x-ui::button>
+            <x-ui::button size="sm" variant="primary" x-show="preferences" x-cloak x-on:click="save()">{{ __('Save choices') }}</x-ui::button>
         </div>
     </div>
 
     <div x-show="preferences" x-cloak class="mt-3.5 border-t border-line-soft pt-1.5">
         <div class="flex items-center gap-3 border-b border-line-soft py-2.5 text-sm">
-            <div class="flex-1"><div class="font-medium">Necessários</div><div class="text-xs text-muted">Sessão, segurança e preferências de tema. Sempre ligados.</div></div>
-            <x-ui::switch checked disabled aria-label="Necessários (sempre ligados)" size="sm" />
+            <div class="flex-1"><div class="font-medium">{{ __('Necessary') }}</div><div class="text-xs text-muted">{{ __('Session, security and theme preferences. Always on.') }}</div></div>
+            <x-ui::switch checked disabled :aria-label="__('Necessary (always on)')" size="sm" />
         </div>
         @foreach ($categories as $key => [$title, $description])
             <div class="flex items-center gap-3 border-b border-line-soft py-2.5 text-sm last:border-b-0">

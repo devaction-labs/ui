@@ -66,7 +66,7 @@
 <section
     data-diff
     id="{{ $diffId }}"
-    aria-label="Diff de {{ $path ?? 'arquivo' }}"
+    aria-label="{{ __('Diff of :file', ['file' => $path ?? __('file')]) }}"
     x-data="uiDiff({ comment: @js($comment) })"
     {{ $attributes->class(['flex min-w-0 flex-col overflow-hidden rounded-2xl border border-line bg-card text-ink']) }}
 >
@@ -76,7 +76,7 @@
             <span class="min-w-0 truncate font-mono text-[13px]">{{ $path }}</span>
             <span class="shrink-0 font-mono text-[11px]"><span class="text-ok-fg">+{{ $additions }}</span> <span class="text-risk-fg">−{{ $deletions }}</span></span>
             @if ($seen !== null)
-                <label class="ml-auto flex shrink-0 cursor-pointer items-center gap-1.5 text-[13px] text-ink-3"><x-ui::checkbox :checked="(bool) $seen" />Visto</label>
+                <label class="ml-auto flex shrink-0 cursor-pointer items-center gap-1.5 text-[13px] text-ink-3"><x-ui::checkbox :checked="(bool) $seen" />{{ __('Viewed') }}</label>
             @endif
         </div>
     @endif
@@ -109,7 +109,7 @@
                             <button
                                 type="button"
                                 x-on:click="toggleDraft({{ (int) $lineKey }})"
-                                aria-label="Comentar na linha {{ $lineKey }}"
+                                aria-label="{{ __('Comment on line :line', ['line' => $lineKey]) }}"
                                 x-bind:class="hasThread({{ (int) $lineKey }}) || draftLine === {{ (int) $lineKey }} ? 'bg-ai text-white opacity-100' : 'bg-line text-ink-3 opacity-0 group-hover:opacity-100 focus-visible:opacity-100'"
                                 class="flex size-[18px] cursor-pointer items-center justify-center rounded-[5px] text-[13px] leading-none transition"
                             >+</button>

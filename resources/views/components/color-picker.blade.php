@@ -60,7 +60,7 @@
                     x-on:click="open = ! open"
                     aria-haspopup="dialog"
                     x-bind:aria-expanded="open"
-                    aria-label="Abrir seletor de cor"
+                    aria-label="{{ __('Open color picker') }}"
                     class="size-[22px] shrink-0 cursor-pointer rounded-md shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)] outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     style="background: {{ $value }}"
                     x-bind:style="{ background: hex() }"
@@ -83,7 +83,7 @@
 
         <div
             role="dialog"
-            aria-label="Seletor de cor"
+            aria-label="{{ __('Color picker') }}"
             @unless ($inline)
                 x-show="open"
                 x-ui-float
@@ -99,7 +99,7 @@
                 x-ref="area"
                 role="slider"
                 tabindex="0"
-                aria-label="Saturação e brilho"
+                aria-label="{{ __('Saturation and brightness') }}"
                 x-bind:aria-valuetext="hex()"
                 x-on:pointerdown="startDrag($event)"
                 x-on:pointermove="drag($event)"
@@ -118,7 +118,7 @@
             </div>
 
             <label class="flex">
-                <span class="sr-only">Matiz</span>
+                <span class="sr-only">{{ __('Hue') }}</span>
                 <input
                     type="range"
                     min="0"
@@ -133,7 +133,7 @@
 
             @if ($alpha)
                 <label class="flex">
-                    <span class="sr-only">Opacidade</span>
+                    <span class="sr-only">{{ __('Opacity') }}</span>
                     <input
                         type="range"
                         min="0"
@@ -152,7 +152,7 @@
                     type="button"
                     x-show="canPickFromScreen()"
                     x-on:click="pickFromScreen()"
-                    aria-label="Conta-gotas"
+                    aria-label="{{ __('Eyedropper') }}"
                     class="flex size-[30px] cursor-pointer items-center justify-center rounded-lg text-ink-3 transition hover:bg-wrap hover:text-ink"
                 >
                     <x-ui::icon name="pen-01" class="size-4" />
@@ -160,7 +160,7 @@
             </div>
 
             @if ($presets !== [])
-                <div role="radiogroup" aria-label="Cores prontas" class="grid grid-cols-8 gap-1.5">
+                <div role="radiogroup" aria-label="{{ __('Preset colors') }}" class="grid grid-cols-8 gap-1.5">
                     @foreach ($presets as $preset)
                         <button
                             type="button"

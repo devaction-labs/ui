@@ -31,7 +31,8 @@
     $todayDate = \Illuminate\Support\Carbon::parse($today ?? now()->toDateString())->startOfDay();
     $monthStart = \Illuminate\Support\Carbon::parse(($month ?? $todayDate->format('Y-m')).'-01')->startOfMonth();
     $selectedDate = $selected ? \Illuminate\Support\Carbon::parse($selected)->startOfDay() : null;
-    $monthName = ucfirst($monthStart->locale('pt_BR')->translatedFormat('F Y'));
+    $calendarLocale = app()->getLocale();
+    $monthName = ucfirst($monthStart->locale($calendarLocale)->translatedFormat('F Y'));
 
     $tones = [
         'blue' => ['bg-info-bg text-info-fg', '#2563EB'],
@@ -78,16 +79,16 @@
 <div data-calendar data-view="{{ $view }}" {{ $attributes->class(['flex w-full min-w-0 flex-col gap-4']) }}>
     <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
-            <{{ $previous['tag'] }} {!! $previous['attributes'] !!} aria-label="Mês anterior" class="flex size-9 cursor-pointer items-center justify-center rounded-[9px] border border-line-strong bg-card text-ink transition hover:bg-subtle">
+            <{{ $previous['tag'] }} {!! $previous['attributes'] !!} aria-label="{{ __('Previous month') }}" class="flex size-9 cursor-pointer items-center justify-center rounded-[9px] border border-line-strong bg-card text-ink transition hover:bg-subtle">
                 <x-ui::icon name="arrow-left-01" class="size-4" />
             </{{ $previous['tag'] }}>
             <span class="min-w-[140px] text-center font-semibold text-ink" aria-live="polite">{{ $monthName }}</span>
-            <{{ $next['tag'] }} {!! $next['attributes'] !!} aria-label="Próximo mês" class="flex size-9 cursor-pointer items-center justify-center rounded-[9px] border border-line-strong bg-card text-ink transition hover:bg-subtle">
+            <{{ $next['tag'] }} {!! $next['attributes'] !!} aria-label="{{ __('Next month') }}" class="flex size-9 cursor-pointer items-center justify-center rounded-[9px] border border-line-strong bg-card text-ink transition hover:bg-subtle">
                 <x-ui::icon name="arrow-right-01" class="size-4" />
             </{{ $next['tag'] }}>
         </div>
-        <div role="radiogroup" aria-label="Visão" class="flex rounded-[10px] border border-line bg-wrap p-[3px]">
-            @foreach (['month' => 'Mês', 'week' => 'Semana'] as $viewKey => $viewLabel)
+        <div role="radiogroup" aria-label="{{ __('View') }}" class="flex rounded-[10px] border border-line bg-wrap p-[3px]">
+            @foreach (['month' => __('Month'), 'week' => __('Week')] as $viewKey => $viewLabel)
                 @php
                     $link = $navigate($currentMonth, $viewKey);
                 @endphp
@@ -109,7 +110,7 @@
                         'border-b border-l border-line px-2.5 py-2 text-[13px] text-ink',
                         'bg-wrap font-semibold' => $weekDay->isSameDay($todayDate),
                         'bg-subtle' => ! $weekDay->isSameDay($todayDate),
-                    ])>{{ $weekDay->locale('pt_BR')->translatedFormat('D d') }}</span>
+                    ])>{{ $weekDay->locale($calendarLocale)->translatedFormat('D d') }}</span>
                 @endforeach
                 <div class="flex flex-col">
                     @foreach (range($startHour, $endHour - 1) as $hour)
@@ -148,7 +149,7 @@
         </div>
     @else
         <div role="grid" aria-label="{{ $monthName }}" class="grid grid-cols-7 overflow-hidden rounded-xl border-t border-l border-line">
-            @foreach (['seg', 'ter', 'qua', 'qui', 'sex', 'sáb', 'dom'] as $weekdayName)
+            @foreach (collect($monthDays)->take(7)->map(fn ($weekdayDate) => rtrim($weekdayDate->locale($calendarLocale)->translatedFormat('D'), '.')) as $weekdayName)
                 <span role="columnheader" class="border-r border-b border-line bg-subtle px-2.5 py-2 font-mono text-[11px] tracking-[0.06em] text-muted uppercase">{{ $weekdayName }}</span>
             @endforeach
             @foreach ($monthDays as $day)
@@ -163,7 +164,7 @@
                     role="gridcell"
                     data-date="{{ $day->toDateString() }}"
                     aria-selected="{{ $isSelected ? 'true' : 'false' }}"
-                    aria-label="{{ $day->locale('pt_BR')->translatedFormat('j \d\e F') }}{{ count($dayEvents) ? ', '.count($dayEvents).' '.(count($dayEvents) === 1 ? 'evento' : 'eventos') : '' }}"
+                    aria-label="{{ $day->locale($calendarLocale)->isoFormat('LL') }}{{ count($dayEvents) ? ', '.trans_choice(':count event|:count events', count($dayEvents)) : '' }}"
                     x-data
                     x-on:click="$dispatch('calendar-day', { date: @js($day->toDateString()) })"
                     @class([

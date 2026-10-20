@@ -5,9 +5,13 @@
     <x-ui::sidebar.search placeholder="Buscar contatos" kbd="/" />
 --}}
 @props([
-    'placeholder' => 'Buscar',
+    'placeholder' => null,
     'kbd' => '⌘K',
 ])
+
+@php
+    $placeholder ??= __('Search');
+@endphp
 
 <button
     type="button"

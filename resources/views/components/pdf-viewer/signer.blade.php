@@ -14,9 +14,9 @@
 
 @php
     [$statusLabel, $statusColor] = match ($status) {
-        'signed' => ['Assinou', 'ok'],
-        'declined' => ['Recusou', 'risk'],
-        default => ['Pendente', 'warn'],
+        'signed' => [__('Signed'), 'ok'],
+        'declined' => [__('Declined'), 'risk'],
+        default => [__('Pending'), 'warn'],
     };
 @endphp
 

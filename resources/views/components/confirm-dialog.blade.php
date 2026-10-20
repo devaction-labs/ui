@@ -25,14 +25,16 @@
     'text' => null,
     'icon' => null,
     'color' => 'default',
-    'confirm' => 'Confirmar',
-    'cancel' => 'Cancelar',
+    'confirm' => null,
+    'cancel' => null,
     'confirmVariant' => 'primary',
     'size' => 'sm',
     'closeOnConfirm' => true,
 ])
 
 @php
+    $confirm ??= __('Confirm');
+    $cancel ??= __('Cancel');
     $confirmAttributes = new \Illuminate\View\ComponentAttributeBag(
         collect($attributes->getAttributes())
             ->filter(fn ($value, string $key): bool => str_starts_with($key, 'confirm:'))

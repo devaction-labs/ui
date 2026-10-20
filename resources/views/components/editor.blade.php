@@ -19,7 +19,7 @@
     'label' => null,
     'description' => null,
     'error' => null,
-    'placeholder' => 'Escreva aqui… Digite / para comandos',
+    'placeholder' => null,
     'toolbar' => 'heading | bold italic strike code | bullet ordered blockquote codeblock | link | undo redo',
     'value' => '',
     'name' => null,
@@ -29,6 +29,7 @@
 ])
 
 @php
+    $placeholder ??= __('Write here… Type / for commands');
     $modelName = collect($attributes->getAttributes())
         ->first(fn ($attributeValue, string $key): bool => str_starts_with($key, 'wire:model'));
     $fieldName = $name ?? $modelName;
@@ -37,30 +38,30 @@
     $editorId = $attributes->get('id') ?? 'ui-editor-'.($fieldName ? \Illuminate\Support\Str::slug($fieldName) : substr(md5((string) $label), 0, 8));
 
     $buttons = [
-        'bold' => ['icon' => 'text-bold', 'label' => 'Negrito (⌘B)', 'click' => "run('bold')", 'state' => 'active.bold'],
-        'italic' => ['icon' => 'text-italic', 'label' => 'Itálico (⌘I)', 'click' => "run('italic')", 'state' => 'active.italic'],
-        'strike' => ['icon' => 'text-strikethrough', 'label' => 'Tachado', 'click' => "run('strikeThrough')", 'state' => 'active.strikeThrough'],
-        'code' => ['icon' => 'source-code', 'label' => 'Código', 'click' => 'toggleCode()', 'state' => 'active.code'],
-        'bullet' => ['icon' => 'left-to-right-list-bullet', 'label' => 'Lista', 'click' => "run('insertUnorderedList')", 'state' => 'active.insertUnorderedList'],
-        'ordered' => ['icon' => 'left-to-right-list-number', 'label' => 'Lista numerada', 'click' => "run('insertOrderedList')", 'state' => 'active.insertOrderedList'],
-        'blockquote' => ['icon' => 'quote-down', 'label' => 'Citação', 'click' => "setBlock(block === 'blockquote' ? 'p' : 'blockquote')", 'state' => "block === 'blockquote'"],
-        'codeblock' => ['icon' => 'code', 'label' => 'Bloco de código', 'click' => "setBlock(block === 'pre' ? 'p' : 'pre')", 'state' => "block === 'pre'"],
+        'bold' => ['icon' => 'text-bold', 'label' => __('Bold (⌘B)'), 'click' => "run('bold')", 'state' => 'active.bold'],
+        'italic' => ['icon' => 'text-italic', 'label' => __('Italic (⌘I)'), 'click' => "run('italic')", 'state' => 'active.italic'],
+        'strike' => ['icon' => 'text-strikethrough', 'label' => __('Strikethrough'), 'click' => "run('strikeThrough')", 'state' => 'active.strikeThrough'],
+        'code' => ['icon' => 'source-code', 'label' => __('Code'), 'click' => 'toggleCode()', 'state' => 'active.code'],
+        'bullet' => ['icon' => 'left-to-right-list-bullet', 'label' => __('List'), 'click' => "run('insertUnorderedList')", 'state' => 'active.insertUnorderedList'],
+        'ordered' => ['icon' => 'left-to-right-list-number', 'label' => __('Numbered list'), 'click' => "run('insertOrderedList')", 'state' => 'active.insertOrderedList'],
+        'blockquote' => ['icon' => 'quote-down', 'label' => __('Quote'), 'click' => "setBlock(block === 'blockquote' ? 'p' : 'blockquote')", 'state' => "block === 'blockquote'"],
+        'codeblock' => ['icon' => 'code', 'label' => __('Code block'), 'click' => "setBlock(block === 'pre' ? 'p' : 'pre')", 'state' => "block === 'pre'"],
         'link' => ['icon' => 'link-01', 'label' => 'Link', 'click' => 'link()', 'state' => 'active.link'],
-        'undo' => ['icon' => 'undo-02', 'label' => 'Desfazer (⌘Z)', 'click' => "run('undo')", 'state' => null],
-        'redo' => ['icon' => 'redo-02', 'label' => 'Refazer (⇧⌘Z)', 'click' => "run('redo')", 'state' => null],
+        'undo' => ['icon' => 'undo-02', 'label' => __('Undo (⌘Z)'), 'click' => "run('undo')", 'state' => null],
+        'redo' => ['icon' => 'redo-02', 'label' => __('Redo (⇧⌘Z)'), 'click' => "run('redo')", 'state' => null],
     ];
     $groups = collect(explode('|', $toolbar))
         ->map(fn (string $group): array => array_values(array_filter(explode(' ', trim($group)))))
         ->filter()
         ->values();
-    $blocks = ['p' => 'Parágrafo', 'h2' => 'Título', 'h3' => 'Subtítulo'];
+    $blocks = ['p' => __('Paragraph'), 'h2' => __('Heading'), 'h3' => __('Subheading')];
     $slashItems = [
-        ['label' => 'Título', 'icon' => 'heading-01', 'hint' => '##', 'click' => "chooseSlash('formatBlock', 'h2')"],
-        ['label' => 'Subtítulo', 'icon' => 'text-font', 'hint' => '###', 'click' => "chooseSlash('formatBlock', 'h3')"],
-        ['label' => 'Lista', 'icon' => 'left-to-right-list-bullet', 'hint' => '-', 'click' => "chooseSlash('insertUnorderedList')"],
-        ['label' => 'Lista numerada', 'icon' => 'left-to-right-list-number', 'hint' => '1.', 'click' => "chooseSlash('insertOrderedList')"],
-        ['label' => 'Citação', 'icon' => 'quote-down', 'hint' => '>', 'click' => "chooseSlash('formatBlock', 'blockquote')"],
-        ['label' => 'Bloco de código', 'icon' => 'code', 'hint' => '```', 'click' => "chooseSlash('formatBlock', 'pre')"],
+        ['label' => __('Heading'), 'icon' => 'heading-01', 'hint' => '##', 'click' => "chooseSlash('formatBlock', 'h2')"],
+        ['label' => __('Subheading'), 'icon' => 'text-font', 'hint' => '###', 'click' => "chooseSlash('formatBlock', 'h3')"],
+        ['label' => __('List'), 'icon' => 'left-to-right-list-bullet', 'hint' => '-', 'click' => "chooseSlash('insertUnorderedList')"],
+        ['label' => __('Numbered list'), 'icon' => 'left-to-right-list-number', 'hint' => '1.', 'click' => "chooseSlash('insertOrderedList')"],
+        ['label' => __('Quote'), 'icon' => 'quote-down', 'hint' => '>', 'click' => "chooseSlash('formatBlock', 'blockquote')"],
+        ['label' => __('Code block'), 'icon' => 'code', 'hint' => '```', 'click' => "chooseSlash('formatBlock', 'pre')"],
     ];
 
     foreach ($commands as $command) {
@@ -95,7 +96,7 @@
             <input type="hidden" name="{{ $name }}" value="{{ $value }}" x-bind:value="value" />
         @endif
 
-        <div role="toolbar" aria-label="Formatação" aria-controls="{{ $editorId }}" class="flex flex-wrap items-center gap-0.5 rounded-t-xl border-b border-line bg-subtle px-2 py-1.5">
+        <div role="toolbar" aria-label="{{ __('Formatting') }}" aria-controls="{{ $editorId }}" class="flex flex-wrap items-center gap-0.5 rounded-t-xl border-b border-line bg-subtle px-2 py-1.5">
             @foreach ($groups as $group)
                 @if (! $loop->first)
                     <span class="mx-1 h-[18px] w-px bg-line" aria-hidden="true"></span>
@@ -109,10 +110,10 @@
                                 x-on:click="menu = ! menu"
                                 aria-haspopup="menu"
                                 x-bind:aria-expanded="menu"
-                                aria-label="Estilo do texto"
+                                aria-label="{{ __('Text style') }}"
                                 class="inline-flex h-[34px] cursor-pointer items-center gap-1 rounded-lg px-2 text-[13px] text-ink-2 transition hover:bg-wrap hover:text-ink"
                             >
-                                <span x-text="@js($blocks)[block] ?? 'Parágrafo'">Parágrafo</span>
+                                <span x-text="@js($blocks)[block] ?? @js(__('Paragraph'))">{{ __('Paragraph') }}</span>
                                 <x-ui::icon name="arrow-down-01" class="size-3.5" />
                             </button>
                             <div x-show="menu" x-ui-float="{ gap: 4 }" x-cloak role="menu" class="absolute top-full left-0 z-50 mt-1 flex w-44 flex-col rounded-xl border border-line bg-card p-1.5 shadow-[0_16px_40px_rgb(24_24_27/0.12)]">
@@ -188,11 +189,11 @@
                 x-show="slashOpen && slashItems().length"
                 x-cloak
                 role="menu"
-                aria-label="Comandos"
+                aria-label="{{ __('Commands') }}"
                 class="absolute z-20 flex w-[270px] flex-col rounded-xl border border-line bg-card p-1.5 shadow-[0_16px_40px_rgb(0_0_0/0.18)]"
                 x-bind:style="{ top: slashTop + 'px', left: slashLeft + 'px' }"
             >
-                <span class="px-2 pt-1.5 pb-1 font-mono text-[10px] tracking-[0.08em] text-muted">INSERIR</span>
+                <span class="px-2 pt-1.5 pb-1 font-mono text-[10px] tracking-[0.08em] text-muted uppercase">{{ __('Insert') }}</span>
                 @foreach ($slashItems as $slashItem)
                     <button
                         type="button"
@@ -217,11 +218,12 @@
                     x-show="mentionOpen && mentionItems().length"
                     x-cloak
                     role="listbox"
-                    aria-label="Pessoas"
+                    data-mention-list
+                    aria-label="{{ __('People') }}"
                     class="absolute z-20 flex w-[330px] max-w-[calc(100%-1rem)] flex-col rounded-xl border border-line bg-card p-1.5 shadow-[0_16px_40px_-12px_rgb(24_24_27/0.28)]"
                     x-bind:style="{ top: mentionTop + 'px', left: mentionLeft + 'px' }"
                 >
-                    <span class="px-2 pt-1 pb-1.5 font-mono text-[10px] tracking-[0.08em] text-muted">PESSOAS</span>
+                    <span class="px-2 pt-1 pb-1.5 font-mono text-[10px] tracking-[0.08em] text-muted uppercase">{{ __('People') }}</span>
                     @foreach ($mentions as $mention)
                         <button
                             type="button"

@@ -15,22 +15,25 @@
     'label' => null,
     'description' => null,
     'error' => null,
-    'placeholder' => 'Escolha o período',
+    'placeholder' => null,
     'value' => null,
     'min' => null,
     'max' => null,
     'presets' => [],
     'withTime' => false,
     'step' => 15,
-    'timeHeading' => 'Horário',
+    'timeHeading' => null,
     'timezone' => null,
     'inline' => false,
     'name' => null,
-    'locale' => 'pt-BR',
+    'locale' => null,
     'today' => null,
 ])
 
 @php
+    $placeholder ??= __('Pick a period');
+    $timeHeading ??= __('Time');
+    $locale ??= str_replace('_', '-', app()->getLocale());
     $modelName = collect($attributes->getAttributes())->first(fn ($attributeValue, string $key): bool => str_starts_with($key, 'wire:model'));
     $fieldName = $name ?? $modelName;
     $errorBag = \Illuminate\Support\Facades\View::shared('errors');
@@ -95,7 +98,7 @@
 
         <div
             role="dialog"
-            aria-label="{{ $label ?? 'Escolher período' }}"
+            aria-label="{{ $label ?? __('Pick a period') }}"
             @unless ($inline)
                 x-show="open"
                 x-ui-float="{ reference: $refs.trigger }"
@@ -108,7 +111,7 @@
             ])
         >
             <div @class(['grid', 'md:grid-cols-[180px_auto]' => ! $withTime, 'md:grid-cols-[180px_auto] xl:grid-cols-[180px_auto_280px]' => $withTime])>
-                <div class="flex gap-0.5 overflow-x-auto border-b border-line-soft p-2.5 md:flex-col md:border-r md:border-b-0" role="group" aria-label="Atalhos">
+                <div class="flex gap-0.5 overflow-x-auto border-b border-line-soft p-2.5 md:flex-col md:border-r md:border-b-0" role="group" aria-label="{{ __('Shortcuts') }}">
                     <template x-for="preset in presetList()" x-bind:key="preset.key">
                         <button
                             type="button"
@@ -126,11 +129,11 @@
                         <div @class(['max-sm:hidden' => $offset === 1])>
                             <div class="flex h-[30px] items-center">
                                 @if ($offset === 0)
-                                    <button type="button" x-on:click="shift(-1)" aria-label="Mês anterior" class="flex size-7 cursor-pointer items-center justify-center rounded-lg border border-line text-ink transition hover:bg-subtle"><x-ui::icon name="arrow-left-01" class="size-3.5" /></button>
+                                    <button type="button" x-on:click="shift(-1)" aria-label="{{ __('Previous month') }}" class="flex size-7 cursor-pointer items-center justify-center rounded-lg border border-line text-ink transition hover:bg-subtle"><x-ui::icon name="arrow-left-01" class="size-3.5" /></button>
                                 @endif
                                 <span class="flex-1 text-center text-sm font-semibold first-letter:uppercase" x-text="monthLabel({{ $offset }})" aria-live="polite"></span>
                                 @if ($offset === 1)
-                                    <button type="button" x-on:click="shift(1)" aria-label="Próximo mês" class="flex size-7 cursor-pointer items-center justify-center rounded-lg border border-line text-ink transition hover:bg-subtle"><x-ui::icon name="arrow-right-01" class="size-3.5" /></button>
+                                    <button type="button" x-on:click="shift(1)" aria-label="{{ __('Next month') }}" class="flex size-7 cursor-pointer items-center justify-center rounded-lg border border-line text-ink transition hover:bg-subtle"><x-ui::icon name="arrow-right-01" class="size-3.5" /></button>
                                 @endif
                             </div>
                             <div role="grid" x-bind:aria-label="monthLabel({{ $offset }})" class="mt-2.5 grid grid-cols-7 gap-y-0.5 text-center text-[13px]" x-on:mouseleave="hovered = null">
@@ -164,7 +167,7 @@
                     <div class="flex flex-col gap-3.5 border-t border-line-soft px-5 py-4 md:col-span-2 xl:col-span-1 xl:border-t-0 xl:border-l">
                         <div class="text-sm font-semibold">{{ $timeHeading }}</div>
                         <div class="grid grid-cols-2 gap-2.5">
-                            @foreach (['start' => 'Início', 'end' => 'Fim'] as $timeKey => $timeLabel)
+                            @foreach (['start' => __('Start'), 'end' => __('End')] as $timeKey => $timeLabel)
                                 <label class="flex flex-col gap-1.5 text-[13px] text-ink-3">
                                     {{ $timeLabel }}
                                     <button
@@ -177,7 +180,7 @@
                                 </label>
                             @endforeach
                         </div>
-                        <div role="listbox" aria-label="Horários" class="h-[252px] overflow-y-auto rounded-[10px] border border-line p-1">
+                        <div role="listbox" aria-label="{{ __('Times') }}" class="h-[252px] overflow-y-auto rounded-[10px] border border-line p-1">
                             <template x-for="clock in slots()" x-bind:key="clock">
                                 <button
                                     type="button"
@@ -190,19 +193,19 @@
                                 ><span x-text="clock"></span><span class="ml-auto font-sans text-xs opacity-70" x-text="slotHint(clock)"></span></button>
                             </template>
                         </div>
-                        <div class="flex items-center justify-between rounded-[10px] bg-subtle p-3 text-sm"><span class="text-ink-3">Duração</span><span class="font-mono font-medium" x-text="duration()"></span></div>
+                        <div class="flex items-center justify-between rounded-[10px] bg-subtle p-3 text-sm"><span class="text-ink-3">{{ __('Duration') }}</span><span class="font-mono font-medium" x-text="duration()"></span></div>
                         @if ($timezone)
-                            <div class="text-xs text-muted">Fuso: {{ $timezone }} · intervalos de {{ (int) $step }} min</div>
+                            <div class="text-xs text-muted">{{ __('Time zone: :zone · :step min steps', ['zone' => $timezone, 'step' => (int) $step]) }}</div>
                         @endif
                     </div>
                 @endif
             </div>
 
             <div class="flex flex-wrap items-center gap-2 border-t border-line-soft px-5 py-3.5 text-[13px] text-ink-3">
-                <span x-text="dayCount() ? (dayCount() === 1 ? '1 dia selecionado' : dayCount() + ' dias selecionados') : 'Escolha a data final'"></span>
+                <span x-text="dayCount() ? (dayCount() === 1 ? @js(__('1 day selected')) : @js(__(':count days selected')).replace(':count', dayCount())) : @js(__('Pick the end date'))"></span>
                 @unless ($inline)
-                    <x-ui::button size="sm" class="ml-auto" x-on:click="cancel(); $refs.trigger.focus()">Cancelar</x-ui::button>
-                    <x-ui::button size="sm" variant="primary" x-on:click="apply()" x-bind:disabled="! draft.start || ! draft.end">Aplicar</x-ui::button>
+                    <x-ui::button size="sm" class="ml-auto" x-on:click="cancel(); $refs.trigger.focus()">{{ __('Cancel') }}</x-ui::button>
+                    <x-ui::button size="sm" variant="primary" x-on:click="apply()" x-bind:disabled="! draft.start || ! draft.end">{{ __('Apply') }}</x-ui::button>
                 @endunless
             </div>
         </div>

@@ -4,8 +4,12 @@
     <x-ui::resizable.handle label="Tamanho do diff" />
 --}}
 @props([
-    'label' => 'Redimensionar painéis',
+    'label' => null,
 ])
+
+@php
+    $label ??= __('Resize panels');
+@endphp
 
 <div
     data-resizable-handle

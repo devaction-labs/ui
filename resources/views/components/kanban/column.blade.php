@@ -46,10 +46,10 @@
                     'text-muted' => ! $isAtLimit,
                 ])
                 @if ($countText)
-                    wire:text="({{ $countText }}) + '/{{ (int) $limit }}' + (({{ $countText }}) >= {{ (int) $limit }} ? ' limite' : '')"
+                    wire:text="({{ $countText }}) + '/{{ (int) $limit }}' + (({{ $countText }}) >= {{ (int) $limit }} ? @js(' '.__('limit')) : '')"
                     x-bind:class="{ 'text-risk-fg': ({{ $countText }}) >= {{ (int) $limit }}, 'text-muted': ({{ $countText }}) < {{ (int) $limit }} }"
                 @endif
-            >{{ $count ?? 0 }}/{{ $limit }}{{ $isAtLimit ? ' limite' : '' }}</span>
+            >{{ $count ?? 0 }}/{{ $limit }}{{ $isAtLimit ? ' '.__('limit') : '' }}</span>
         @endif
         @isset($actions)
             <span @class(['flex items-center', 'ml-auto' => $limit === null])>{{ $actions }}</span>

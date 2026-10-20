@@ -43,9 +43,9 @@
             <button
                 type="button"
                 x-on:click="revealed = ! revealed"
-                x-bind:aria-label="revealed ? 'Esconder' : 'Mostrar'"
+                x-bind:aria-label="revealed ? @js(__('Hide')) : @js(__('Show'))"
                 x-bind:aria-pressed="revealed.toString()"
-                aria-label="Mostrar"
+                aria-label="{{ __('Show') }}"
                 class="flex w-10 shrink-0 cursor-pointer items-center justify-center border-l border-line bg-card text-ink-2 transition hover:text-ink"
             >
                 <x-ui::icon name="view" class="size-4" x-show="! revealed" />
@@ -60,9 +60,9 @@
         >
             <x-ui::icon name="copy-01" class="size-3.5" x-show="! copied" />
             <x-ui::icon name="tick-02" class="size-3.5" x-show="copied" x-cloak />
-            <span x-text="copied ? 'Copiado' : 'Copiar'">Copiar</span>
+            <span x-text="copied ? @js(__('Copied')) : @js(__('Copy'))">{{ __('Copy') }}</span>
         </button>
-        <span class="sr-only" aria-live="polite" x-text="copied ? 'Copiado para a área de transferência' : ''"></span>
+        <span class="sr-only" aria-live="polite" x-text="copied ? @js(__('Copied to clipboard')) : ''"></span>
     </div>
 
     @if ($description)

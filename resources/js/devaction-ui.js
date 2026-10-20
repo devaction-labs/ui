@@ -13,8 +13,44 @@ const modalControl = (name) => ({
     close: () => window.dispatchEvent(new CustomEvent('ui-modal', { detail: { name, action: 'close' } })),
 });
 
+/**
+ * Textos do JavaScript do kit. A fonte é inglês; o idioma vem do <html lang> (pt, pt-BR → português).
+ * Outros idiomas: DevActionUI.translations.es = { 'Copied': 'Copiado', … }.
+ */
+const translations = {
+    pt: {
+        code: 'código',
+        'Link address': 'Endereço do link',
+        '1 file': '1 arquivo',
+        ':count files': ':count arquivos',
+        ':item moved to position :position of :total.': ':item movido para a posição :position de :total.',
+        ':item grabbed. Use the arrow keys and press Space to drop.': ':item pego. Use as setas e aperte Espaço para soltar.',
+        ':item went back to position :position.': ':item voltou para a posição :position.',
+        ':item stayed at position :position.': ':item ficou na posição :position.',
+        Today: 'Hoje',
+        'Last 7 days': 'Últimos 7 dias',
+        'This month': 'Este mês',
+        'Last month': 'Mês passado',
+        'This quarter': 'Este trimestre',
+    },
+};
+
+const translate = (text, replacements = {}) => {
+    const language = (document.documentElement.lang || 'en').toLowerCase();
+    const dictionary = window.DevActionUI?.translations?.[language] ?? window.DevActionUI?.translations?.[language.split('-')[0]] ?? {};
+    let result = dictionary[text] ?? text;
+
+    Object.entries(replacements).forEach(([key, value]) => {
+        result = result.replaceAll(`:${key}`, String(value));
+    });
+
+    return result;
+};
+
 window.DevActionUI = {
     ...(window.DevActionUI ?? {}),
+    translations: { ...translations, ...(window.DevActionUI?.translations ?? {}) },
+    t: translate,
     modal: modalControl,
     modals: () => ({ close: () => window.dispatchEvent(new CustomEvent('ui-modal', { detail: { action: 'close-all' } })) }),
 };
@@ -1394,7 +1430,7 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
-            const text = window.getSelection()?.toString() || 'código';
+            const text = window.getSelection()?.toString() || translate('code');
             this.run('insertHTML', `<code>${text.replace(/[&<>]/g, (character) => `&#${character.charCodeAt(0)};`)}</code>&nbsp;`);
         },
 
@@ -1405,7 +1441,7 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
-            const url = window.prompt('Endereço do link', 'https://');
+            const url = window.prompt(translate('Link address'), 'https://');
 
             if (url && url !== 'https://') {
                 this.run('createLink', url);
@@ -1546,7 +1582,7 @@ document.addEventListener('alpine:init', () => {
                 }
             }
 
-            if (event.key === '@' && ! this.mentionOpen && this.$root.querySelector('[data-mention-item], [role=listbox][aria-label=Pessoas]')) {
+            if (event.key === '@' && ! this.mentionOpen && this.$root.querySelector('[data-mention-item], [data-mention-list]')) {
                 this.$nextTick(() => this.openMention());
             }
 
@@ -1684,7 +1720,7 @@ document.addEventListener('alpine:init', () => {
             this.depth++;
             this.dragging = true;
             const items = [...(event.dataTransfer?.items ?? [])].filter((item) => item.kind === 'file');
-            this.summary = items.length === 1 ? '1 arquivo' : `${items.length} arquivos`;
+            this.summary = items.length === 1 ? translate('1 file') : translate(':count files', { count: items.length });
         },
 
         leave() {
@@ -1711,7 +1747,7 @@ document.addEventListener('alpine:init', () => {
         chosen() {
             const files = [...this.$refs.input.files];
             const total = files.reduce((sum, file) => sum + file.size, 0);
-            this.summary = files.length ? `${files.length === 1 ? files[0].name : files.length + ' arquivos'} · ${this.humanSize(total)}` : '';
+            this.summary = files.length ? `${files.length === 1 ? files[0].name : translate(':count files', { count: files.length })} · ${this.humanSize(total)}` : '';
         },
     }));
 
@@ -2386,7 +2422,7 @@ document.addEventListener('alpine:init', () => {
 
         announce(item) {
             const items = this.items();
-            this.message = `${item.dataset.label} movido para a posição ${items.indexOf(item) + 1} de ${items.length}.`;
+            this.message = translate(':item moved to position :position of :total.', { item: item.dataset.label, position: items.indexOf(item) + 1, total: items.length });
         },
 
         commit(item) {
@@ -2411,7 +2447,7 @@ document.addEventListener('alpine:init', () => {
                 } else {
                     this.grabbed = item.dataset.key;
                     this.origin = this.items().indexOf(item);
-                    this.message = `${item.dataset.label} pego. Use as setas e aperte Espaço para soltar.`;
+                    this.message = translate(':item grabbed. Use the arrow keys and press Space to drop.', { item: item.dataset.label });
                 }
             } else if (this.grabbed === item.dataset.key && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
                 event.preventDefault();
@@ -2421,7 +2457,7 @@ document.addEventListener('alpine:init', () => {
                 event.stopPropagation();
                 this.place(item, this.origin);
                 this.grabbed = null;
-                this.message = `${item.dataset.label} voltou para a posição ${this.origin + 1}.`;
+                this.message = translate(':item went back to position :position.', { item: item.dataset.label, position: this.origin + 1 });
                 this.$nextTick(() => item.querySelector('[data-sortable-handle]')?.focus());
             }
         },
@@ -2436,7 +2472,7 @@ document.addEventListener('alpine:init', () => {
             if (this.items().indexOf(item) !== this.origin) {
                 this.commit(item);
             } else if (! silent) {
-                this.message = `${item.dataset.label} ficou na posição ${this.origin + 1}.`;
+                this.message = translate(':item stayed at position :position.', { item: item.dataset.label, position: this.origin + 1 });
             }
         },
 
@@ -2690,11 +2726,11 @@ document.addEventListener('alpine:init', () => {
                 weekAgo.setDate(date.getDate() - 6);
 
                 return [
-                    { key: 'today', label: 'Hoje', start: this.today, end: this.today },
-                    { key: '7d', label: 'Últimos 7 dias', start: toIso(weekAgo), end: this.today },
-                    { key: 'month', label: 'Este mês', start: firstOfMonth, end: this.today },
-                    { key: 'last-month', label: 'Mês passado', start: lastMonthStart, end: lastMonthEnd },
-                    { key: 'quarter', label: 'Este trimestre', start: quarterStart, end: this.today },
+                    { key: 'today', label: translate('Today'), start: this.today, end: this.today },
+                    { key: '7d', label: translate('Last 7 days'), start: toIso(weekAgo), end: this.today },
+                    { key: 'month', label: translate('This month'), start: firstOfMonth, end: this.today },
+                    { key: 'last-month', label: translate('Last month'), start: lastMonthStart, end: lastMonthEnd },
+                    { key: 'quarter', label: translate('This quarter'), start: quarterStart, end: this.today },
                     ...presets.map((preset, index) => ({ key: `custom-${index}`, ...preset })),
                 ];
             },

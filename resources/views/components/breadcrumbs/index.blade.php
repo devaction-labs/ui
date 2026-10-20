@@ -15,7 +15,7 @@
     'size' => 'base',
 ])
 
-<nav aria-label="Breadcrumb" data-breadcrumbs {{ $attributes->class(['min-w-0']) }}>
+<nav aria-label="{{ __('Breadcrumb') }}" data-breadcrumbs {{ $attributes->class(['min-w-0']) }}>
     <ol @class([
         'flex min-w-0 flex-wrap items-center text-muted',
         'gap-2 text-[13px]' => $size === 'sm',

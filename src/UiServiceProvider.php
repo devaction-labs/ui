@@ -10,13 +10,16 @@ use Livewire\Blaze\Blaze;
 class UiServiceProvider extends ServiceProvider
 {
     /**
-     * Registra as views do pacote no namespace "ui" e os componentes anônimos como <x-ui::*>.
+     * Registra as views do pacote no namespace "ui", os componentes anônimos como <x-ui::*>
+     * e as traduções (textos em inglês; lang/pt_BR.json traz o português). Para trocar um texto,
+     * o app repete a chave no próprio lang/{locale}.json, que tem prioridade.
      *
      * Ícones podem ser adicionados ou sobrescritos pelo app em resources/views/vendor/ui/icons.
      */
     public function boot(): void
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'ui');
+        $this->loadJsonTranslationsFrom(__DIR__.'/../lang');
 
         Blade::anonymousComponentPath(__DIR__.'/../resources/views/components', 'ui');
 

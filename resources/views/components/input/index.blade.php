@@ -122,18 +122,18 @@
         <x-ui::kbd>{{ $kbd }}</x-ui::kbd>
     @endif
     @if ($clearable)
-        <button type="button" aria-label="Limpar" data-input-clear x-on:click="$refs.input.value = ''; $refs.input.dispatchEvent(new Event('input', { bubbles: true })); $refs.input.focus()" class="-mr-1.5 inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-wrap hover:text-ink">
+        <button type="button" aria-label="{{ __('Clear') }}" data-input-clear x-on:click="$refs.input.value = ''; $refs.input.dispatchEvent(new Event('input', { bubbles: true })); $refs.input.focus()" class="-mr-1.5 inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-wrap hover:text-ink">
             <x-ui::icon name="cancel-01" class="size-4" />
         </button>
     @endif
     @if ($viewable)
-        <button type="button" x-on:click="revealed = ! revealed" x-bind:aria-label="revealed ? 'Ocultar senha' : 'Mostrar senha'" aria-label="Mostrar senha" class="-mr-1.5 inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-wrap hover:text-ink">
+        <button type="button" x-on:click="revealed = ! revealed" x-bind:aria-label="revealed ? @js(__('Hide password')) : @js(__('Show password'))" aria-label="{{ __('Show password') }}" class="-mr-1.5 inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-wrap hover:text-ink">
             <x-ui::icon name="view" class="size-4" x-show="! revealed" />
             <x-ui::icon name="view-off" class="size-4" x-show="revealed" x-cloak />
         </button>
     @endif
     @if ($copyable)
-        <button type="button" x-on:click="navigator.clipboard?.writeText($refs.input.value); copied = true; setTimeout(() => copied = false, 1500)" x-bind:aria-label="copied ? 'Copiado' : 'Copiar'" aria-label="Copiar" class="-mr-2 inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-card hover:text-ink">
+        <button type="button" x-on:click="navigator.clipboard?.writeText($refs.input.value); copied = true; setTimeout(() => copied = false, 1500)" x-bind:aria-label="copied ? @js(__('Copied')) : @js(__('Copy'))" aria-label="{{ __('Copy') }}" class="-mr-2 inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-card hover:text-ink">
             <x-ui::icon name="copy-01" class="size-4" x-show="! copied" />
             <x-ui::icon name="tick-02" class="size-4 text-ok-fg" x-show="copied" x-cloak />
         </button>

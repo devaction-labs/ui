@@ -72,7 +72,7 @@
             ])
         >
             @if ($typing)
-                <span class="flex h-[26px] items-center gap-1" role="status" aria-label="{{ $name ?? 'Alguém' }} está digitando">
+                <span class="flex h-[26px] items-center gap-1" role="status" aria-label="{{ __(':name is typing', ['name' => $name ?? __('Someone')]) }}">
                     @foreach ([0, 150, 300] as $delay)
                         <span class="size-1.5 rounded-full bg-muted motion-safe:animate-blink" style="animation-delay: {{ $delay }}ms"></span>
                     @endforeach
@@ -91,7 +91,7 @@
                 'px-1 text-xs',
                 'text-muted' => $status !== 'error',
                 'text-risk-fg' => $status === 'error',
-            ])>{{ match ($status) { 'sending' => 'Enviando…', 'error' => 'Não enviada', default => 'Enviada' } }}</span>
+            ])>{{ match ($status) { 'sending' => __('Sending…'), 'error' => __('Not sent'), default => __('Sent') } }}</span>
         @endif
 
         @if (! $typing && ($copyable || $feedback || isset($actions)))
@@ -100,8 +100,8 @@
                     <button
                         type="button"
                         x-on:click="navigator.clipboard?.writeText($refs.content.innerText); copied = true; setTimeout(() => copied = false, 1600)"
-                        x-bind:aria-label="copied ? 'Copiado' : 'Copiar resposta'"
-                        aria-label="Copiar resposta"
+                        x-bind:aria-label="copied ? @js(__('Copied')) : @js(__('Copy response'))"
+                        aria-label="{{ __('Copy response') }}"
                         class="flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-wrap hover:text-ink"
                     >
                         <x-ui::icon name="copy-01" class="size-3.5" x-show="! copied" />
@@ -109,7 +109,7 @@
                     </button>
                 @endif
                 @if ($feedback)
-                    @foreach (['up' => ['thumbs-up', 'Resposta útil'], 'down' => ['thumbs-down', 'Resposta ruim']] as $vote => [$voteIcon, $voteLabel])
+                    @foreach (['up' => ['thumbs-up', __('Helpful response')], 'down' => ['thumbs-down', __('Bad response')]] as $vote => [$voteIcon, $voteLabel])
                         <button
                             type="button"
                             x-on:click="vote = vote === @js($vote) ? null : @js($vote); $dispatch('chat-feedback', { value: vote })"

@@ -31,7 +31,7 @@
         x-on:keydown="onKeydown($event, $el.closest('[data-sortable-item]'))"
         x-on:blur="drop($el.closest('[data-sortable-item]'), true)"
         x-bind:aria-pressed="(grabbed === $el.closest('[data-sortable-item]').dataset.key).toString()"
-        aria-label="Mover {{ $label ?? trim(preg_replace('/\s+/', ' ', strip_tags((string) $slot))) }}"
+        aria-label="{{ __('Move :item', ['item' => $label ?? trim(preg_replace('/\s+/', ' ', strip_tags((string) $slot)))]) }}"
         class="flex size-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted transition hover:bg-wrap hover:text-ink focus-visible:ring-2 focus-visible:ring-ring active:cursor-grabbing"
     >
         <x-ui::icon name="drag-drop-vertical" class="size-4" />
@@ -42,8 +42,8 @@
     @endisset
     @if ($buttons)
         <span class="flex shrink-0 gap-1">
-            <button type="button" x-on:click="moveBy($el.closest('[data-sortable-item]'), -1)" x-bind:disabled="isFirst($el.closest('[data-sortable-item]'))" aria-label="Mover para cima" class="flex size-[26px] cursor-pointer items-center justify-center rounded-[7px] border border-line bg-card transition hover:border-line-hover disabled:cursor-default disabled:opacity-35"><x-ui::icon name="arrow-up-01" class="size-[13px]" /></button>
-            <button type="button" x-on:click="moveBy($el.closest('[data-sortable-item]'), 1)" x-bind:disabled="isLast($el.closest('[data-sortable-item]'))" aria-label="Mover para baixo" class="flex size-[26px] cursor-pointer items-center justify-center rounded-[7px] border border-line bg-card transition hover:border-line-hover disabled:cursor-default disabled:opacity-35"><x-ui::icon name="arrow-down-01" class="size-[13px]" /></button>
+            <button type="button" x-on:click="moveBy($el.closest('[data-sortable-item]'), -1)" x-bind:disabled="isFirst($el.closest('[data-sortable-item]'))" aria-label="{{ __('Move up') }}" class="flex size-[26px] cursor-pointer items-center justify-center rounded-[7px] border border-line bg-card transition hover:border-line-hover disabled:cursor-default disabled:opacity-35"><x-ui::icon name="arrow-up-01" class="size-[13px]" /></button>
+            <button type="button" x-on:click="moveBy($el.closest('[data-sortable-item]'), 1)" x-bind:disabled="isLast($el.closest('[data-sortable-item]'))" aria-label="{{ __('Move down') }}" class="flex size-[26px] cursor-pointer items-center justify-center rounded-[7px] border border-line bg-card transition hover:border-line-hover disabled:cursor-default disabled:opacity-35"><x-ui::icon name="arrow-down-01" class="size-[13px]" /></button>
         </span>
     @endif
 </li>

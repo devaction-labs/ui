@@ -13,12 +13,13 @@
 --}}
 @props([
     'files' => [],
-    'heading' => 'Arquivos alterados',
+    'heading' => null,
     'value' => null,
     'filters' => true,
 ])
 
 @php
+    $heading ??= __('Changed files');
     $nodes = [];
     $directories = [];
 
@@ -78,12 +79,12 @@
         @if ($filters)
             <label class="mt-2.5 flex h-8 items-center gap-2 rounded-lg border border-line px-2.5 text-[13px] text-muted focus-within:border-ink">
                 <x-ui::icon name="search-01" class="size-3.5" />
-                <span class="sr-only">Filtrar arquivos</span>
-                <input type="search" x-ref="filter" x-model="query" placeholder="Filtrar arquivos" class="min-w-0 flex-1 bg-transparent text-ink outline-none placeholder:text-muted [&::-webkit-search-cancel-button]:hidden" />
+                <span class="sr-only">{{ __('Filter files') }}</span>
+                <input type="search" x-ref="filter" x-model="query" placeholder="{{ __('Filter files') }}" class="min-w-0 flex-1 bg-transparent text-ink outline-none placeholder:text-muted [&::-webkit-search-cancel-button]:hidden" />
                 <x-ui::kbd class="px-[5px] py-px text-[10px]">T</x-ui::kbd>
             </label>
-            <div role="tablist" aria-label="Mostrar" class="mt-2 flex gap-1">
-                @foreach (['all' => 'Todos', 'findings' => 'Com achados', 'new' => 'Novos'] as $filterKey => $filterLabel)
+            <div role="tablist" aria-label="{{ __('Show') }}" class="mt-2 flex gap-1">
+                @foreach (['all' => __('All'), 'findings' => __('With findings'), 'new' => __('New')] as $filterKey => $filterLabel)
                     <button
                         type="button"
                         role="tab"
@@ -131,18 +132,18 @@
                 @unless ($node['directory'])
                     <span class="ml-auto flex shrink-0 items-center gap-1.5">
                         @if ($findings > 0)
-                            <span @class(['inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-[5px] text-[11px] font-semibold text-white', 'bg-risk-fg' => ($node['level'] ?? 'warn') === 'risk', 'bg-ai' => ($node['level'] ?? 'warn') !== 'risk'])>{{ $findings }}<span class="sr-only"> achados</span></span>
+                            <span @class(['inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-[5px] text-[11px] font-semibold text-white', 'bg-risk-fg' => ($node['level'] ?? 'warn') === 'risk', 'bg-ai' => ($node['level'] ?? 'warn') !== 'risk'])>{{ $findings }}<span class="sr-only"> {{ __('findings') }}</span></span>
                         @endif
                         <span class="inline-flex size-3.5 items-center justify-center rounded-[3px] font-mono text-[10px] {{ $statusClasses[$status] ?? $statusClasses['M'] }}">{{ $status }}</span>
                     </span>
                 @endunless
             </button>
         @endforeach
-        <p x-show="! hasMatches()" x-cloak class="px-2 py-6 text-center text-[13px] text-muted">Nenhum arquivo com esse filtro.</p>
+        <p x-show="! hasMatches()" x-cloak class="px-2 py-6 text-center text-[13px] text-muted">{{ __('No files match this filter.') }}</p>
     </div>
 
     <div class="flex gap-3 border-t border-line-soft px-3.5 py-2.5 text-[11px] text-muted">
-        @foreach (['A' => 'novo', 'M' => 'alterado', 'D' => 'removido'] as $legendStatus => $legendLabel)
+        @foreach (['A' => __('added'), 'M' => __('modified'), 'D' => __('removed')] as $legendStatus => $legendLabel)
             <span class="flex items-center gap-1"><span class="inline-flex size-3 items-center justify-center rounded-[3px] font-mono text-[9px] {{ $statusClasses[$legendStatus] }}">{{ $legendStatus }}</span>{{ $legendLabel }}</span>
         @endforeach
     </div>

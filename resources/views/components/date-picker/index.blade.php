@@ -24,18 +24,19 @@
     'presets' => true,
     'relative' => true,
     'name' => null,
-    'locale' => 'pt-BR',
+    'locale' => null,
     'today' => null,
 ])
 
 @php
+    $locale ??= str_replace('_', '-', app()->getLocale());
     $modelName = collect($attributes->getAttributes())
         ->first(fn ($attributeValue, string $key): bool => str_starts_with($key, 'wire:model'));
     $fieldName = $name ?? $modelName;
     $errorBag = \Illuminate\Support\Facades\View::shared('errors');
     $errorMessage = $error ?? ($fieldName && $errorBag ? $errorBag->first($fieldName) : null);
     $pickerId = $attributes->get('id') ?? 'ui-date-'.($fieldName ? \Illuminate\Support\Str::slug($fieldName) : substr(md5($label.($range ? 'range' : 'single')), 0, 8));
-    $placeholder ??= $range ? 'Início → fim' : 'Escolha uma data';
+    $placeholder ??= $range ? __('Start → end') : __('Pick a date');
     $startValue = $range ? ($value['start'] ?? null) : $value;
     $endValue = $range ? ($value['end'] ?? null) : null;
     $alpineConfig = [

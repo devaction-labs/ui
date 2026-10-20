@@ -25,7 +25,7 @@ test('pdf viewer renders pages, toolbar, signature fields and signers', function
         ->toContain('aria-label="Diminuir zoom"')
         ->toContain('src="/p1.png" alt="Página 1"')
         ->toContain('left: 54%; top: 78%; width: 38%; height: 10%')
-        ->toContain('VOCÊ ASSINA AQUI')
+        ->toContain('Você assina aqui')
         ->toContain('data-mine')
         ->toContain('wire:click="openSignature"')
         ->toContain('border-ok-line bg-ok-bg')

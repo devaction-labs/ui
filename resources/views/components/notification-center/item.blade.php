@@ -47,5 +47,5 @@
         @endif
     </span>
     <span x-show="isUnread($el.closest('[data-notification]'))" class="mt-1.5 size-2 shrink-0 rounded-full bg-ai" aria-hidden="true"></span>
-    <span class="sr-only" x-text="isUnread($el.closest('[data-notification]')) ? 'não lida' : ''"></span>
+    <span class="sr-only" x-text="isUnread($el.closest('[data-notification]')) ? @js(__('unread')) : ''"></span>
 </{{ $tag }}>

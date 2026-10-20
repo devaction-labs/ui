@@ -17,10 +17,11 @@
     'current' => 1,
     'error' => false,
     'counter' => true,
-    'errorText' => 'falhou · tente de novo',
+    'errorText' => null,
 ])
 
 @php
+    $errorText ??= __('failed · try again');
     $steps = array_values($steps);
     $total = count($steps);
     $current = max(1, min((int) $current, $total + 1));
@@ -28,7 +29,7 @@
 
 <div data-stepper {{ $attributes->class(['flex flex-col gap-3']) }}>
     @if ($counter && $total)
-        <span class="self-end font-mono text-xs text-muted">Passo {{ min($current, $total) }} de {{ $total }}</span>
+        <span class="self-end font-mono text-xs text-muted">{{ __('Step :current of :total', ['current' => min($current, $total), 'total' => $total]) }}</span>
     @endif
 
     <ol class="grid gap-2" style="grid-template-columns: repeat({{ max($total, 1) }}, minmax(0, 1fr))">
@@ -60,7 +61,7 @@
                     ])>
                         @if ($state === 'done')
                             <x-ui::icon name="tick-02" class="size-3.5" />
-                            <span class="sr-only">Feito:</span>
+                            <span class="sr-only">{{ __('Done:') }}</span>
                         @else
                             {{ $number }}
                         @endif

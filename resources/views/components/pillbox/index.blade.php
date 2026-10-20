@@ -27,7 +27,7 @@
     'label' => null,
     'description' => null,
     'error' => null,
-    'placeholder' => 'Adicionar…',
+    'placeholder' => null,
     'name' => null,
     'value' => [],
     'suggestions' => [],
@@ -35,13 +35,16 @@
     'unique' => true,
     'variant' => 'default',
     'searchable' => false,
-    'searchPlaceholder' => 'Buscar…',
+    'searchPlaceholder' => null,
     'filter' => true,
     'size' => 'base',
-    'empty' => 'Nada encontrado.',
+    'empty' => null,
 ])
 
 @php
+    $placeholder ??= __('Add…');
+    $searchPlaceholder ??= __('Search…');
+    $empty ??= __('No results found.');
     $modelName = collect($attributes->getAttributes())
         ->first(fn ($attributeValue, string $key): bool => str_starts_with($key, 'wire:model'));
     $fieldName = $name ?? $modelName;
@@ -98,7 +101,7 @@
                     <button
                         type="button"
                         x-on:click.stop="unselect(item)"
-                        x-bind:aria-label="'Remover ' + (labels[item]?.text ?? item)"
+                        x-bind:aria-label="@js(__('Remove :item')).replace(':item', labels[item]?.text ?? item)"
                         class="flex size-[22px] shrink-0 cursor-pointer items-center justify-center rounded-md text-ink-3 transition hover:bg-line hover:text-ink"
                     >
                         <x-ui::icon name="cancel-01" class="size-3" />
@@ -183,7 +186,7 @@
                     <button
                         type="button"
                         x-on:click.stop="remove(index)"
-                        x-bind:aria-label="'Remover ' + pill"
+                        x-bind:aria-label="@js(__('Remove :item')).replace(':item', pill)"
                         class="flex size-[22px] shrink-0 cursor-pointer items-center justify-center rounded-md text-ink-3 transition hover:bg-line hover:text-ink"
                     >
                         <x-ui::icon name="cancel-01" class="size-3" />

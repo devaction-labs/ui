@@ -26,7 +26,7 @@
 
 @php
     $isRecurring = is_array($price);
-    $per ??= $isRecurring ? '/mês' : '';
+    $per ??= $isRecurring ? __('/month') : '';
     $actionAttributes = $attributes->filter(fn ($value, string $key): bool => str_starts_with($key, 'wire:') || str_starts_with($key, 'x-on:'));
     $cardAttributes = $attributes->except(array_keys($actionAttributes->getAttributes()));
 @endphp
@@ -62,7 +62,7 @@
         @if ($note)
             {{ $note }}
         @elseif ($isRecurring)
-            <span x-text="yearly ? 'cobrado anualmente' : 'cobrado todo mês'">cobrado anualmente</span>
+            <span x-text="yearly ? @js(__('billed yearly')) : @js(__('billed monthly'))">{{ __('billed yearly') }}</span>
         @endif
     </p>
 

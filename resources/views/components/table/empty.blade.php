@@ -7,9 +7,13 @@
 --}}
 @props([
     'icon' => 'search-01',
-    'heading' => 'Nada por aqui',
+    'heading' => null,
     'text' => null,
 ])
+
+@php
+    $heading ??= __('Nothing here');
+@endphp
 
 <tr data-table-empty>
     <td colspan="100" {{ $attributes->class(['px-5 py-10']) }}>

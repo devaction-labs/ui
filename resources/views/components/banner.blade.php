@@ -57,7 +57,7 @@
                 <button
                     type="button"
                     x-on:click="visible = false; $dispatch('banner-dismissed')"
-                    aria-label="Fechar aviso"
+                    aria-label="{{ __('Dismiss') }}"
                     class="flex size-7 cursor-pointer items-center justify-center rounded-md opacity-70 transition hover:opacity-100"
                 >
                     <x-ui::icon name="cancel-01" class="size-4" />

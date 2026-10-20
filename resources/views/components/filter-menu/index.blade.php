@@ -14,10 +14,14 @@
     align: start · end (lado em que o painel abre)
 --}}
 @props([
-    'label' => 'Filtrar',
+    'label' => null,
     'value' => [],
     'align' => 'start',
 ])
+
+@php
+    $label ??= __('Filter');
+@endphp
 
 <div
     data-filter-menu
@@ -61,7 +65,7 @@
     >
         <div class="flex items-center justify-between pt-2.5 pr-2.5 pb-1.5 pl-3.5">
             <span class="text-sm font-semibold text-ink">{{ $label }}</span>
-            <button type="button" x-on:click="close(true)" aria-label="Fechar" class="flex size-[30px] cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-wrap hover:text-ink">
+            <button type="button" x-on:click="close(true)" aria-label="{{ __('Close') }}" class="flex size-[30px] cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-wrap hover:text-ink">
                 <x-ui::icon name="cancel-01" class="size-3.5" />
             </button>
         </div>
@@ -71,8 +75,8 @@
         </div>
 
         <div class="grid grid-cols-2 gap-2 border-t border-line-soft p-2.5">
-            <x-ui::button size="sm" x-on:click="clear()">Limpar</x-ui::button>
-            <x-ui::button size="sm" variant="primary" x-on:click="apply()">Aplicar</x-ui::button>
+            <x-ui::button size="sm" x-on:click="clear()">{{ __('Clear') }}</x-ui::button>
+            <x-ui::button size="sm" variant="primary" x-on:click="apply()">{{ __('Apply') }}</x-ui::button>
         </div>
     </div>
 </div>

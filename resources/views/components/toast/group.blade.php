@@ -34,7 +34,7 @@
 
 <section
     data-toast-group
-    aria-label="Notificações"
+    aria-label="{{ __('Notifications') }}"
     x-data="uiToastGroup({ max: {{ (int) $max }}, toasts: @js(array_values($toasts)) })"
     x-on:mouseenter="expand()"
     x-on:mouseleave="collapse()"
@@ -119,7 +119,7 @@
                 <button
                     type="button"
                     x-on:click="dismiss(toast.id)"
-                    aria-label="Fechar notificação"
+                    aria-label="{{ __('Dismiss notification') }}"
                     class="-my-1 -mr-1.5 inline-flex size-[30px] shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted transition hover:bg-line-soft hover:text-ink"
                 >
                     <x-ui::icon name="cancel-01" class="size-4" />

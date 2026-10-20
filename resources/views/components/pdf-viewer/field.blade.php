@@ -10,11 +10,15 @@
     'y' => 0,
     'w' => 30,
     'h' => 10,
-    'label' => 'Assinar',
+    'label' => null,
     'signer' => null,
     'signed' => false,
     'mine' => false,
 ])
+
+@php
+    $label ??= __('Sign');
+@endphp
 
 <button
     type="button"
@@ -30,7 +34,7 @@
     ]) }}
 >
     @if ($mine && ! $signed)
-        <span class="absolute -top-[10px] -left-px flex h-[18px] items-center rounded-[5px_5px_5px_0] bg-ai px-1.5 text-[10px] font-semibold text-white">VOCÊ ASSINA AQUI</span>
+        <span class="absolute -top-[10px] -left-px flex h-[18px] items-center rounded-[5px_5px_5px_0] bg-ai px-1.5 text-[10px] font-semibold text-white uppercase">{{ __('You sign here') }}</span>
     @endif
     <span @class(['text-[0.85em] font-semibold', 'text-ok-fg' => $signed, 'text-warn-fg' => $mine && ! $signed, 'text-ink-3' => ! $signed && ! $mine])>{{ $label }}</span>
     @if ($signer)

@@ -16,11 +16,17 @@
     empty:    texto quando a aba não tem nada
 --}}
 @props([
-    'heading' => 'Notificações',
-    'tabs' => ['all' => 'Tudo'],
+    'heading' => null,
+    'tabs' => null,
     'markAll' => null,
-    'empty' => 'Nada por aqui.',
+    'empty' => null,
 ])
+
+@php
+    $heading ??= __('Notifications');
+    $tabs ??= ['all' => __('Everything')];
+    $empty ??= __('Nothing here.');
+@endphp
 
 <section
     data-notification-center
@@ -30,11 +36,11 @@
 >
     <div class="flex items-center px-4 pt-4">
         <h2 class="text-[17px] font-semibold">{{ $heading }}</h2>
-        <button type="button" x-on:click="readAll()" x-bind:disabled="unread('all') === 0" class="ml-auto cursor-pointer text-[13px] text-ink transition hover:underline disabled:cursor-default disabled:text-muted disabled:no-underline">Marcar tudo como lido</button>
+        <button type="button" x-on:click="readAll()" x-bind:disabled="unread('all') === 0" class="ml-auto cursor-pointer text-[13px] text-ink transition hover:underline disabled:cursor-default disabled:text-muted disabled:no-underline">{{ __('Mark all as read') }}</button>
     </div>
 
     @if (count($tabs) > 1)
-        <div role="tablist" aria-label="Filtrar notificações" class="flex gap-4 border-b border-line-soft px-4 pt-3">
+        <div role="tablist" aria-label="{{ __('Filter notifications') }}" class="flex gap-4 border-b border-line-soft px-4 pt-3">
             @foreach ($tabs as $tabKey => $tabLabel)
                 <button
                     type="button"

@@ -17,7 +17,7 @@ test('page header renders breadcrumbs, status, heading, actions and tabs', funct
 
     expect($html)
         ->toContain('data-page-header')
-        ->toContain('aria-label="Breadcrumb"')
+        ->toContain('aria-label="Trilha"')
         ->toContain('href="/projetos"')
         ->toContain('<span>ATIVO</span>')
         ->toMatch('/<h1[^>]*text-\[32px\][^>]*>SGE · Gestão Eclesial<\/h1>/s')

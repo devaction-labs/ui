@@ -69,13 +69,13 @@
                     <button
                         type="button"
                         x-on:click="navigator.clipboard?.writeText(@js($source)); copied = true; setTimeout(() => copied = false, 1500)"
-                        x-bind:aria-label="copied ? 'Código copiado' : 'Copiar código'"
-                        aria-label="Copiar código"
+                        x-bind:aria-label="copied ? @js(__('Code copied')) : @js(__('Copy code'))"
+                        aria-label="{{ __('Copy code') }}"
                         class="inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-lg border border-[#3f3f46] bg-[#27272a] px-2.5 font-sans text-xs text-code-ink transition hover:bg-[#3f3f46]"
                     >
                         <x-ui::icon name="copy-01" class="size-3.5" x-show="! copied" />
                         <x-ui::icon name="tick-02" class="size-3.5 text-code-tag" x-show="copied" x-cloak />
-                        <span x-text="copied ? 'Copiado' : 'Copiar'">Copiar</span>
+                        <span x-text="copied ? @js(__('Copied')) : @js(__('Copy'))">{{ __('Copy') }}</span>
                     </button>
                 @endif
             </span>
@@ -84,8 +84,8 @@
         <button
             type="button"
             x-on:click="navigator.clipboard?.writeText(@js($source)); copied = true; setTimeout(() => copied = false, 1500)"
-            x-bind:aria-label="copied ? 'Código copiado' : 'Copiar código'"
-            aria-label="Copiar código"
+            x-bind:aria-label="copied ? @js(__('Code copied')) : @js(__('Copy code'))"
+            aria-label="{{ __('Copy code') }}"
             class="absolute top-2.5 right-2.5 inline-flex size-7 cursor-pointer items-center justify-center rounded-lg border border-[#3f3f46] bg-[#27272a] text-code-ink opacity-0 transition group-hover/code:opacity-100 hover:bg-[#3f3f46] focus-visible:opacity-100"
         >
             <x-ui::icon name="copy-01" class="size-3.5" x-show="! copied" />

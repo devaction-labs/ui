@@ -42,7 +42,7 @@
         <span id="{{ $groupId }}-label" class="text-sm font-medium text-ink">{{ $label }}</span>
     @endif
 
-    <div role="group" @if ($label) aria-labelledby="{{ $groupId }}-label" @else aria-label="Código de verificação" @endif class="flex items-center justify-center gap-2">
+    <div role="group" @if ($label) aria-labelledby="{{ $groupId }}-label" @else aria-label="{{ __('Verification code') }}" @endif class="flex items-center justify-center gap-2">
         @for ($index = 0; $index < $length; $index++)
             @if ($separator && $index === intdiv($length, 2))
                 <span class="h-0.5 w-2.5 bg-line-hover" aria-hidden="true"></span>
@@ -52,7 +52,7 @@
                 @if ($index === 0) id="{{ $groupId }}" autocomplete="one-time-code" @else autocomplete="off" @endif
                 inputmode="{{ $mode === 'alphanumeric' ? 'text' : 'numeric' }}"
                 maxlength="{{ $length }}"
-                aria-label="Dígito {{ $index + 1 }} de {{ $length }}"
+                aria-label="{{ __('Digit :position of :total', ['position' => $index + 1, 'total' => $length]) }}"
                 @if ($errorMessage) aria-invalid="true" aria-describedby="{{ $groupId }}-hint" @endif
                 x-bind:value="digits[{{ $index }}] ?? ''"
                 x-on:input="typed($event, {{ $index }})"
@@ -74,16 +74,16 @@
     @if ($errorMessage)
         <p id="{{ $groupId }}-hint" role="alert" class="flex items-center gap-1.5 text-[13px] text-risk-fg"><x-ui::icon name="alert-02" class="size-3.5" />{{ $errorMessage }}</p>
     @elseif ($success)
-        <p role="status" class="flex items-center gap-1.5 text-[13px] text-ok-fg"><x-ui::icon name="checkmark-circle-02" class="size-3.5" />{{ is_string($success) ? $success : 'Verificado.' }}</p>
+        <p role="status" class="flex items-center gap-1.5 text-[13px] text-ok-fg"><x-ui::icon name="checkmark-circle-02" class="size-3.5" />{{ is_string($success) ? $success : __('Verified.') }}</p>
     @else
-        <p class="min-h-5 text-[13px] text-muted" aria-live="polite" x-text="remaining() > 0 && filled() > 0 ? (remaining() === 1 ? 'Falta 1 dígito' : 'Faltam ' + remaining() + ' dígitos') : ''"></p>
+        <p class="min-h-5 text-[13px] text-muted" aria-live="polite" x-text="remaining() > 0 && filled() > 0 ? (remaining() === 1 ? @js(__('1 digit left')) : @js(__(':count digits left')).replace(':count', remaining())) : ''"></p>
     @endif
 
     @if ($resend)
         <p class="text-[13px] text-muted">
-            Não chegou?
+            {{ __("Didn't get it?") }}
             <button type="button" x-on:click="sendAgain()" x-bind:disabled="wait > 0" class="cursor-pointer font-medium text-ink underline-offset-4 hover:underline disabled:cursor-default disabled:text-muted disabled:no-underline">
-                <span x-text="wait > 0 ? 'Reenviar em ' + clock() : 'Reenviar código'">Reenviar código</span>
+                <span x-text="wait > 0 ? @js(__('Resend in :time')).replace(':time', clock()) : @js(__('Resend code'))">{{ __('Resend code') }}</span>
             </button>
         </p>
     @endif

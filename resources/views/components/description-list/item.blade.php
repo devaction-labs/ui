@@ -31,8 +31,8 @@
                 type="button"
                 x-data="{ copied: false }"
                 x-on:click="navigator.clipboard?.writeText($el.previousElementSibling.textContent.trim()); copied = true; setTimeout(() => copied = false, 1500)"
-                x-bind:aria-label="copied ? 'Copiado' : 'Copiar {{ $label }}'"
-                aria-label="Copiar {{ $label }}"
+                x-bind:aria-label="copied ? @js(__('Copied')) : @js(__('Copy :label', ['label' => $label]))"
+                aria-label="{{ __('Copy :label', ['label' => $label]) }}"
                 class="inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted transition hover:bg-wrap hover:text-ink"
             >
                 <x-ui::icon name="copy-01" class="size-3.5" x-show="! copied" />

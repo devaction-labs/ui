@@ -40,20 +40,20 @@
     <div data-pagination {{ $attributes->class(['flex flex-wrap items-center justify-between gap-3']) }}>
         @if ($summary && $isLengthAware)
             <p class="text-[13px] text-muted">
-                Mostrando <span class="font-medium text-ink tabular-nums">{{ $paginator->firstItem() }}–{{ $paginator->lastItem() }}</span>
-                de <span class="font-medium text-ink tabular-nums">{{ number_format($paginator->total(), 0, ',', '.') }}</span>
+                {{ __('Showing') }} <span class="font-medium text-ink tabular-nums">{{ $paginator->firstItem() }}–{{ $paginator->lastItem() }}</span>
+                {{ __('of') }} <span class="font-medium text-ink tabular-nums">{{ number_format($paginator->total(), 0, ',', '.') }}</span>
             </p>
         @elseif ($summary)
-            <p class="text-[13px] text-muted">Página <span class="font-medium text-ink tabular-nums">{{ $current }}</span></p>
+            <p class="text-[13px] text-muted">{{ __('Page') }} <span class="font-medium text-ink tabular-nums">{{ $current }}</span></p>
         @endif
 
-        <nav aria-label="Paginação" class="ml-auto flex items-center gap-1">
+        <nav aria-label="{{ __('Pagination') }}" class="ml-auto flex items-center gap-1">
             @if ($paginator->onFirstPage())
-                <span class="{{ $arrowDisabled }}" aria-disabled="true" aria-label="Anterior"><x-ui::icon name="arrow-left-01" class="size-4" /></span>
+                <span class="{{ $arrowDisabled }}" aria-disabled="true" aria-label="{{ __('Previous') }}"><x-ui::icon name="arrow-left-01" class="size-4" /></span>
             @elseif ($livewire)
-                <button type="button" wire:click="previousPage(@js($pageName))" @if ($scrollScript) x-on:click="{{ $scrollScript }}" @endif wire:loading.attr="disabled" class="{{ $arrowLink }} cursor-pointer" aria-label="Anterior" rel="prev"><x-ui::icon name="arrow-left-01" class="size-4" /></button>
+                <button type="button" wire:click="previousPage(@js($pageName))" @if ($scrollScript) x-on:click="{{ $scrollScript }}" @endif wire:loading.attr="disabled" class="{{ $arrowLink }} cursor-pointer" aria-label="{{ __('Previous') }}" rel="prev"><x-ui::icon name="arrow-left-01" class="size-4" /></button>
             @else
-                <a href="{{ $paginator->previousPageUrl() }}" class="{{ $arrowLink }}" aria-label="Anterior" rel="prev"><x-ui::icon name="arrow-left-01" class="size-4" /></a>
+                <a href="{{ $paginator->previousPageUrl() }}" class="{{ $arrowLink }}" aria-label="{{ __('Previous') }}" rel="prev"><x-ui::icon name="arrow-left-01" class="size-4" /></a>
             @endif
 
             @foreach ($pages as $index => $page)
@@ -64,18 +64,18 @@
                 @if ($page === $current)
                     <span class="{{ $baseLink }} bg-ink font-medium text-on-ink tabular-nums" aria-current="page">{{ $page }}</span>
                 @elseif ($livewire)
-                    <button type="button" wire:click="setPage({{ $page }}, @js($pageName))" @if ($scrollScript) x-on:click="{{ $scrollScript }}" @endif class="{{ $baseLink }} cursor-pointer tabular-nums hover:bg-wrap" aria-label="Página {{ $page }}">{{ $page }}</button>
+                    <button type="button" wire:click="setPage({{ $page }}, @js($pageName))" @if ($scrollScript) x-on:click="{{ $scrollScript }}" @endif class="{{ $baseLink }} cursor-pointer tabular-nums hover:bg-wrap" aria-label="{{ __('Page :page', ['page' => $page]) }}">{{ $page }}</button>
                 @else
-                    <a href="{{ $paginator->url($page) }}" class="{{ $baseLink }} tabular-nums hover:bg-wrap" aria-label="Página {{ $page }}">{{ $page }}</a>
+                    <a href="{{ $paginator->url($page) }}" class="{{ $baseLink }} tabular-nums hover:bg-wrap" aria-label="{{ __('Page :page', ['page' => $page]) }}">{{ $page }}</a>
                 @endif
             @endforeach
 
             @if (! $paginator->hasMorePages())
-                <span class="{{ $arrowDisabled }}" aria-disabled="true" aria-label="Próxima"><x-ui::icon name="arrow-right-01" class="size-4" /></span>
+                <span class="{{ $arrowDisabled }}" aria-disabled="true" aria-label="{{ __('Next') }}"><x-ui::icon name="arrow-right-01" class="size-4" /></span>
             @elseif ($livewire)
-                <button type="button" wire:click="nextPage(@js($pageName))" @if ($scrollScript) x-on:click="{{ $scrollScript }}" @endif wire:loading.attr="disabled" class="{{ $arrowLink }} cursor-pointer" aria-label="Próxima" rel="next"><x-ui::icon name="arrow-right-01" class="size-4" /></button>
+                <button type="button" wire:click="nextPage(@js($pageName))" @if ($scrollScript) x-on:click="{{ $scrollScript }}" @endif wire:loading.attr="disabled" class="{{ $arrowLink }} cursor-pointer" aria-label="{{ __('Next') }}" rel="next"><x-ui::icon name="arrow-right-01" class="size-4" /></button>
             @else
-                <a href="{{ $paginator->nextPageUrl() }}" class="{{ $arrowLink }}" aria-label="Próxima" rel="next"><x-ui::icon name="arrow-right-01" class="size-4" /></a>
+                <a href="{{ $paginator->nextPageUrl() }}" class="{{ $arrowLink }}" aria-label="{{ __('Next') }}" rel="next"><x-ui::icon name="arrow-right-01" class="size-4" /></a>
             @endif
         </nav>
     </div>
