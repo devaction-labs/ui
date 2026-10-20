@@ -29,7 +29,11 @@ test('mini timer renders a compact row', function () {
     $html = Blade::render('<x-ui::timer variant="mini" label="Mini" :seconds="1520" />');
 
     expect($html)
-        ->toContain('format(false)')
-        ->toContain('>00:25</span>')
+        ->toContain('>25:20</span>')
+        ->toContain('x-text="format(true)"')
         ->not->toContain('Parar e lançar');
+});
+
+test('mini timer keeps the seconds after the first hour', function () {
+    expect(Blade::render('<x-ui::timer variant="mini" :seconds="3725" />'))->toContain('>1:02:05</span>');
 });

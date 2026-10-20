@@ -1808,13 +1808,17 @@ document.addEventListener('alpine:init', () => {
             this.value = 0;
         },
 
-        format(withSeconds = true) {
+        format(compact = false) {
             const hours = Math.floor(this.value / 3600);
             const minutes = Math.floor((this.value % 3600) / 60);
             const secs = this.value % 60;
-            const parts = [hours, minutes].concat(withSeconds ? [secs] : []);
+            const pad = (part) => String(part).padStart(2, '0');
 
-            return parts.map((part) => String(part).padStart(2, '0')).join(':');
+            if (compact) {
+                return hours > 0 ? `${hours}:${pad(minutes)}:${pad(secs)}` : `${pad(minutes)}:${pad(secs)}`;
+            }
+
+            return [hours, minutes, secs].map(pad).join(':');
         },
     }));
 

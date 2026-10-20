@@ -6,7 +6,7 @@
 
     seconds:    tempo já contado
     running:    começa rodando; com started-at (timestamp unix) retoma o tempo certo depois de recarregar
-    variant:    card (padrão) · mini (linha para barras e listas)
+    variant:    card (padrão, HH:MM:SS) · mini (linha para barras e listas, MM:SS e H:MM:SS depois de 1 h)
     Eventos:    timer-started, timer-paused e timer-stopped com detail.seconds
     wire:model: recebe os segundos a cada tique
 --}}
@@ -19,7 +19,9 @@
 ])
 
 @php
-    $initial = sprintf('%02d:%02d:%02d', intdiv((int) $seconds, 3600), intdiv((int) $seconds % 3600, 60), (int) $seconds % 60);
+    $hours = intdiv((int) $seconds, 3600);
+    $initial = sprintf('%02d:%02d:%02d', $hours, intdiv((int) $seconds % 3600, 60), (int) $seconds % 60);
+    $compact = $hours > 0 ? sprintf('%d:%02d:%02d', $hours, intdiv((int) $seconds % 3600, 60), (int) $seconds % 60) : substr($initial, 3);
     $alpineConfig = ['seconds' => (int) $seconds, 'running' => (bool) $running, 'startedAt' => $startedAt];
 @endphp
 
@@ -32,7 +34,7 @@
     >
         <span class="size-2 shrink-0 rounded-full bg-line-hover" x-bind:class="running && 'bg-ok-fg! animate-pulse motion-reduce:animate-none'" aria-hidden="true"></span>
         <span class="min-w-0 flex-1 truncate text-[13px] text-ink-2">{{ $label }}</span>
-        <span class="font-mono text-[13px] text-ink tabular-nums" role="timer" x-text="format(false)">{{ substr($initial, 0, 5) }}</span>
+        <span class="font-mono text-[13px] text-ink tabular-nums" role="timer" x-text="format(true)">{{ $compact }}</span>
         <button type="button" x-on:click="toggle()" x-bind:aria-label="running ? @js(__('Pause')) : @js(__('Start timer'))" class="flex size-7 cursor-pointer items-center justify-center rounded-lg text-ink-2 transition hover:bg-wrap hover:text-ink">
             <x-ui::icon name="pause" class="size-3.5" x-show="running" />
             <x-ui::icon name="play" class="size-3.5" x-show="! running" />
