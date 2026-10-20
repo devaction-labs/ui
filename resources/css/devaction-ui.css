@@ -130,6 +130,16 @@
     --shadow-code: 0 24px 60px -24px rgb(24 24 27 / 0.45);
 
     --animate-shimmer: shimmer 1.4s linear infinite;
+    --animate-indeterminate: indeterminate 1.4s ease-in-out infinite;
+
+    @keyframes indeterminate {
+        from {
+            transform: translateX(-100%);
+        }
+        to {
+            transform: translateX(250%);
+        }
+    }
 
     @keyframes shimmer {
         to {
