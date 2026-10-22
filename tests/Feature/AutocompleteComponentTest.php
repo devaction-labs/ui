@@ -47,3 +47,11 @@ test('autocomplete shows errors and empty text', function () {
         ->toContain('Nada')
         ->toContain('minChars: 0');
 });
+
+test('autocomplete listbox has no x-transition, which throws cancelled-transition errors in the Alpine console', function () {
+    $html = Blade::render('<x-ui::autocomplete label="Busca"><x-ui::autocomplete.item value="A" /></x-ui::autocomplete>');
+
+    expect($html)
+        ->toContain('x-show="open && items().length"')
+        ->not->toContain('x-transition');
+});
