@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [code-block]
+---
 # Code block · `<x-ui::code-block>`
 
 Shows code with a header, syntax colors, copy, line numbers and line highlighting. The panel is dark in both themes.

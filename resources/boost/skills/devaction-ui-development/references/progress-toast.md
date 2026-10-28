@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [toast.progress]
+---
 # Progress toast · `<x-ui::progress-toast>`
 
 A toast for long background tasks: the background fills as it advances and, when complete, shows a check and goes away.

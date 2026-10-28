@@ -6,3 +6,4 @@
 - Style only with the kit's tokens (`bg-card`, `text-ink`, `text-muted`, `border-line`, `bg-ai`, `text-risk-fg`…), never raw palette colors, and never add `dark:` variants: tokens switch with the `.dark` class.
 - Icons: `<x-ui::icon name="calendar-03" />` with Hugeicons Stroke Rounded names. Missing icon? Run `php artisan ui:icon {name}`.
 - Kit texts follow the app locale (English by default, Portuguese with `pt_BR`); override any of them in `lang/{locale}.json`.
+- With `laravel/mcp` installed, the `devaction-ui` MCP server (`php artisan mcp:start devaction-ui`) exposes `list-components`, `get-component`, `generate-component` and `generate-template`: use it to look up props and to get ready-made `x-ui::` markup instead of guessing.

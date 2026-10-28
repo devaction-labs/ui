@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [context-menu]
+---
 # Context menu · `<x-ui::context-menu>`
 
 Actions for a row or card via right-click (or Shift+F10), with the same items as the ⋯ menu.

@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [dropzone, dropzone.file, dropzone.remove]
+---
 # Dropzone · `<x-ui::dropzone>`
 
 Area to drag files in or click to choose, with the upload queue below. It uses the native file input, so Livewire uploads work without configuration.

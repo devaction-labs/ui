@@ -1,3 +1,8 @@
+---
+kind: component
+group: Navigation
+components: [sidebar, sidebar.brand, sidebar.group, sidebar.item, sidebar.nav, sidebar.profile, sidebar.search, sidebar.spacer, sidebar.toggle]
+---
 # Sidebar · `<x-ui::sidebar>`
 
 The app main navigation: 236 px open, 64 px collapsed with icons only and, on mobile, a top bar with the menu in a drawer.

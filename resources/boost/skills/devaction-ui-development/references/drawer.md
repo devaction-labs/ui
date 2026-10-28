@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [drawer]
+---
 # Drawer · `<x-ui::drawer>`
 
 Side panel to edit without leaving the screen: profile, task, contract item. For short, interrupting decisions, use Modal.

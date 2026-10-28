@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [panel, card, card.actions, card.body, card.footer, card.header, card.heading, card.subheading]
+---
 # Panel · `<x-ui::panel>`
 
 The container for the design's panels: a 6 px frame and a card with heading, supporting line, actions and footer. Underneath, it is the Flux-style Card.

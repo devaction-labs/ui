@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [textarea]
+---
 # Textarea · `<x-ui::textarea>`
 
 Long text: milestone scope, notes, comments. With a counter, an actions footer and auto-grow.

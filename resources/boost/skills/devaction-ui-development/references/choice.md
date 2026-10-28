@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [checkbox, checkbox.group, radio, radio.group]
+---
 # Choice · `<x-ui::choice>`
 
 Checkbox, radio and choice cards built on native inputs. They work in plain forms and with wire:model on the input or the group.

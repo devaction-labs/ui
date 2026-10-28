@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [timeline, timeline.block, timeline.content, timeline.indicator, timeline.item]
+---
 # Timeline · `<x-ui::timeline>`
 
 Shows a sequence of events or steps: the history of a PR, the progress of a milestone, the stages of a process.

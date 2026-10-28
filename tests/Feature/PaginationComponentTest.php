@@ -52,3 +52,11 @@ test('pagination is hidden with a single page', function () {
 
     expect(trim(Blade::render('<x-ui::pagination :paginator="$paginator" />', ['paginator' => $paginator])))->toBe('');
 });
+
+test('pagination renders in english without colliding with the framework pagination lang file', function () {
+    app()->setLocale('en');
+    $paginator = new LengthAwarePaginator(range(1, 10), 120, 10, 3, ['path' => '/deals']);
+
+    expect(Blade::render('<x-ui::pagination :paginator="$paginator" />', ['paginator' => $paginator]))
+        ->toContain('aria-label="Pagination navigation"');
+});

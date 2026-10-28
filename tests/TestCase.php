@@ -3,6 +3,7 @@
 namespace DevAction\Ui\Tests;
 
 use DevAction\Ui\UiServiceProvider;
+use Laravel\Mcp\Server\McpServiceProvider;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -18,6 +19,7 @@ abstract class TestCase extends Orchestra
     {
         return [
             LivewireServiceProvider::class,
+            McpServiceProvider::class,
             UiServiceProvider::class,
         ];
     }

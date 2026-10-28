@@ -1,3 +1,8 @@
+---
+kind: component
+group: Data
+components: [diff, diff.comment, diff.composer, diff.thread]
+---
 # Diff · `<x-ui::diff>`
 
 A file diff with conversations pinned to lines: comment, reply, suggest a change and resolve, like in a PR review.

@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [date-picker, date-picker.calendar]
+---
 # Date picker · `<x-ui::date-picker>`
 
 Pick a date or a range from a calendar, with shortcuts and limits. The field shows the date in words and how far away it is.

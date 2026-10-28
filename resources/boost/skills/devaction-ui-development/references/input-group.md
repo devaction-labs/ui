@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [input, input.group, input.group.prefix, input.group.suffix]
+---
 # Input group · `<x-ui::input-group>`
 
 Text fields with label, icon, help and error, attached add-ons (prefix, suffix, select) and the native select. The base of every form in the kit.

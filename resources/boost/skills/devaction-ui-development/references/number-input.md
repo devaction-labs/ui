@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [number-input]
+---
 # Number input · `<x-ui::number-input>`
 
 Number with − and +, limits, step and unit: milestone hours, installments, discount.

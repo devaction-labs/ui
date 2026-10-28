@@ -1,0 +1,2 @@
+{{-- Grupo. --}}
+<div>{{ $slot }}</div>

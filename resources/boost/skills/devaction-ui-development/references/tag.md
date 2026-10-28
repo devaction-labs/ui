@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [tag]
+---
 # Tag · `<x-ui::tag>`
 
 A status label in uppercase Geist Mono, with border, background and text in the same tone.

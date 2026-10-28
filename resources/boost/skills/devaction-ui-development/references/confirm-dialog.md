@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [confirm-dialog]
+---
 # Confirm dialog · `<x-ui::confirm-dialog>`
 
 Asks for a yes before an action with effects outside the app, like publishing or sending. Icon, title, what will happen and two ways out.

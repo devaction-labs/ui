@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [alert]
+---
 # Alert · `<x-ui::alert>`
 
 Reports the result of something that just happened. Every alert has an icon and a title; the icon defaults per variant.

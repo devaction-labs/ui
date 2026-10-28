@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [cookie-consent]
+---
 # Cookie consent · `<x-ui::cookie-consent>`
 
 Cookie notice for privacy laws (GDPR, LGPD): accept all, necessary only, or choose by category. The choice is remembered.

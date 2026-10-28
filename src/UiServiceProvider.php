@@ -3,6 +3,7 @@
 namespace DevAction\Ui;
 
 use DevAction\Ui\Console\IconCommand;
+use DevAction\Ui\Console\SkillCommand;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Blaze\Blaze;
@@ -24,13 +25,14 @@ class UiServiceProvider extends ServiceProvider
         Blade::anonymousComponentPath(__DIR__.'/../resources/views/components', 'ui');
 
         $this->optimizeWithBlaze();
+        $this->registerMcpServer();
 
         $this->publishes([
             __DIR__.'/../resources/views/icons' => resource_path('views/vendor/ui/icons'),
         ], 'ui-icons');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([IconCommand::class]);
+            $this->commands([IconCommand::class, SkillCommand::class]);
         }
     }
 
@@ -48,5 +50,20 @@ class UiServiceProvider extends ServiceProvider
         Blaze::optimize()
             ->in(__DIR__.'/../resources/views/components')
             ->in(__DIR__.'/../resources/views/components/icon.blade.php', memo: true);
+    }
+
+    /**
+     * Registra o servidor MCP local `devaction-ui` quando o app tem laravel/mcp (opcional).
+     *
+     * As classes do laravel/mcp ficam só em strings/FQCN: sem o pacote, nada é carregado.
+     */
+    protected function registerMcpServer(): void
+    {
+        if (! class_exists('Laravel\Mcp\Facades\Mcp')) {
+            return;
+        }
+
+        // Por string: o Pint importaria um FQCN, e o provider não pode referenciar classes do laravel/mcp.
+        $this->app->make('Laravel\\Mcp\\Server\\Registrar')->local('devaction-ui', 'DevAction\\Ui\\Mcp\\UiServer');
     }
 }

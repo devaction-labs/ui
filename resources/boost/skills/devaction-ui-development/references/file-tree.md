@@ -1,3 +1,8 @@
+---
+kind: component
+group: Data
+components: [file-tree]
+---
 # File tree · `<x-ui::file-tree>`
 
 Tree of the files changed in a PR: folders built from the paths, status, +/− and AI findings per file.

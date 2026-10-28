@@ -1,3 +1,8 @@
+---
+kind: guide
+group: Guides
+components: []
+---
 # Theming · tokens and dark mode
 
 The kit reads CSS variables only. `:root` holds the light theme, `.dark` the dark one; use `.light` inside a `.dark` block to switch back locally.

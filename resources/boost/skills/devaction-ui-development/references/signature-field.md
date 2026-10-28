@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [signature-field]
+---
 # Signature field · `<x-ui::signature-field>`
 
 A signature drawn with a finger or mouse, or typed. It outputs SVG, light enough to store next to the document.

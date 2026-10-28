@@ -1,3 +1,8 @@
+---
+kind: component
+group: Data
+components: [properties, properties.item, properties.section]
+---
 # Properties · `<x-ui::properties>`
 
 The details column next to a task, card or contract: small sections with label and value rows.

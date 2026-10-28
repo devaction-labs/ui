@@ -44,7 +44,7 @@ Put `<x-ui::toast.group />` once in the main layout. Optional: `composer require
 
 ## Livewire patterns
 
-See [references/livewire.md](references/livewire.md) for complete examples. Quick ones:
+See the Livewire guide in the Guides index below for complete examples. Quick ones:
 
 ```php
 use DevAction\Ui\Livewire\InteractsWithModals;
@@ -66,7 +66,7 @@ Ui::modals()->close();
 
 ## Layouts
 
-Six page shells share the same pieces. See [references/layouts.md](references/layouts.md).
+Six page shells share the same pieces. See the Layouts reference in the Layouts index below.
 
 - `x-ui::layout.classic` — sidebar + inset panel with header (add `collapsed` for the icon rail; ⌘B toggles).
 - `x-ui::layout.topbar` — horizontal navigation, wide content.
@@ -76,7 +76,7 @@ Six page shells share the same pieces. See [references/layouts.md](references/la
 
 ## Theming
 
-Tokens, dark mode and density are explained in [references/theming.md](references/theming.md).
+Tokens, dark mode and density are explained in the Theming guide in the Guides index below.
 
 ## Common pitfalls
 
@@ -187,7 +187,22 @@ Each link opens the full reference: description, Blade examples, Livewire code, 
 - [Aura](references/aura.md) — A light border that spins around a card, toast or button while the AI works. The glow version pulses without spinning, for things that need you.
 - [Chat bubble](references/chat-bubble.md) — Messages in a conversation with the AI or another person: sender, time, status, typing, copy and rate the answer.
 
+### Primitives
+
+- [Field](references/field.md) — Lays out a form field: label, control, supporting text and error, with the label, description and error helpers.
+- [Icon](references/icon.md) — Hugeicons Stroke Rounded icons as inline SVG that follow the text color and the theme.
+- [Typography](references/typography.md) — Heading, text and eyebrow: titles, supporting text and the uppercase mono section label.
+
 ### Templates
 
 - [Auth](references/auth.md) — Ready-made authentication screens: login, registration, magic link and password reset, in a centered or split layout. They work with POST and a CSRF token or with Livewire.
 - [Pricing](references/pricing.md) — A pricing page: cards with price, features and an action, plus a monthly / yearly billing toggle.
+
+### Layouts
+
+- [Layouts](references/layouts.md) — Six page shells (classic, rail, topbar, split, centered, docs) plus `main`, `logo` and `spacer`.
+
+### Guides
+
+- [Livewire](references/livewire.md) — Modals, toasts, server-side search, tables, drag and drop and actions in Livewire 4 components.
+- [Theming](references/theming.md) — Tokens, dark mode, density and per-app overrides.

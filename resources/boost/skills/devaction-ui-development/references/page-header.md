@@ -1,3 +1,8 @@
+---
+kind: component
+group: Navigation
+components: [page-header]
+---
 # Page header · `<x-ui::page-header>`
 
 Top of an app page: breadcrumb, status, heading with a context line, actions and tabs, always in the same order.

@@ -1,3 +1,8 @@
+---
+kind: component
+group: Navigation
+components: [breadcrumbs, breadcrumbs.item]
+---
 # Breadcrumb · `<x-ui::breadcrumb>`
 
 Shows where the page sits and leads back to the levels above. The last item is the current page.

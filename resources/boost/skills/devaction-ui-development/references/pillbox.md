@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [pillbox, pillbox.input, pillbox.option, pillbox.option.create, pillbox.option.empty, pillbox.search]
+---
 # Pillbox · `<x-ui::pillbox>`
 
 Several values as pills inside a field: pick from a list (with local or server search) or type free text, like tags and emails.

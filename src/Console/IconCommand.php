@@ -97,7 +97,7 @@ class IconCommand extends Command
     {
         $argument = $this->argument('icons');
 
-        if (is_array($argument) && $argument !== []) {
+        if ($argument !== []) {
             return array_values(array_filter($argument, is_string(...)));
         }
 

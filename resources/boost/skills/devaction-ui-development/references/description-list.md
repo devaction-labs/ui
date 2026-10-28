@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [description-list, description-list.item]
+---
 # Description list · `<x-ui::description-list>`
 
 Label and value pairs for detail pages: client, contract, repository, owner.

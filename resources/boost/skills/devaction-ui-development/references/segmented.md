@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [segmented, segmented.option]
+---
 # Segmented · `<x-ui::segmented>`
 
 A single choice among a few options that switch the view instantly: mode, layout, period, theme.

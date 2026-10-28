@@ -1,3 +1,8 @@
+---
+kind: component
+group: Data
+components: [chart]
+---
 # Chart · `<x-ui::chart>`
 
 Line, column, bar, donut and sparkline charts as SVG rendered on the server. No JavaScript library; the hover uses Alpine.

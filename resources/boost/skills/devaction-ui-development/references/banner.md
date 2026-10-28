@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [banner]
+---
 # Banner · `<x-ui::banner>`
 
 A notice strip that applies to the whole page: news, instability, billing or a lost connection.

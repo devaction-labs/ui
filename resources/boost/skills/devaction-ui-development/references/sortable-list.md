@@ -1,3 +1,8 @@
+---
+kind: component
+group: Data
+components: [sortable-list, sortable-list.item]
+---
 # Sortable list · `<x-ui::sortable-list>`
 
 A list that reorders by dragging the handle, with the keyboard or with buttons, and announces changes to screen readers.

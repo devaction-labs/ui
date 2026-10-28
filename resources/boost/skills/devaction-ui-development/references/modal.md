@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [modal, modal.close, modal.trigger]
+---
 # Modal · `<x-ui::modal>`
 
 For interrupting decisions: confirm, a short form, a notice. Focus is trapped, Esc closes and the page does not scroll behind it.

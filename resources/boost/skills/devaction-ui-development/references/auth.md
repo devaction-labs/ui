@@ -1,3 +1,8 @@
+---
+kind: template
+group: Templates
+components: [auth.heading, auth.layout, auth.login, auth.magic-link, auth.register, auth.reset-password, auth.social]
+---
 # Auth · `<x-ui::auth>`
 
 Ready-made authentication screens: login, registration, magic link and password reset, in a centered or split layout. They work with POST and a CSRF token or with Livewire.

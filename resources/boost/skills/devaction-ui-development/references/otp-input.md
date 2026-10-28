@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [otp-input]
+---
 # OTP input · `<x-ui::otp-input>`
 
 Verification code by email or SMS: one box per digit, pasting fills them all and phones suggest the code.

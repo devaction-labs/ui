@@ -1,3 +1,8 @@
+---
+kind: template
+group: Templates
+components: [pricing, pricing.plan]
+---
 # Pricing · `<x-ui::pricing>`
 
 A pricing page: cards with price, features and an action, plus a monthly / yearly billing toggle.
