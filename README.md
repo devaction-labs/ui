@@ -162,7 +162,42 @@ The file lands in `resources/views/vendor/ui/icons` and works with `<x-ui::icon 
 
 ## Laravel Boost
 
-If your app uses [Laravel Boost](https://github.com/laravel/boost), `php artisan boost:install` picks up the DevAction UI guidelines and skill shipped with this package, so your AI assistant knows every component, prop and best practice.
+If your app uses [Laravel Boost](https://github.com/laravel/boost), `php artisan boost:install` picks up the DevAction UI guidelines and skill shipped with this package, so your AI assistant knows every component, prop and best practice. The skill described below is installed the same way, and the [MCP server](#mcp-server) works alongside it.
+
+## Skill
+
+`skill/` is the AI skill of the kit: a `SKILL.md` index plus `references/` (one markdown per component, template and layout, with props, slots and accessibility notes) and `examples/` (a rendered-ready Blade example for each one).
+
+- **Laravel Boost:** used automatically, see above.
+- **Manual:** copy `vendor/devaction/ui/skill` into `.claude/skills/devaction-ui` (or your agent's skills folder).
+
+`skill/` is the source of truth. The folder under `resources/boost/skills` is generated from it, so never edit that one by hand.
+
+## MCP server
+
+An optional [Model Context Protocol](https://modelcontextprotocol.io) server, `devaction-ui`, lets an assistant look up and generate kit markup on demand. It runs 100% local over stdio and never touches the network.
+
+```bash
+composer require laravel/mcp
+php artisan mcp:start devaction-ui
+```
+
+Client configuration:
+
+```json
+{ "mcpServers": { "devaction-ui": { "command": "php", "args": ["artisan", "mcp:start", "devaction-ui"] } } }
+```
+
+| Tool | What it does |
+| --- | --- |
+| `list-components` | Lists components, templates and layouts; filter by `group` or `query` |
+| `get-component` | Props, slots, children, example and reference of one component |
+| `generate-component` | Ready-to-paste `<x-ui::…>` markup from `name`, `props` and `slot` |
+| `generate-template` | Full page Blade (plus the Livewire class for `auth.*`) |
+| `scaffold-component` | Authoring: creates a new component, test, reference, example and index entry |
+| `scaffold-template` | Authoring: same for a template or layout |
+
+The `scaffold-*` authoring tools only appear in a checkout of the kit itself (`vendor/bin/testbench mcp:start devaction-ui`), never in an app that installed it from Composer. They default to `dry_run`.
 
 ## Blaze
 
@@ -180,9 +215,12 @@ Tests run on a minimal Laravel app with [Testbench](https://packages.tools/testb
 composer lint        # Pint
 composer test:lint   # Pint in check mode
 composer test:types  # PHPStan
+composer test:skill  # skill manifest and Boost mirror in sync
 composer test:unit   # Pest
 composer test        # everything
 ```
+
+If `test:skill` fails, regenerate with `vendor/bin/testbench ui:skill`.
 
 ## License
 
