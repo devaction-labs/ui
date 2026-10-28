@@ -47,7 +47,7 @@
             <p class="text-[13px] text-muted">{{ __('Page') }} <span class="font-medium text-ink tabular-nums">{{ $current }}</span></p>
         @endif
 
-        <nav aria-label="{{ __('Pagination') }}" class="ml-auto flex items-center gap-1">
+        <nav aria-label="{{ __('Pagination navigation') }}" class="ml-auto flex items-center gap-1">
             @if ($paginator->onFirstPage())
                 <span class="{{ $arrowDisabled }}" aria-disabled="true" aria-label="{{ __('Previous') }}"><x-ui::icon name="arrow-left-01" class="size-4" /></span>
             @elseif ($livewire)
