@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [separator]
+---
 # Separator · `<x-ui::separator>`
 
 A line that separates blocks: plain, with text in the middle or vertical between items on a row.

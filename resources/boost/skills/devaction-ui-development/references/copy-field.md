@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [copy-field]
+---
 # Copy field · `<x-ui::copy-field>`
 
 A value ready to copy: API key, webhook secret, invite link. Secrets show masked.

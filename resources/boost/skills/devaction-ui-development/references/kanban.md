@@ -1,3 +1,8 @@
+---
+kind: component
+group: Data
+components: [kanban, kanban.add, kanban.card, kanban.column]
+---
 # Kanban · `<x-ui::kanban>`
 
 Board of columns with cards: tasks, pipeline deals, candidates. Dragging between columns uses Livewire 4's wire:sort.

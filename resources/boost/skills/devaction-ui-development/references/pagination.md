@@ -1,3 +1,8 @@
+---
+kind: component
+group: Navigation
+components: [pagination]
+---
 # Pagination · `<x-ui::pagination>`
 
 Moves between the pages of a list. Takes the Laravel paginator and works with regular links or with Livewire's WithPagination.

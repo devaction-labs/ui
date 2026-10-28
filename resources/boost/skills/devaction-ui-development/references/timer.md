@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [timer]
+---
 # Timer · `<x-ui::timer>`
 
 Tracks time on a task for the hour bank. When stopped, it reports the seconds so you can log the hours.

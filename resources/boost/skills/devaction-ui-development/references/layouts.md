@@ -1,3 +1,8 @@
+---
+kind: layout
+group: Layouts
+components: [layout.centered, layout.classic, layout.docs, layout.split, layout.topbar, layout.topbar.item, logo, main, spacer]
+---
 # Layouts · `<x-ui::layout.*>`
 
 Six page shells. All of them use the kit's sidebar, header, page header and content area, so switching themes doesn't mean rewriting screens.
@@ -86,4 +91,14 @@ The sidebar's open/collapsed state lives in `$store.uiSidebar` (`toggle()`, `col
     <x-slot:toc><a href="#install">Install</a></x-slot:toc>
     <h1>Getting started</h1>
 </x-ui::layout.docs>
+```
+
+## Layout pieces
+
+Small components the shells and the sidebar share, also usable on their own.
+
+```blade
+<x-ui::main container>…</x-ui::main>   {{-- white rounded panel beside the sidebar; `container` centers with a max width --}}
+<x-ui::logo size="xs">Docs</x-ui::logo>   {{-- DevAction symbol; size: xs · sm (default) · md · lg --}}
+<div class="flex"><x-ui::spacer /><x-ui::button>Save</x-ui::button></div>   {{-- pushes siblings to the edges --}}
 ```

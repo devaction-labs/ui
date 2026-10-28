@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [autocomplete, autocomplete.group, autocomplete.item]
+---
 # Autocomplete · `<x-ui::autocomplete>`
 
 Free text with suggestions as you type. Unlike the combobox, the value can be any text; suggestions only help to complete it.

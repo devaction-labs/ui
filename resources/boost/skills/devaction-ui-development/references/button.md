@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [button]
+---
 # Button · `<x-ui::button>`
 
 Triggers an action or navigates. Variants, sizes, loading state and an icon-only version.

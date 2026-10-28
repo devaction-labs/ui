@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [skeleton, skeleton.group, skeleton.line]
+---
 # Skeleton · `<x-ui::skeleton>`
 
 Holds the place of content while it loads, in the same shape. The shimmer stops with prefers-reduced-motion.

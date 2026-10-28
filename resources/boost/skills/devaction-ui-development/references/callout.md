@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [callout, callout.heading, callout.link, callout.text]
+---
 # Callout · `<x-ui::callout>`
 
 Highlights important information and guides to the next action. Amber always means "the AI did it", red means "someone is missing".

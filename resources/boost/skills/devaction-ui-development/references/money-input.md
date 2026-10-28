@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [money-input]
+---
 # Money input · `<x-ui::money-input>`
 
 Money amount: formats the currency while you type and sends the raw number to Livewire and to the form.

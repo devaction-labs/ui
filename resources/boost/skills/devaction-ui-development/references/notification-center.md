@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [notification-center, notification-center.group, notification-center.item]
+---
 # Notification center · `<x-ui::notification-center>`
 
 Notification center: tabs with unread counts, grouped by day, mark one or all as read. Standalone or in the bell.

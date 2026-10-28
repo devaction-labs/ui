@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [kbd]
+---
 # Kbd · `<x-ui::kbd>`
 
 Shows a keyboard shortcut in Geist Mono.

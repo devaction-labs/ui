@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [date-range]
+---
 # Date range · `<x-ui::date-range>`
 
 Date range with two months side by side, shortcuts and an optional time. The choice only counts after Apply.

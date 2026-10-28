@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [dropdown, menu, menu.checkbox, menu.group, menu.item, menu.radio, menu.radio.group, menu.separator, menu.submenu]
+---
 # Dropdown · `<x-ui::dropdown>`
 
 Action menu that opens from a button. Arrow keys, Home, End and the first letter navigate; Esc closes and returns to the button.

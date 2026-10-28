@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [combobox, combobox.input, combobox.option, combobox.option.create, combobox.option.empty]
+---
 # Combobox · `<x-ui::combobox>`
 
 Select with search: a single choice from a long list, filtering as you type. Accents and capitals don’t get in the way of the filter.

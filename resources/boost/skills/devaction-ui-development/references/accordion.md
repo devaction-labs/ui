@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [accordion, accordion.content, accordion.heading, accordion.item]
+---
 # Accordion · `<x-ui::accordion>`
 
 Opens and closes sections of content. For FAQs, contract milestones and grouped lists.

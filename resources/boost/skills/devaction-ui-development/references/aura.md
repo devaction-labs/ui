@@ -1,3 +1,8 @@
+---
+kind: component
+group: AI
+components: [aura]
+---
 # Aura · `<x-ui::aura>`
 
 A light border that spins around a card, toast or button while the AI works. The glow version pulses without spinning, for things that need you.

@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [slider]
+---
 # Slider · `<x-ui::slider>`
 
 Pick a value or a range by dragging: minimum coverage, review strictness, contract value.

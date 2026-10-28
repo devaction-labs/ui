@@ -26,6 +26,7 @@
     },
     "require-dev": {
         "larastan/larastan": "^3.13",
+        "laravel/mcp": "^0.6",
         "laravel/pint": "^1.32",
         "livewire/livewire": "^4.1",
         "orchestra/testbench": "^11.0",
@@ -35,6 +36,7 @@
         "pestphp/pest-plugin-phpstan": "^5.0"
     },
     "suggest": {
+        "laravel/mcp": "Servidor MCP local devaction-ui (^0.6)",
         "livewire/blaze": "Compila os componentes em funções PHP otimizadas (^1.0)"
     },
     "autoload": {
@@ -67,10 +69,12 @@
         "lint": "pint --parallel",
         "test:lint": "pint --parallel --test",
         "test:types": "phpstan analyse --memory-limit=1G",
+        "test:skill": "testbench ui:skill --check",
         "test:unit": "pest --parallel",
         "test": [
             "@test:lint",
             "@test:types",
+            "@test:skill",
             "@test:unit"
         ]
     }

@@ -1,0 +1,4 @@
+providers:
+  - Livewire\LivewireServiceProvider
+  - Laravel\Mcp\Server\McpServiceProvider
+  - DevAction\Ui\UiServiceProvider

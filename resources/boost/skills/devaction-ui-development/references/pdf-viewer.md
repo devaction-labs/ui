@@ -1,3 +1,8 @@
+---
+kind: component
+group: Data
+components: [pdf-viewer, pdf-viewer.field, pdf-viewer.page, pdf-viewer.signer]
+---
 # PDF viewer · `<x-ui::pdf-viewer>`
 
 A document to review and sign: thumbnails, zoom, pages and marked signature fields, with the signers panel.

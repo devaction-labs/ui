@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [spinner]
+---
 # Spinner · `<x-ui::spinner>`
 
 Shows that something is loading when you cannot tell how much is left. For known progress, use Progress.

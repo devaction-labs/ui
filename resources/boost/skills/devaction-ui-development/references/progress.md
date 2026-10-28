@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [progress, progress.segment]
+---
 # Progress · `<x-ui::progress>`
 
 Shows how much of something is done: milestone scope, hour bank, billed installments or a background process.

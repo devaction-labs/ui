@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [filter-menu, filter-menu.group, filter-menu.option]
+---
 # Filter menu · `<x-ui::filter-menu>`
 
 Grouped filters with submenus. The menu stays open while you check options and only filters on Apply.

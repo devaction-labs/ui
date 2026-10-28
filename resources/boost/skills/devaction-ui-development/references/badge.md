@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [badge]
+---
 # Badge · `<x-ui::badge>`
 
 Status in running text, with an optional dot. Never color alone: always with text.

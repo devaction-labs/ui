@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [toast.group]
+---
 # Toast group · `<x-ui::toast-group>`
 
 Short notices after an action. They stack: collapsed, the stack shows the front one with two peeking behind; on hover or focus it expands into a list and the timers pause.

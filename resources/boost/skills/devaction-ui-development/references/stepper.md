@@ -1,3 +1,8 @@
+---
+kind: component
+group: Navigation
+components: [stepper]
+---
 # Stepper · `<x-ui::stepper>`
 
 Shows which step of a flow the person is on: done, current, failed and to do.

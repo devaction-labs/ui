@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [select, select.input, select.option, select.option.create, select.option.empty]
+---
 # Select · `<x-ui::select>`
 
 Pick from a list. Native by default; with variant="listbox" it gains search, multiple options and server-side search, like Flux.

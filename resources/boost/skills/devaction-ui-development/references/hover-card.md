@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [hover-card, hover-card.person]
+---
 # Hover card · `<x-ui::hover-card>`
 
 Card that opens on hover or focus: person, PR, company. Shows context without taking people off the page.

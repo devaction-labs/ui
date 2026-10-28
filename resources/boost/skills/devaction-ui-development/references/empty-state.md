@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [empty-state]
+---
 # Empty state · `<x-ui::empty-state>`
 
 Every empty state says what the area is, why it is empty and what the next step is, with a single primary button.

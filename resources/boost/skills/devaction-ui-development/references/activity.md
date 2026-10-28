@@ -1,3 +1,8 @@
+---
+kind: component
+group: Data
+components: [activity, activity.comment, activity.event]
+---
 # Activity · `<x-ui::activity>`
 
 A single conversation for a task: comments, events and the AI review on one rail, with the comment box at the end.

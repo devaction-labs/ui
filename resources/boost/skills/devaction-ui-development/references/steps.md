@@ -1,3 +1,8 @@
+---
+kind: component
+group: Navigation
+components: [steps, steps.item]
+---
 # Steps · `<x-ui::steps>`
 
 Steps in a column joined by a line: a setup checklist or the history of a process.

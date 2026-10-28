@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [editor]
+---
 # Editor · `<x-ui::editor>`
 
 Rich text for delivery notes, descriptions and comments. Formatting toolbar, keyboard shortcuts and a "/" command menu. No dependencies.

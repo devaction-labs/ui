@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [popover]
+---
 # Popover · `<x-ui::popover>`
 
 Panel that opens from a button for free-form content: milestone details, filters, a short form. For lists of actions, use Dropdown.

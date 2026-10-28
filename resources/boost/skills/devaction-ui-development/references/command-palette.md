@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [command, command.empty, command.group, command.input, command.item, command.items]
+---
 # Command palette · `<x-ui::command-palette>`
 
 ⌘K search with groups and shortcuts. Filters as you type; ↑↓ navigate, ↵ picks and Esc closes.

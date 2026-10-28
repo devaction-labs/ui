@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [tabs, tab, tab.group, tab.panel]
+---
 # Tabs · `<x-ui::tabs>`
 
 Organizes content into panels in the same area, without leaving the page. Arrows, Home and End switch tabs.

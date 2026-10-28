@@ -1,3 +1,8 @@
+---
+kind: guide
+group: Guides
+components: []
+---
 # Livewire with DevAction UI
 
 ## Fields and validation

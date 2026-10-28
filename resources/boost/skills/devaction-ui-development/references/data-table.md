@@ -1,3 +1,8 @@
+---
+kind: component
+group: Data
+components: [table, table.cell, table.column, table.columns, table.empty, table.group, table.row, table.rows, table.skeleton]
+---
 # Data table · `<x-ui::data-table>`
 
 Data table in a real <table>: sorting, bulk selection, expandable rows, groups, pagination, states, sticky columns and cards on mobile.

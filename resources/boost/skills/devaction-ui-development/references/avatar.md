@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [avatar, avatar.group]
+---
 # Avatar · `<x-ui::avatar>`
 
 Represents people, workspaces, repositories, clients and the AI agent. Initials come from the name and the color is stable by hash.

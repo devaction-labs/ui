@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [reactions]
+---
 # Reactions · `<x-ui::reactions>`
 
 Emoji reactions under a comment: one pill per emoji with its count, yours highlighted, and a button to add one.

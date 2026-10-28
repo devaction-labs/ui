@@ -1,3 +1,8 @@
+---
+kind: component
+group: AI
+components: [chat, chat.bubble]
+---
 # Chat bubble · `<x-ui::chat-bubble>`
 
 Messages in a conversation with the AI or another person: sender, time, status, typing, copy and rate the answer.

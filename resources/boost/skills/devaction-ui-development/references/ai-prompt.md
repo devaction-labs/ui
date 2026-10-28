@@ -1,3 +1,8 @@
+---
+kind: component
+group: AI
+components: [ai-prompt]
+---
 # AI prompt · `<x-ui::ai-prompt>`
 
 Input for chatting with the AI: grows up to 8 lines, accepts attachments, / commands and @ mentions, and turns into a stop button while the AI responds.

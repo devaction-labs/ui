@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [danger-dialog]
+---
 # Danger dialog · `<x-ui::danger-dialog>`
 
 For things that can’t be undone. The action only unlocks after the person types the resource name, as the design requires.

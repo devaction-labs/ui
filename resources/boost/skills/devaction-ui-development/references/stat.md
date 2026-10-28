@@ -1,3 +1,8 @@
+---
+kind: component
+group: Base
+components: [stat, stat.group]
+---
 # Stat · `<x-ui::stat>`
 
 A highlighted number with a label, change and context, for dashboards and summary strips.

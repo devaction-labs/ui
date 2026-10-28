@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [color-picker]
+---
 # Color picker · `<x-ui::color-picker>`
 
 Picks a color by dragging, from a preset or by typing the hex. Always outputs hex, ready to save.

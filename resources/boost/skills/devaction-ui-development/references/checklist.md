@@ -1,3 +1,8 @@
+---
+kind: component
+group: Data
+components: [checklist, checklist.item]
+---
 # Checklist · `<x-ui::checklist>`
 
 A list of steps to tick off, with a progress bar and the option to hide what is already done.

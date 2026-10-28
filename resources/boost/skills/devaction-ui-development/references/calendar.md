@@ -1,3 +1,8 @@
+---
+kind: component
+group: Data
+components: [calendar]
+---
 # Calendar · `<x-ui::calendar>`
 
 Event calendar by month or week: deliveries, due dates, meetings. Rendered on the server; navigation works with links or with Livewire.

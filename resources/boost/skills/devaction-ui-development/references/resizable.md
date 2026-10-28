@@ -1,3 +1,8 @@
+---
+kind: component
+group: Navigation
+components: [resizable, resizable.handle, resizable.panel]
+---
 # Resizable · `<x-ui::resizable>`
 
 Two panels with a divider that changes their size: diff and AI summary, list and detail.

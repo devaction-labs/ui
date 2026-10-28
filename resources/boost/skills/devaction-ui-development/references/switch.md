@@ -1,3 +1,8 @@
+---
+kind: component
+group: Form
+components: [switch]
+---
 # Switch · `<x-ui::switch>`
 
 Turns something on and off that applies immediately, without a save button. For choices that only apply after saving, use a checkbox.

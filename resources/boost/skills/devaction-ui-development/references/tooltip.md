@@ -1,3 +1,8 @@
+---
+kind: component
+group: Overlay
+components: [tooltip]
+---
 # Tooltip · `<x-ui::tooltip>`
 
 Names icon-only buttons and shows the shortcut when there is one. Appears on hover after 400 ms and immediately on keyboard focus; Esc closes it.
